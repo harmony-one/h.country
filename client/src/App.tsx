@@ -5,10 +5,11 @@ import {BrowserRouter} from "react-router-dom";
 import {AppRoutes} from "./Routes";
 import {ToastContainer} from "react-toastify";
 import {UserProvider} from "./context/UserContext";
+import {theme} from "./theme/grommet";
 
 function App() {
   return (
-    <Grommet full>
+    <Grommet full theme={theme}>
       <BrowserRouter>
         <UserProvider>
           <AppRoutes />
