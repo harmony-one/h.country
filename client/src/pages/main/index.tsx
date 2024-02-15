@@ -1,10 +1,19 @@
-import React, {ReactNode} from 'react'
+import React, {ReactNode, useState, useEffect} from 'react'
 import {Box, Text} from "grommet";
 import {PlainButton} from "../../components/button";
+import { collection, query, onSnapshot, where } from "firebase/firestore";
+import { db } from "../../configs/firebase-config";
+
+const testUsername = "WanderingGiraffe54";
 
 interface HeaderListProps {
   title: string
   items: Array<{ content: ReactNode }>
+}
+
+interface Message {
+  id: string;
+  hashtags?: string[];
 }
 
 const HeaderList = (props: HeaderListProps) => {
@@ -39,33 +48,45 @@ export const MainPage = () => {
     content: <Text>g/stephen-tse</Text>
   }]
 
-  const tagItems = [{
-    content: <Box direction={'row'}>
-      <Text>one</Text>
-      <Text size={'xsmall'}>99</Text>
-    </Box>
-  }, {
-    content: <Box direction={'row'}>
-      <Text>compiler</Text>
-      <Text size={'xsmall'}>42</Text>
-    </Box>
-  }, {
-    content: <Box direction={'row'}>
-      <Text>map</Text>
-      <Text size={'xsmall'}>11</Text>
-    </Box>
-  }, {
-    content: <Box direction={'row'}>
-      <Text>ai</Text>
-      <Text size={'xsmall'}>2</Text>
-    </Box>
-  }]
-
   const actions: string[] = [
     'x/stse links Github g/stephen-tse',
     'x/stse links Telegram g/stephentse',
     'g/soph-neou 🤖by x/stse'
   ]
+
+  const [tagItems, setTagItems] = useState<Array<{ content: ReactNode }>>([]);
+  useEffect(() => {
+    const messagesQuery = query(collection(db, "messages"), where("username", "==", testUsername));
+  
+    const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
+      const messages: Message[] = querySnapshot.docs.map(doc => ({
+        ...doc.data(),
+        id: doc.id,
+      })) as Message[]; // Cast to Message[] to satisfy TypeScript
+  
+      const allHashtags = messages.flatMap(msg => msg.hashtags || []);
+      const hashtagFrequency = allHashtags.reduce<Record<string, number>>((acc, hashtag) => {
+        acc[hashtag] = (acc[hashtag] || 0) + 1;
+        return acc;
+      }, {});
+  
+      const sortedHashtags = Object.entries(hashtagFrequency)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([hashtag, count]) => ({
+          content: (
+            <Box direction={'row'} key={hashtag}> {/* Ensure key is provided for list items */}
+              <Text>{hashtag}</Text>
+              <Text size={'xsmall'}>{count}</Text>
+            </Box>
+          )
+        }));
+  
+      setTagItems(sortedHashtags);
+    });
+  
+    return () => unsubscribe(); // Cleanup subscription on component unmount
+  }, []);  
 
   return <Box>
     <Box>
@@ -85,3 +106,4 @@ export const MainPage = () => {
     </Box>
   </Box>
 }
+
