@@ -1,7 +1,7 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { WelcomePage } from "./pages/welcome";
 import { AppLayout } from "./components/layout";
-import {MainPage} from "./pages/main";
+import { MainPage } from "./pages/main";
 
 export const AppRoutes = () => {
   return (

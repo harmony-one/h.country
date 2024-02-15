@@ -2,7 +2,7 @@ import { JsonRpcProvider, Wallet } from "ethers";
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-export const LSAccountKey = 'human_protocol_client_account';
+export const LSAccountKey = 'h_country_client_account';
 
 interface UserContextType {
   wallet: Wallet | undefined;
@@ -55,7 +55,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   return (
     <UserContext.Provider value={value}>
-      {children}
+      { children }
     </UserContext.Provider>
   );
 };
