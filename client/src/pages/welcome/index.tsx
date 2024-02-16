@@ -104,6 +104,7 @@ const TopicItem = (props: TopicItemProps) => {
       setImage(logo);
     }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSelected, themeMode]);
 
   const prefix = "#"; // topic.type === 'blockchain' ? '$' : '#'
