@@ -2,7 +2,7 @@ import React, { ReactNode, useState, useEffect } from "react";
 import { Box, Button, Text } from "grommet";
 import { PlainButton } from "../../components/button";
 import { useUserContext } from "../../context/UserContext";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   collection,
   query,
@@ -16,6 +16,7 @@ import {
 import { db } from "../../configs/firebase-config";
 import axios from "axios";
 import { HeaderList } from "./headerList";
+import {UserAction} from "../../components/action";
 
 interface LocationData {
   latitude: number | null;
@@ -371,16 +372,7 @@ export const UserPage = () => {
       </Box>
       <Box>
         {actions.map((action, index) => (
-          <Box key={index} border={{ side: "bottom" }} pad={"4px 0"}>
-            <Text size={"small"}>
-              {action.timestamp} - {" "}
-              <Link className="link" to={`/0/${action.username}`}>0/{action.usernameShort}</Link>
-              {" tags #"}
-              {action.hashtag}
-              {" on "}
-              <Link className="link" to={`/0/${action.mention}`}>0/{action.mentionShort}</Link>
-            </Text>
-          </Box>
+          <UserAction key={index + action.timestamp} action={action} />
         ))}
       </Box>
     </Box>
