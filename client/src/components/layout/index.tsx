@@ -4,11 +4,21 @@ import {Outlet} from "react-router-dom";
 import {AppMenu} from "../menu";
 
 export const AppLayout = () => {
-  return <Box background={'background'} pad={'16px'}>
-    <AppMenu />
+  return <Box background={'background'} >
+    <Box
+      pad={'8px 16px'}
+      background={'background'}
+      style={{
+        position: 'sticky',
+        top: '0px'
+    }}
+    >
+      <AppMenu />
+    </Box>
     <Box
       width={'700px'}
-      margin={'0 auto'}
+      margin={'0px auto'}
+      pad={'8px 16px 16px'}
     >
       <Outlet />
     </Box>
