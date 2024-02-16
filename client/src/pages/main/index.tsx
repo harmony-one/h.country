@@ -62,7 +62,7 @@ export const MainPage = () => {
       {actions.map((action, index) => (
         <Box key={index} border={{ side: "bottom" }} pad={"4px 0"}>
           <Text size={"small"}>
-            {action.timestamp} - 
+            {action.timestamp} - {" "}
             <Link className="link" to={`/0/${action.username}`}>0/{action.usernameShort}</Link>
             {" tags #"}
             {action.hashtag}
