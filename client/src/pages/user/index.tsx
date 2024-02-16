@@ -11,7 +11,6 @@ import {
   orderBy,
   where,
   getDocs,
-  updateDoc,
 } from "firebase/firestore";
 import { db } from "../../configs/firebase-config";
 import axios from "axios";
@@ -129,7 +128,6 @@ const addMessage = async (
     hashtags,
   };
 
-  // Then add the message to Firestore
   try {
     await addDoc(collection(db, "messages"), message);
   } catch (error) {
@@ -162,8 +160,18 @@ export const UserPage = () => {
       const formattedMessages = querySnapshot.docs.reduce<string[]>(
         (acc, doc) => {
           const data = doc.data();
+          const date = new Date(data.timestamp);
+          const formattedTimestamp = date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          }).replace(',', '').replace(/([AP]M)$/, ' $1');
+    
           if (data.hashtags?.length > 0 && data.mentions?.length > 0) {
-            const messageString = `0/${data.username.substring(0, 4)} tags #${
+            const messageString = `${formattedTimestamp} - 0/${data.username.substring(0, 4)} tags #${
               data.hashtags[0]
             } on 0/${data.mentions[0].substring(0, 4)}`;
             acc.push(messageString);
@@ -172,9 +180,9 @@ export const UserPage = () => {
         },
         []
       );
-
+    
       setActions(formattedMessages);
-    };
+    };       
 
     const fetchMessagesByKey = async (key: string) => {
       const mentionsQuery = query(
@@ -183,14 +191,14 @@ export const UserPage = () => {
         where("mentions", "array-contains", key)
       );
       const mentionsSnapshot = await getDocs(mentionsQuery);
-
+    
       const usernameQuery = query(
         collection(db, "messages"),
         orderBy("timestamp", "desc"),
         where("username", "==", key)
       );
       const usernameSnapshot = await getDocs(usernameQuery);
-
+    
       const combinedActions = [
         ...mentionsSnapshot.docs,
         ...usernameSnapshot.docs,
@@ -202,16 +210,25 @@ export const UserPage = () => {
         )
         .reduce<string[]>((acc, { data }) => {
           if (data.hashtags?.length > 0 && data.mentions?.length > 0) {
-            const messageString = `0/${data.username.substring(0, 4)} tags #${
+            const date = new Date(data.timestamp);
+            const formattedTimestamp = date.toLocaleString('en-US', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: true
+            }).replace(',', '').replace(/([AP]M)$/, ' $1');
+            const messageString = `${formattedTimestamp} - 0/${data.username.substring(0, 4)} tags #${
               data.hashtags[0]
             } on 0/${data.mentions[0].substring(0, 4)}`;
             acc.push(messageString);
           }
           return acc;
         }, []);
-
+    
       setActions(combinedActions);
-    };
+    };    
 
     if (filterMode === "all") {
       fetchAllMessages();
@@ -222,6 +239,7 @@ export const UserPage = () => {
 
   const [tagItems, setTagItems] = useState<Array<{ content: ReactNode }>>([]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     console.log(key);
     const messagesQuery = query(
