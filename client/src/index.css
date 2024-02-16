@@ -11,3 +11,11 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.link {
+  color: #ADD8E6; /* Very light blue */
+}
+
+.link:visited {
+  color: #E6E6FA; /* Very light purple */
+}
