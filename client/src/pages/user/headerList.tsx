@@ -9,7 +9,6 @@ import { db } from '../../configs/firebase-config';
 import { socialUrlParser } from '../../utils';
 
 interface HeaderListProps {
-  title: string;
   userId: string;
   isLoading?: boolean
   type: 'url' | 'hashtag'
@@ -19,7 +18,7 @@ interface HeaderListProps {
 }
 
 export const HeaderList = (props: HeaderListProps) => {
-  const { userId: key, isLoading, type, title, items, wallet } = props;
+  const { userId: key, isLoading, type, items, wallet } = props;
 
   const [isSubmitting, setSubmitting] = useState(false)
   const [showPopup, setShowPopup] = useState(false);
