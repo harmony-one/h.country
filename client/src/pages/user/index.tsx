@@ -11,7 +11,6 @@ import {
   orderBy,
   where,
   getDocs,
-  getDoc,
   doc
 } from "firebase/firestore";
 import { db } from "../../configs/firebase-config";
