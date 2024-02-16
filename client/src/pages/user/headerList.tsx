@@ -58,11 +58,25 @@ export const HeaderList = (props: HeaderListProps) => {
       console.error("No key provided for URL submission.");
       return;
     }
+  
+    let fieldName: 'x' | 'ig' | '' = '';
+    if (url.includes("twitter.com")) {
+      fieldName = 'x'; // For Twitter links
+    } else if (url.includes("instagram.com")) {
+      fieldName = 'ig'; // For Instagram links
+    } else {
+      console.error("URL is neither Twitter nor Instagram.");
+      return;
+    }
+  
+    const updateData: { [key: string]: string } = {};
+    if (fieldName) {
+      updateData[fieldName] = url;
+    }
+  
     try {
-      await setDoc(doc(db, "userLinks", key), {
-        x: url
-      });
-      console.log("Document successfully written!");
+      await setDoc(doc(db, "userLinks", key), updateData, { merge: true });
+      console.log("Document successfully updated or created with URL.");
     } catch (error) {
       console.error("Error writing document: ", error);
     }

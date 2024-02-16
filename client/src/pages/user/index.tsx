@@ -1,5 +1,5 @@
 import React, { ReactNode, useState, useEffect } from "react";
-import { Box, Button, Text, TextInput } from "grommet";
+import { Box, Button, Text } from "grommet";
 import { PlainButton } from "../../components/button";
 import { useUserContext } from "../../context/UserContext";
 import { useParams, Link } from "react-router-dom";
@@ -115,8 +115,10 @@ const addMessage = async (
   const duplicateCheckSnapshot = await getDocs(duplicateCheckQuery);
 
   if (!duplicateCheckSnapshot.empty) {
-    window.alert("Duplicate message detected. No duplicate messages allowed.");
-    return;
+    if (!text.includes("https://")) {
+      window.alert("Duplicate message detected. No duplicate messages allowed.");
+      return;
+    }
   }
 
   const mentions = [...text.matchAll(/@(\w+)/g)].map((match) => match[1]);
@@ -163,7 +165,7 @@ export const UserPage = () => {
             minute: "2-digit",
             hour12: true,
           }).replace(",", "").replace(/([AP]M)$/, " $1");
-  
+
           return {
             timestamp: formattedTimestamp,
             username: data.username,
@@ -174,9 +176,9 @@ export const UserPage = () => {
           };
         })
         .filter((action) => action.mention && action.hashtag);
-  
+
       setActions(formattedMessages);
-    };     
+    };
 
     const fetchMessagesByKey = async (key: string) => {
       const mentionsQuery = query(
@@ -185,14 +187,14 @@ export const UserPage = () => {
         where("mentions", "array-contains", key)
       );
       const mentionsSnapshot = await getDocs(mentionsQuery);
-    
+
       const usernameQuery = query(
         collection(db, "messages"),
         orderBy("timestamp", "desc"),
         where("username", "==", key)
       );
       const usernameSnapshot = await getDocs(usernameQuery);
-    
+
       const combinedActions = [
         ...mentionsSnapshot.docs,
         ...usernameSnapshot.docs,
@@ -213,7 +215,7 @@ export const UserPage = () => {
             minute: '2-digit',
             hour12: true
           }).replace(',', '').replace(/([AP]M)$/, ' $1');
-    
+
           return {
             timestamp: formattedTimestamp,
             username: data.username,
@@ -224,9 +226,9 @@ export const UserPage = () => {
           };
         })
         .filter((action) => action.mention && action.hashtag);
-    
+
       setActions(combinedActions);
-    };    
+    };
 
     if (filterMode === "all") {
       fetchAllMessages();
@@ -238,34 +240,47 @@ export const UserPage = () => {
   const [tagItems, setTagItems] = useState<Array<{ content: ReactNode }>>([]);
 
   useEffect(() => {
-    const fetchUserLinkById = async () => {
-      if (!key) return;
-
-      console.log("sdfsdfsdfsd", key)
-  
-      const docRef = doc(collection(db, "userLinks"), key);
-      const docSnap = await getDoc(docRef);
-  
+    if (!key) return;
+    const docRef = doc(db, "userLinks", key);
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-        const usernameFromUrl = data.x.split('/').pop();
-        const linkItem = {
-          id: docSnap.id,
-          text: <a href={data.x} target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
-          {`x/${usernameFromUrl}`}
-        </a>,
-        };
-  
-        setUrls([linkItem]);
+        let linkItems: LinkItem[] = [];
+
+        if (data.x) {
+          const usernameFromUrl = data.x.split('/').pop();
+          linkItems.push({
+            id: docSnap.id + "-twitter",
+            text: (
+              <a href={data.x} target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
+                {`x/${usernameFromUrl}`}
+              </a>
+            ),
+          });
+        }
+
+        if (data.ig) {
+          const parts = data.ig.split('/');
+          const usernameFromUrl = parts[parts.length - 2];
+          linkItems.push({
+            id: docSnap.id + "-instagram",
+            text: (
+              <a href={data.ig} target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
+                {`ig/${usernameFromUrl}`}
+              </a>
+            ),
+          });
+        }
+
+        setUrls(linkItems);
       } else {
         console.log("No such document!");
         setUrls([]);
       }
-    };
-  
-    fetchUserLinkById();
+    });
+
+    return () => unsubscribe();
   }, [key]);
-  
 
   useEffect(() => {
     const messagesQuery = query(
@@ -303,7 +318,7 @@ export const UserPage = () => {
                   console.log("Invalid user wallet");
                 }
               }}
-            plain>
+              plain>
               <Box direction={"row"} key={hashtag}>
                 <Text>{hashtag}</Text>
                 <Text size={"xsmall"}>{count}</Text>
@@ -311,7 +326,7 @@ export const UserPage = () => {
             </Button>
           ),
         })
-      );
+        );
 
       setTagItems(sortedHashtags);
     });
@@ -326,13 +341,13 @@ export const UserPage = () => {
   return (
     <Box>
       <Box>
-      <HeaderList title={"/"} items={urls.map(item => ({
+        <HeaderList title={"/"} items={urls.map(item => ({
           content: (
             <Box key={item.id}>
               <Text>{item.text}</Text>
             </Box>
           ),
-        }))} wallet={wallet}/>
+        }))} wallet={wallet} />
         <HeaderList title={"#"} items={tagItems} wallet={wallet} />
       </Box>
       <Box>
@@ -356,19 +371,19 @@ export const UserPage = () => {
         </Box>
       </Box>
       <Box>
-      {actions.map((action, index) => (
-        <Box key={index} border={{ side: "bottom" }} pad={"4px 0"}>
-          <Text size={"small"}>
-  {action.timestamp} - {" "}
-  <Link className="link" to={`/0/${action.username}`}>0/{action.usernameShort}</Link>
-  {" tags #"}
-  {action.hashtag}
-  {" on "}
-  <Link className="link" to={`/0/${action.mention}`}>0/{action.mentionShort}</Link>
-</Text>
-        </Box>
-      ))}
-    </Box>
+        {actions.map((action, index) => (
+          <Box key={index} border={{ side: "bottom" }} pad={"4px 0"}>
+            <Text size={"small"}>
+              {action.timestamp} - {" "}
+              <Link className="link" to={`/0/${action.username}`}>0/{action.usernameShort}</Link>
+              {" tags #"}
+              {action.hashtag}
+              {" on "}
+              <Link className="link" to={`/0/${action.mention}`}>0/{action.mentionShort}</Link>
+            </Text>
+          </Box>
+        ))}
+      </Box>
     </Box>
   );
 };
