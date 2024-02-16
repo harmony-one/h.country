@@ -3,6 +3,7 @@ import { Box, Button, Text, Layer, FormField, TextInput, Form } from 'grommet';
 import { handleSubmit } from '.';
 import { ethers } from 'ethers';
 import { useParams } from 'react-router-dom';
+import { doc, setDoc } from "firebase/firestore";
 
 interface HeaderListProps {
   title: string;
@@ -16,14 +17,17 @@ export const HeaderList = (props: HeaderListProps) => {
 
   const [showPopup, setShowPopup] = useState(false);
   const [inputText, setInputText] = useState('');
+  const [inputUrl, setInputUrl] = useState('');
+  const [popupType, setPopupType] = useState<'hashtag' | 'url'>('hashtag');
 
   const hashtagHeader = () => {
     setShowPopup(true);
   };
-  
+
   const slashHeader = () => {
-    // TODO: slash header logic
-  }
+    setPopupType('url');
+    setShowPopup(true);
+  };
 
   const onTitleClick = () => {
     if (title === '#') {
@@ -36,6 +40,16 @@ export const HeaderList = (props: HeaderListProps) => {
   const handleClosePopup = () => {
     setShowPopup(false);
   };
+
+  const isValidUrl = (url: string) => {
+    const pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name and extension
+      '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+      '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+    return !!pattern.test(url);
+  }
 
   return (
     <Box>
@@ -60,32 +74,42 @@ export const HeaderList = (props: HeaderListProps) => {
             <Form onSubmit={
               async (e) => {
                 e.preventDefault();
-                if (!inputText.trim() || inputText.includes(' ')) {
-                  alert('Enter a single hashtag without any spaces.');
-                  return;
+                if (popupType === 'hashtag') {
+                  if (!inputText.trim() || inputText.includes(' ')) {
+                    alert('Enter a single hashtag without any spaces.');
+                    return;
+                  }
+                } else if (popupType === 'url') {
+                  if (!isValidUrl(inputUrl)) {
+                    alert('Enter a valid URL.');
+                    return;
+                  }
                 }
+
                 if (wallet !== undefined) {
                   const addressWithoutPrefix = wallet.address.slice(2);
-                  await handleSubmit(e, addressWithoutPrefix, `#${inputText} @${key}`);
+                  const submitText = popupType === 'hashtag' ? `#${inputText}` : inputUrl;
+                  await handleSubmit(e, addressWithoutPrefix, `${submitText} @${key}`);
                   setInputText('');
+                  setInputUrl('');
                   setShowPopup(false);
                 } else {
                   console.log("Invalid user wallet");
                 }
               }
             }>
-              <FormField label="Enter Hashtag" name="hashtag" required>
+              <FormField label={popupType === 'hashtag' ? "Enter Hashtag" : "Enter URL"} name={popupType} required>
                 <TextInput
-                  name="hashtag"
-                  value={inputText}
-                  onChange={(event) => setInputText(event.target.value)}
+                  name={popupType}
+                  value={popupType === 'hashtag' ? inputText : inputUrl}
+                  onChange={(event) => popupType === 'hashtag' ? setInputText(event.target.value) : setInputUrl(event.target.value)}
                   color='#2aaee9'
                   style={{ borderColor: '#2aaee9' }}
                 />
               </FormField>
               <Box direction="row" justify="between" margin={{ top: 'medium' }}>
                 <Button label="Cancel" onClick={handleClosePopup} color="#2aaee9" />
-                <Button type="submit" label="Submit" primary style={{ backgroundColor: '#2aaee9' }}/>
+                <Button type="submit" label="Submit" primary style={{ backgroundColor: '#2aaee9' }} />
               </Box>
             </Form>
           </Box>

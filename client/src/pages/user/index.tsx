@@ -46,14 +46,6 @@ const isValid = (key: string): boolean => {
   return key.length === 40 && hexRegExp.test(key);
 };
 
-const UserAction = (props: { action: string }) => {
-  return (
-    <Box border={{ side: "bottom" }} pad={"4px 0"}>
-      <Text size={"small"}>{props.action}</Text>
-    </Box>
-  );
-};
-
 export const handleSubmit = async (
   event: React.FormEvent,
   wallet: string,
@@ -153,54 +145,19 @@ export const UserPage = () => {
   const { key } = useParams();
   const [actions, setActions] = useState<Action[]>([]);
   const [filterMode, setFilterMode] = useState<"all" | "key" | null>(null);
+  const [urls, setUrls] = useState<LinkItem[]>([]);
 
-  const [linkItems, setLinkItems] = useState<LinkItem[]>([
-    { id: 1, text: "𝕏/", isEditing: false },
-    { id: 2, text: "t/", isEditing: false },
-    { id: 3, text: "ig/", isEditing: false },
-    { id: 4, text: "l/", isEditing: false },
-    { id: 5, text: "d/", isEditing: false },
-  ]);
-  
-  const toggleEdit = (id: number) => {
-    const walletKey = wallet?.address?.toLowerCase() ?? "";
-    const paramKey = key?.toLowerCase() ?? "foo";
-
-    if (walletKey.includes(paramKey)) {
-      setLinkItems((prevItems) =>
-        prevItems.map((item) =>
-          item.id === id ? { ...item, isEditing: !item.isEditing } : item
-        )
-      );
-    } else {
-      alert("You can only edit items when your wallet matches the user ID in the URL.");
-    }
+  const handleUrlSubmit = async (
+    event: React.FormEvent,
+    url: string
+  ) => {
+    event.preventDefault();
+    setUrls((prevUrls: LinkItem[]) => [
+      ...prevUrls,
+      // map ids (twitter url id = x, instagram url id = ig ...)
+      { id: prevUrls.length + 1, text: url, isEditing: false },
+    ]);
   };
-
-  const updateText = (id: number, text: string) => {
-    setLinkItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, text: text, isEditing: false } : item
-      )
-    );
-  };
-
-  const renderedLinkItems = linkItems.map((item) => ({
-    content: item.isEditing ? (
-      <TextInput
-        autoFocus
-        defaultValue={item.text}
-        onBlur={() => toggleEdit(item.id)}
-        onKeyPress={(e) => {
-          if (e.key === "Enter") {
-            updateText(item.id, e.currentTarget.value);
-          }
-        }}
-      />
-    ) : (
-      <Text onClick={() => toggleEdit(item.id)} style={{ cursor: 'pointer' }}>{item.text}</Text>
-    ),
-  }));
 
   useEffect(() => {
     const fetchAllMessages = async () => {
@@ -350,6 +307,15 @@ export const UserPage = () => {
   if (!key || !isValid(key)) {
     return <Box>Not a valid user ID</Box>;
   }
+
+  const renderedLinkItems = urls.map((item) => ({
+    content: (
+      <Box key={item.id}>
+        <Text>{item.text}</Text> {/* Display the URL text */}
+        {/* You can add more interactive elements here if needed */}
+      </Box>
+    ),
+  }));
 
   return (
     <Box>
