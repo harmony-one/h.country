@@ -166,6 +166,7 @@ export function throwError(message: string, code: string | null | undefined, par
       messageDetails.push(key + '=' + JSON.stringify(params[key].toString()));
     }
   });
+  // eslint-disable-next-line no-useless-concat
   messageDetails.push('version=' + '#version');
 
   const reason = message;

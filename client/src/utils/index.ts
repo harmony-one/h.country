@@ -2,6 +2,7 @@ export * from './getAddress/GetAddress'
 
 export const shortenAddress = (address: string): string => {
   const start = address.substring(0, 4 + 2); // +2 to include '0x'
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const end = address.substring(address.length - 4);
   return start; // `${start}...${end}`;
 }
