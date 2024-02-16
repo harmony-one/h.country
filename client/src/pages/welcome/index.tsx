@@ -8,6 +8,7 @@ import { useUserContext } from "../../context/UserContext";
 import { UserTopic } from "../../types";
 import { Typography, Spin } from "antd";
 import {postUserTopics} from "../../api/firebase";
+import useDarkMode from "../../hooks/useDarkMode";
 
 const WelcomeContainer = styled(Box)`
   margin: 0 auto !important;
@@ -17,7 +18,7 @@ const WelcomeContainer = styled(Box)`
   gap: 2em;
   width: 100%;
   height: 100svh;
-  background-color: #fff;
+  /* background-color: #fff; */
 `;
 
 const TopicsContainer = styled(Box)`
@@ -91,16 +92,20 @@ interface TopicItemProps {
 
 const TopicItem = (props: TopicItemProps) => {
   const { topic, isSelected, onClick } = props;
-  const [image, setImage] = useState(topic.logoOutline);
+  const [image, setImage] = useState(topic.light);
+
+  const themeMode = useDarkMode()
 
   useEffect(() => {
     if (isSelected) {
-      setImage(topic.logo);
+      setImage(topic.color);
     } else {
-      setImage(topic.logoOutline);
+      const logo =  themeMode ? topic.dark : topic.light 
+      setImage(logo);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSelected]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSelected, themeMode]);
 
   const prefix = "#"; // topic.type === 'blockchain' ? '$' : '#'
   return (
