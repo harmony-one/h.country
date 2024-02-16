@@ -10,7 +10,7 @@ function UsernamePrompt({ providerName, displayName, providerShorthand, authType
     } else {
       setButtonLabel(displayName);
     }
-  }, [providerName]);
+  }, [providerName, displayName, providerShorthand]);
 
   const handlePrompt = () => {
     const userInput = window.prompt(`${displayName} name?`);
