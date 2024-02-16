@@ -88,11 +88,6 @@ export const HeaderList = (props: HeaderListProps) => {
             </Text>
           </Box>
         </Button>
-        {!isLoading && items.length === 0 &&
-            <Box>
-                <Text color={'blue1'} style={{ textDecoration: 'underline' }}>Add {type === 'url' ? 'link' : 'hashtag'}</Text>
-            </Box>
-        }
         {!isLoading && items.length > 0 && <Box gap={"8px"}>
             {items.map((item) => item.content)}
           </Box>
