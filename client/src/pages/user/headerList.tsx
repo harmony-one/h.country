@@ -1,8 +1,8 @@
 import React, { ReactNode, useState } from 'react';
-import { Box, Text, Layer, FormField, TextInput, Form } from 'grommet';
+import { Box, Button, Text, Layer, FormField, TextInput, Form } from 'grommet';
 import { handleSubmit } from '.';
 import { ethers } from 'ethers';
-import { Button } from 'antd';
+import { Button as AntdButton } from 'antd';
 import { doc, setDoc } from "firebase/firestore";
 import { db } from '../../configs/firebase-config';
 import { socialUrlParser } from '../../utils';
@@ -113,24 +113,24 @@ export const HeaderList = (props: HeaderListProps) => {
 
   return (
     <Box>
-      <div onClick={onTitleClick}>
-        <Box direction={"row"} gap={"24px"} align={"center"}>
+      <Box direction={"row"} gap={"24px"} align={"center"}>
+        <Button plain onClick={onTitleClick}>
           <Box width={"116px"} align={"center"}>
             <Text size={"164px"} weight={800} color={"blue1"}>
               {type === 'hashtag' ? '#' : '/'}
             </Text>
           </Box>
-          {!isLoading && items.length === 0 &&
-              <Box>
-                  <Text color={'blue1'} style={{ textDecoration: 'underline' }}>Add {type === 'url' ? 'link' : 'hashtag'}</Text>
-              </Box>
-          }
-          {!isLoading && items.length > 0 && <Box gap={"8px"}>
-              {items.map((item) => item.content)}
+        </Button>
+        {!isLoading && items.length === 0 &&
+            <Box>
+                <Text color={'blue1'} style={{ textDecoration: 'underline' }}>Add {type === 'url' ? 'link' : 'hashtag'}</Text>
             </Box>
-          }
-        </Box>
-      </div>
+        }
+        {!isLoading && items.length > 0 && <Box gap={"8px"}>
+            {items.map((item) => item.content)}
+          </Box>
+        }
+      </Box>
 
       {showPopup && (
         <Layer
@@ -151,15 +151,15 @@ export const HeaderList = (props: HeaderListProps) => {
                 />
               </FormField>
               <Box direction="row" justify="end" gap={'16px'} margin={{ top: 'medium' }}>
-                <Button onClick={handleClosePopup} color="#2aaee9">Cancel</Button>
-                <Button
+                <AntdButton onClick={handleClosePopup} color="#2aaee9">Cancel</AntdButton>
+                <AntdButton
                   type="primary"
                   htmlType={'submit'}
                   style={{ backgroundColor: '#2aaee9' }}
                   loading={isSubmitting}
                 >
                   Submit
-                </Button>
+                </AntdButton>
               </Box>
             </Form>
           </Box>
