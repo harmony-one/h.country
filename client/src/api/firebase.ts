@@ -1,6 +1,6 @@
 import { collection, getDocs, setDoc, doc, query, where, orderBy, addDoc } from 'firebase/firestore';
-import {db} from "../configs/firebase-config";
-import {Action, LocationData} from "../types";
+import { db } from "../configs/firebase-config";
+import { Action, LocationData } from "../types";
 
 export const getMessages = async (): Promise<Action[]> => {
   const q = query(collection(db, "messages"), orderBy("timestamp", "desc"));
@@ -49,7 +49,7 @@ export const getMessagesByKey = async (key: string): Promise<Action[]> => {
     ...mentionsSnapshot.docs,
     ...usernameSnapshot.docs,
   ]
-    .map((doc) => ({id: doc.id, data: doc.data()}))
+    .map((doc) => ({ id: doc.id, data: doc.data() }))
     .filter(
       (value, index, self) =>
         index === self.findIndex((t) => t.id === value.id)
@@ -127,3 +127,13 @@ export const postUserTopics = async (address: string, topics: string[]) => {
     created: Math.floor(Date.now() / 1000)
   });
 }
+
+export const getUserBySocial = async (filter: { key: string, value: string }): Promise<any[]> => {
+  const mentionsQuery = query(
+    collection(db, "userLinks"),
+    where(filter.key, "==", filter.value)
+  );
+  const mentionsSnapshot = await getDocs(mentionsQuery);
+
+  return mentionsSnapshot.docs.map((doc) => ({ id: doc.id, data: doc.data() }))
+};
