@@ -1,5 +1,5 @@
 import React, { ReactNode, useState, useEffect } from "react";
-import { Box, Button, Spinner, Text } from "grommet";
+import {Box, Button, Spinner, Text} from "grommet";
 import { PlainButton } from "../../components/button";
 import { useUserContext } from "../../context/UserContext";
 import {
@@ -12,8 +12,8 @@ import {
 import { db } from "../../configs/firebase-config";
 import axios from "axios";
 import { HeaderList } from "./headerList";
-import { UserAction } from "../../components/action";
-import { addMessage, getMessages, getMessagesByKey } from "../../api/firebase";
+import {UserAction} from "../../components/action";
+import {addMessage, getMessages, getMessagesByKey} from "../../api/firebase";
 
 interface LinkItem {
   id: string;
@@ -129,17 +129,32 @@ export const UserPage = (props: { id: string }) => {
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
+        let linkItems: LinkItem[] = [];
 
-        let linkItems: LinkItem[] = Object.keys(data)
-          .filter(key => data[key].username && data[key].url)
-          .map(key => ({
-            id: docSnap.id + key,
+        if (data.x) {
+          const usernameFromUrl = data.x.split('/').pop();
+          linkItems.push({
+            id: docSnap.id + "-twitter",
             text: (
-              <a href={data[key].url} target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
-                {`${key}/${data[key].username}`}
+              <a href={data.x} target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
+                {`x/${usernameFromUrl}`}
               </a>
-            )
-          }));
+            ),
+          });
+        }
+
+        if (data.ig && data.ig.url) {
+          const parts = data.ig.url.split('/');
+          const usernameFromUrl = parts[parts.length - 2];
+          linkItems.push({
+            id: docSnap.id + "-instagram",
+            text: (
+              <a href={data.ig} target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
+                {`ig/${usernameFromUrl}`}
+              </a>
+            ),
+          });
+        }
 
         setUrls(linkItems);
       } else {
@@ -210,14 +225,14 @@ export const UserPage = (props: { id: string }) => {
   return (
     <Box>
       <Box>
-        <HeaderList userId={key} isLoading={isLoading} type={"url"} items={urls.map(item => ({
+        <HeaderList isLoading={isLoading} type={"url"} items={urls.map(item => ({
           content: (
             <Box key={item.id}>
               <Text>{item.text}</Text>
             </Box>
           ),
         }))} wallet={wallet} />
-        <HeaderList userId={key} isLoading={isLoading} type={"hashtag"} items={tagItems} wallet={wallet} />
+        <HeaderList isLoading={isLoading} type={"hashtag"} items={tagItems} wallet={wallet} />
       </Box>
       <Box>
         <Box direction={"row"} gap={"16px"}>
@@ -241,14 +256,14 @@ export const UserPage = (props: { id: string }) => {
       </Box>
       <Box margin={{ top: '16px' }}>
         {isLoading &&
-          <Box align={'center'}>
-            <Spinner color={'spinner'} />
-          </Box>
+            <Box align={'center'}>
+                <Spinner color={'spinner'} />
+            </Box>
         }
         {!isLoading && actions.length === 0 &&
-          <Box align={'center'}>
-            <Text>No messages found</Text>
-          </Box>
+            <Box align={'center'}>
+                <Text>No messages found</Text>
+            </Box>
         }
         {actions.map((action, index) => (
           <UserAction key={index + action.timestamp} action={action} />
