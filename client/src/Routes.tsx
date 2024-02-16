@@ -9,7 +9,7 @@ import { TagPageByName } from "./pages/tag";
 export const AppRoutes = () => {
   return (
     <Routes>
-      <Route path={'/welcome'} element={<WelcomePage />} />
+      <Route path={'/hash'} element={<WelcomePage />} />
       <Route element={<AppLayout />}>
         <Route path={'/'} element={<MainPage />} />
         <Route path="/h/:tagName" element={<TagPageByName />} />
