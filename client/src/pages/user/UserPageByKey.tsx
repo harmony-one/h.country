@@ -1,5 +1,5 @@
 import React from "react";
-// import React, { ReactNode, useState, useEffect } from "react";
+
 import { useParams } from "react-router-dom";
 import { UserPage } from ".";
 import { Text } from "grommet";

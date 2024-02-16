@@ -1,5 +1,5 @@
 import React from "react";
-// import React, { ReactNode, useState, useEffect } from "react";
+
 import { Box } from "grommet";
 
 export const TagPage = (props: { id: string }) => {

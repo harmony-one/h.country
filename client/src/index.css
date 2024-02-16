@@ -13,8 +13,3 @@ body {
   color: #64ebfd; /* Very light blue */
   text-decoration: none;
 }
-
-.link:visited {
-  color: #eeb7ff; /* Very light purple */
-  text-decoration: none;
-}

@@ -1,6 +1,6 @@
+import React from "react";
 import {Box, Text} from "grommet";
 import {Link} from "react-router-dom";
-import React from "react";
 import {Action} from "../../types";
 
 export const UserAction = (props: { action: Action }) => {

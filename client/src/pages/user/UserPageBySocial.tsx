@@ -43,8 +43,7 @@ export const UserPageBySocial = () => {
 
     useEffect(() => {
         loadUser();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socialType, nickname])
+    }, [socialType, nickname, loadUser])
 
     if (loading) {
         return <Text>Loading...</Text>
