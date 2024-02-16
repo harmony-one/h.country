@@ -1,6 +1,5 @@
 import React from 'react'
 import { Box } from "grommet"
-import { useUserContext } from "../../context/UserContext";
 
 export const AppMenu = () => {
   return <Box>

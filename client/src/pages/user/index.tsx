@@ -259,6 +259,7 @@ export const UserPage = () => {
 
   const [tagItems, setTagItems] = useState<Array<{ content: ReactNode }>>([]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     console.log(key);
     const messagesQuery = query(
