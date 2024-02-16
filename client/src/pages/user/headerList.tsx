@@ -8,14 +8,15 @@ import { doc, setDoc } from "firebase/firestore";
 import { db } from '../../configs/firebase-config';
 
 interface HeaderListProps {
-  title: string;
+  isLoading?: boolean
+  type: 'url' | 'hashtag'
   items: Array<{ content: ReactNode }>;
   wallet: ethers.Wallet | undefined;
   onUrlSubmit?: (url: string) => void;
 }
 
 export const HeaderList = (props: HeaderListProps) => {
-  const { title, items, wallet } = props;
+  const { isLoading, type, items, wallet } = props;
   const { key } = useParams();
 
   const [isSubmitting, setSubmitting] = useState(false)
@@ -34,9 +35,9 @@ export const HeaderList = (props: HeaderListProps) => {
   };
 
   const onTitleClick = () => {
-    if (title === '#') {
+    if (type === 'hashtag') {
       hashtagHeader();
-    } else if (title === '/') {
+    } else if (type === 'url') {
       slashHeader();
     }
   };
@@ -124,14 +125,24 @@ export const HeaderList = (props: HeaderListProps) => {
 
   return (
     <Box>
-      <Box direction={"row"} gap={"24px"} align={"center"}>
-        <Box width={"116px"} align={"center"} onClick={onTitleClick}>
-          <Text size={"164px"} weight={800} color={"blue1"}>
-            {title}
-          </Text>
+      <div onClick={onTitleClick}>
+        <Box direction={"row"} gap={"24px"} align={"center"}>
+          <Box width={"116px"} align={"center"}>
+            <Text size={"164px"} weight={800} color={"blue1"}>
+              {type === 'hashtag' ? '#' : '/'}
+            </Text>
+          </Box>
+          {!isLoading && items.length === 0 &&
+              <Box>
+                  <Text color={'blue1'} style={{ textDecoration: 'underline' }}>Add {type === 'url' ? 'link' : 'hashtag'}</Text>
+              </Box>
+          }
+          {!isLoading && items.length > 0 && <Box gap={"8px"}>
+              {items.map((item) => item.content)}
+            </Box>
+          }
         </Box>
-        <Box gap={"8px"}>{items.map((item) => item.content)}</Box>
-      </Box>
+      </div>
 
       {showPopup && (
         <Layer
