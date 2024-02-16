@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import { WelcomePage } from "./pages/welcome";
+import { AuthPage } from "./pages/auth/AuthPage";
 import { AppLayout } from "./components/layout";
 import { MainPage } from "./pages/main";
 import { UserPageByKey, UserPageBySocial } from "./pages/user";
@@ -13,7 +14,8 @@ export const AppRoutes = () => {
         <Route path={'/'} element={<MainPage />} />
         <Route path="/h/:tagName" element={<TagPageByName />} />
         <Route path="/0/:key" element={<UserPageByKey />} />
-        <Route path="/:socialType/:nickname" element={<UserPageBySocial />} />
+        <Route path="/:socialType/:username" element={<UserPageBySocial />} />
+        <Route path={'/auth'} element={<AuthPage />} />
       </Route>
     </Routes>
   );
