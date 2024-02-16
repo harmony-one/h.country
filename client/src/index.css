@@ -5,7 +5,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 
   .ant-typography {
-    font-family: "Nunito", 'Helvetica Neue', sans-serif !important;
+    font-family: 'Nunito', 'Helvetica Neue', sans-serif !important;
+    color: #323232; 
+
+    @media (prefers-color-scheme: dark) {
+      color: #fff  
+    }
   }
 }
 

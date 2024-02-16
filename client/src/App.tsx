@@ -6,10 +6,11 @@ import {AppRoutes} from "./Routes";
 import {ToastContainer} from "react-toastify";
 import {UserProvider} from "./context/UserContext";
 import {theme} from "./theme/grommet";
+import useDarkMode from './hooks/useDarkMode';
 
 function App() {
   return (
-    <Grommet full theme={theme}>
+    <Grommet full theme={theme} themeMode={useDarkMode()  ? 'dark' : 'light'}>
       <BrowserRouter>
         <UserProvider>
           <AppRoutes />
