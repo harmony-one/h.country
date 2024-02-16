@@ -125,6 +125,20 @@ const addMessage = async (
   text: string
 ) => {
   const timestamp = new Date().toISOString();
+
+  const duplicateCheckQuery = query(
+    collection(db, "messages"),
+    where("username", "==", username),
+    where("text", "==", text)
+  );
+
+  const duplicateCheckSnapshot = await getDocs(duplicateCheckQuery);
+
+  if (!duplicateCheckSnapshot.empty) {
+    console.error("Duplicate message detected. No duplicate messages allowed.");
+    return;
+  }
+
   const mentions = [...text.matchAll(/@(\w+)/g)].map((match) => match[1]);
   const hashtags = [...text.matchAll(/#(\w+)/g)].map((match) => match[1]);
 
