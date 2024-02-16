@@ -6,17 +6,18 @@ import { Button } from 'antd';
 import { useParams } from 'react-router-dom';
 import { doc, setDoc } from "firebase/firestore";
 import { db } from '../../configs/firebase-config';
+import { socialUrlParser } from '../../utils';
 
 interface HeaderListProps {
   title: string;
+  userId: string;
   items: Array<{ content: ReactNode }>;
   wallet: ethers.Wallet | undefined;
   onUrlSubmit?: (url: string) => void;
 }
 
 export const HeaderList = (props: HeaderListProps) => {
-  const { title, items, wallet } = props;
-  const { key } = useParams();
+  const { userId: key, title, items, wallet } = props;
 
   const [isSubmitting, setSubmitting] = useState(false)
   const [showPopup, setShowPopup] = useState(false);
@@ -45,35 +46,28 @@ export const HeaderList = (props: HeaderListProps) => {
     setShowPopup(false);
   };
 
-  const isValidUrl = (url: string) => {
-    const pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
-      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name and extension
-      '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
-      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
-      '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-      '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
-    return pattern.test(url);
-  }
-
   const onUrlSubmit = async (url: string) => {
     if (!key) {
       console.error("No key provided for URL submission.");
       return;
     }
 
-    let fieldName: 'x' | 'ig' | '' = '';
-    if (url.includes("twitter.com")) {
-      fieldName = 'x'; // For Twitter links
-    } else if (url.includes("instagram.com")) {
-      fieldName = 'ig'; // For Instagram links
-    } else {
-      console.error("URL is neither Twitter nor Instagram.");
+    const socialObj = socialUrlParser(url)[0];
+
+    console.log(1111, socialObj);
+
+    //return;
+
+    if (!socialObj) {
+      alert('Enter a valid URL.');
       return;
     }
 
-    const updateData: { [key: string]: string } = {};
-    if (fieldName) {
-      updateData[fieldName] = url;
+    const updateData = {
+      [socialObj.type]: {
+        username: socialObj.username,
+        url: socialObj.url,
+      }
     }
 
     try {
@@ -91,12 +85,7 @@ export const HeaderList = (props: HeaderListProps) => {
         return;
       }
     } else if (popupType === 'url') {
-      if (!isValidUrl(inputUrl)) {
-        alert('Enter a valid URL.');
-        return;
-      } else {
-        await onUrlSubmit(inputUrl);
-      }
+      await onUrlSubmit(inputUrl);
     }
     if (wallet !== undefined) {
       const addressWithoutPrefix = wallet.address.slice(2);

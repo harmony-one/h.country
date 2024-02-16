@@ -1,4 +1,5 @@
 export * from './getAddress/GetAddress'
+export * from './social-url-parser'
 
 export const shortenAddress = (address: string): string => {
   const start = address.substring(0, 4 + 2); // +2 to include '0x'

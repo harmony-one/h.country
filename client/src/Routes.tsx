@@ -13,7 +13,7 @@ export const AppRoutes = () => {
         <Route path={'/'} element={<MainPage />} />
         <Route path="/h/:tagName" element={<TagPageByName />} />
         <Route path="/0/:key" element={<UserPageByKey />} />
-        <Route path="/:socialType/:nickname" element={<UserPageBySocial />} />
+        <Route path="/:socialType/:username" element={<UserPageBySocial />} />
       </Route>
     </Routes>
   );
