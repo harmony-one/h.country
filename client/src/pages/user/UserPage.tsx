@@ -136,7 +136,7 @@ export const UserPage = (props: { id: string }) => {
             id: docSnap.id + key,
             text: (
               <a href={data[key].url} target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
-                {`ig/${data[key].username}`}
+                {`${key}/${data[key].username}`}
               </a>
             )
           }));
