@@ -40,11 +40,13 @@ const isValidAddress = (key: string): boolean => {
 };
 
 export const handleSubmit = async (
-  event: React.FormEvent,
+  event: React.FormEvent | undefined,
   wallet: string,
   text: string
 ) => {
-  event.preventDefault();
+  if (event) {
+    event.preventDefault();
+  }
   let locationData = {
     latitude: null as number | null,
     longitude: null as number | null,
