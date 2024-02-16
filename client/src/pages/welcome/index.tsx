@@ -16,8 +16,10 @@ const WelcomeContainer = styled(Box)`
   justify-content: space-around;
   gap: 2em;
   width: 100%;
-  height: 95vh;
+  height: 100svh;
+  background-color: #fff;
 `;
+
 const TopicsContainer = styled(Box)`
   display: grid;
 
