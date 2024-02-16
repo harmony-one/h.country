@@ -1,6 +1,5 @@
 import oneColor from './assets/logos/one-color.svg'
 import oneOutline from './assets/logos/one-grey.svg'
-import polyDark from './assets/logos/polygon-white.svg'
 import {type UserTopic, UserTopicType} from "./types";
 
 export const baseTopicList = [
@@ -13,7 +12,7 @@ export const baseTopicList = [
   { name: 'arbitrum', group: 1, type: 'blockchain'},
   { name: 'ethfoundation', group: 1, type: 'blockchain'},
   { name: 'ethdenver', group: 1, type: 'blockchain'},
-  { name: 'polygon', group: 1, type: 'blockchain'},
+  { name: 'matic', group: 1, type: 'blockchain'},
   { name: 'kraken', group: 1, type: 'blockchain'},
   { name: 'eth', group: 1, type: 'blockchain'},
   // group 2
@@ -46,17 +45,15 @@ export const getTopicLits = async (): Promise<UserTopic[]> => {
   const logoPromises = baseTopicList.map(async (logo) => {
     try {
       const logoName = logo.name
-      const [logoColor, logoLight, logoDark] = await Promise.all([
+      const [logoColor, logoLight] = await Promise.all([
           import(`${colorPath}/${logoName}-color.svg`),
           import(`${colorPath}/${logoName}-grey.svg`),
-          import(`${colorPath}/polygon-white.svg`)
-          // import(`${colorPath}/${logoName}-grey.svg`)
+          // import(`${colorPath}/${logoName}-white.svg`)
 
       ]);
       return {
         name: logo.name,
         light: logoLight.default,
-        dark: logoDark.default,
         color: logoColor.default,
         type: logo.type as UserTopicType,
         group: logo.group
@@ -66,11 +63,9 @@ export const getTopicLits = async (): Promise<UserTopic[]> => {
       return {
           name: logo.name,
           light: oneOutline, // oneOutline, // placeholder,
-          dark: polyDark, // , // placeholder,
           color: oneColor, // placeholder,
           type: logo.type as UserTopicType,
           group: logo.group
-
       }
     }
   })

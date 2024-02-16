@@ -4,7 +4,7 @@ export interface UserTopic {
   name: string
   type: UserTopicType
   light: any
-  dark: any
+  dark?: any
   color: any
   group: number
 }
