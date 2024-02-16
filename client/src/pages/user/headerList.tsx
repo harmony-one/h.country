@@ -3,7 +3,6 @@ import { Box, Text, Layer, FormField, TextInput, Form } from 'grommet';
 import { handleSubmit } from '.';
 import { ethers } from 'ethers';
 import { Button } from 'antd';
-import { useParams } from 'react-router-dom';
 import { doc, setDoc } from "firebase/firestore";
 import { db } from '../../configs/firebase-config';
 import { socialUrlParser } from '../../utils';
