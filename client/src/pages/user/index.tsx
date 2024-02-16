@@ -1,5 +1,5 @@
 import React, { ReactNode, useState, useEffect } from "react";
-import { Box, Button, Text } from "grommet";
+import {Box, Button, Spinner, Text} from "grommet";
 import { PlainButton } from "../../components/button";
 import { useUserContext } from "../../context/UserContext";
 import { useParams } from "react-router-dom";
@@ -7,22 +7,14 @@ import {
   collection,
   query,
   onSnapshot,
-  addDoc,
-  orderBy,
   where,
-  getDocs,
   doc
 } from "firebase/firestore";
 import { db } from "../../configs/firebase-config";
 import axios from "axios";
 import { HeaderList } from "./headerList";
 import {UserAction} from "../../components/action";
-
-interface LocationData {
-  latitude: number | null;
-  longitude: number | null;
-  address: string;
-}
+import {addMessage, getMessages, getMessagesByKey} from "../../api/firebase";
 
 interface LinkItem {
   id: string;
@@ -99,142 +91,34 @@ export const handleSubmit = async (
   }
 };
 
-const addMessage = async (
-  locationData: LocationData,
-  username: string,
-  text: string
-) => {
-  const timestamp = new Date().toISOString();
-
-  const duplicateCheckQuery = query(
-    collection(db, "messages"),
-    where("username", "==", username),
-    where("text", "==", text)
-  );
-
-  const duplicateCheckSnapshot = await getDocs(duplicateCheckQuery);
-
-  if (!duplicateCheckSnapshot.empty) {
-    if (!text.includes("https://")) {
-      window.alert("Duplicate message detected. No duplicate messages allowed.");
-      return;
-    }
-  }
-
-  const mentions = [...text.matchAll(/@(\w+)/g)].map((match) => match[1]);
-  const hashtags = [...text.matchAll(/#(\w+)/g)].map((match) => match[1]);
-
-  let message = {
-    username: username || "Anonymous",
-    text,
-    timestamp,
-    address: locationData.address,
-    latitude: locationData.latitude,
-    longitude: locationData.longitude,
-    mentions,
-    hashtags,
-  };
-
-  try {
-    await addDoc(collection(db, "messages"), message);
-  } catch (error) {
-    console.error("Could not send the message: ", error);
-  }
-};
-
 export const UserPage = () => {
   const { wallet } = useUserContext();
   const { key } = useParams();
   const [actions, setActions] = useState<Action[]>([]);
-  const [filterMode, setFilterMode] = useState<"all" | "key" | null>(null);
+  const [filterMode, setFilterMode] = useState<"all" | "key" | null>('key');
   const [urls, setUrls] = useState<LinkItem[]>([]);
+  const [isLoading, setLoading] = useState(false)
 
   useEffect(() => {
-    const fetchAllMessages = async () => {
-      const q = query(collection(db, "messages"), orderBy("timestamp", "desc"));
-      const querySnapshot = await getDocs(q);
-      const formattedMessages = querySnapshot.docs
-        .map((doc) => {
-          const data = doc.data();
-          const date = new Date(data.timestamp);
-          const formattedTimestamp = date.toLocaleString("en-US", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          }).replace(",", "").replace(/([AP]M)$/, " $1");
-
-          return {
-            timestamp: formattedTimestamp,
-            username: data.username,
-            usernameShort: data.username.substring(0, 4),
-            hashtag: data.hashtags?.[0],
-            mention: data.mentions?.[0],
-            mentionShort: data.mentions?.[0]?.substring(0, 4),
-          };
-        })
-        .filter((action) => action.mention && action.hashtag);
-
-      setActions(formattedMessages);
-    };
-
-    const fetchMessagesByKey = async (key: string) => {
-      const mentionsQuery = query(
-        collection(db, "messages"),
-        orderBy("timestamp", "desc"),
-        where("mentions", "array-contains", key)
-      );
-      const mentionsSnapshot = await getDocs(mentionsQuery);
-
-      const usernameQuery = query(
-        collection(db, "messages"),
-        orderBy("timestamp", "desc"),
-        where("username", "==", key)
-      );
-      const usernameSnapshot = await getDocs(usernameQuery);
-
-      const combinedActions = [
-        ...mentionsSnapshot.docs,
-        ...usernameSnapshot.docs,
-      ]
-        .map((doc) => ({ id: doc.id, data: doc.data() }))
-        .filter(
-          (value, index, self) =>
-            index === self.findIndex((t) => t.id === value.id)
-        )
-        .map((doc) => {
-          const data = doc.data;
-          const date = new Date(data.timestamp);
-          const formattedTimestamp = date.toLocaleString('en-US', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-          }).replace(',', '').replace(/([AP]M)$/, ' $1');
-
-          return {
-            timestamp: formattedTimestamp,
-            username: data.username,
-            usernameShort: data.username.substring(0, 4),
-            hashtag: data.hashtags?.[0],
-            mention: data.mentions?.[0],
-            mentionShort: data.mentions?.[0]?.substring(0, 4),
-          };
-        })
-        .filter((action) => action.mention && action.hashtag);
-
-      setActions(combinedActions);
-    };
-
-    if (filterMode === "all") {
-      fetchAllMessages();
-    } else if (filterMode === "key" && key) {
-      fetchMessagesByKey(key);
+    const loadData = async () => {
+      setLoading(true)
+      setActions([])
+      console.log('filterMode', filterMode)
+      try {
+        let items: Action[] = []
+        if (filterMode === "all") {
+          items = await getMessages();
+        } else if (filterMode === "key" && key) {
+          items = await getMessagesByKey(key);
+        }
+        setActions(items)
+      } catch (e) {
+        console.error('Failed to load messages:', e)
+      } finally {
+        setLoading(false)
+      }
     }
+    loadData()
   }, [filterMode, key]);
 
   const [tagItems, setTagItems] = useState<Array<{ content: ReactNode }>>([]);
@@ -370,7 +254,17 @@ export const UserPage = () => {
           </PlainButton>
         </Box>
       </Box>
-      <Box>
+      <Box margin={{ top: '16px' }}>
+        {isLoading &&
+            <Box align={'center'}>
+                <Spinner color={'spinner'} />
+            </Box>
+        }
+        {!isLoading && actions.length === 0 &&
+            <Box align={'center'}>
+                <Text>No messages found</Text>
+            </Box>
+        }
         {actions.map((action, index) => (
           <UserAction key={index + action.timestamp} action={action} />
         ))}
