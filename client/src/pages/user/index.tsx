@@ -237,14 +237,6 @@ export const UserPage = () => {
 
   const [tagItems, setTagItems] = useState<Array<{ content: ReactNode }>>([]);
 
-  const renderedLinkItems = urls.map((item) => ({
-    content: (
-      <Box key={item.id}>
-        <Text>{item.text}</Text>
-      </Box>
-    ),
-  }));
-
   useEffect(() => {
     const fetchUserLinkById = async () => {
       if (!key) return;
@@ -259,7 +251,9 @@ export const UserPage = () => {
         const usernameFromUrl = data.x.split('/').pop();
         const linkItem = {
           id: docSnap.id,
-          text: <a href={data.x} target="_blank" rel="noopener noreferrer">{`x/${usernameFromUrl}`}</a>,
+          text: <a href={data.x} target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
+          {`x/${usernameFromUrl}`}
+        </a>,
         };
   
         setUrls([linkItem]);
