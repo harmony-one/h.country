@@ -1,8 +1,7 @@
-import React, { ReactNode, useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { TagPage } from ".";
 import { Text } from "grommet";
-import { getUserBySocial } from "../../api/firebase";
 
 export const TagPageByName = () => {
     const { tagName } = useParams();
@@ -32,7 +31,8 @@ export const TagPageByName = () => {
 
     useEffect(() => {
         loadUser();
-    }, [tagName])
+    }, [tagName, loadUser])
+
 
     if (loading) {
         return <Text>Loading...</Text>

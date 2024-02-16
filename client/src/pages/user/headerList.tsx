@@ -11,13 +11,15 @@ import { socialUrlParser } from '../../utils';
 interface HeaderListProps {
   title: string;
   userId: string;
+  isLoading?: boolean
+  type: 'url' | 'hashtag'
   items: Array<{ content: ReactNode }>;
   wallet: ethers.Wallet | undefined;
   onUrlSubmit?: (url: string) => void;
 }
 
 export const HeaderList = (props: HeaderListProps) => {
-  const { userId: key, title, items, wallet } = props;
+  const { userId: key, isLoading, type, title, items, wallet } = props;
 
   const [isSubmitting, setSubmitting] = useState(false)
   const [showPopup, setShowPopup] = useState(false);
@@ -35,9 +37,9 @@ export const HeaderList = (props: HeaderListProps) => {
   };
 
   const onTitleClick = () => {
-    if (title === '#') {
+    if (type === 'hashtag') {
       hashtagHeader();
-    } else if (title === '/') {
+    } else if (type === 'url') {
       slashHeader();
     }
   };
@@ -87,7 +89,7 @@ export const HeaderList = (props: HeaderListProps) => {
     } else if (popupType === 'url') {
       await onUrlSubmit(inputUrl);
     }
-    if (wallet !== undefined) {
+    if (wallet !== undefined && key !== undefined) {
       const addressWithoutPrefix = wallet.address.slice(2);
       const submitText = popupType === 'hashtag' ? `#${inputText}` : inputUrl;
       await handleSubmit(e, addressWithoutPrefix, `${submitText} @${key}`);
@@ -113,14 +115,24 @@ export const HeaderList = (props: HeaderListProps) => {
 
   return (
     <Box>
-      <Box direction={"row"} gap={"24px"} align={"center"}>
-        <Box width={"116px"} align={"center"} onClick={onTitleClick}>
-          <Text size={"164px"} weight={800} color={"blue1"}>
-            {title}
-          </Text>
+      <div onClick={onTitleClick}>
+        <Box direction={"row"} gap={"24px"} align={"center"}>
+          <Box width={"116px"} align={"center"}>
+            <Text size={"164px"} weight={800} color={"blue1"}>
+              {type === 'hashtag' ? '#' : '/'}
+            </Text>
+          </Box>
+          {!isLoading && items.length === 0 &&
+              <Box>
+                  <Text color={'blue1'} style={{ textDecoration: 'underline' }}>Add {type === 'url' ? 'link' : 'hashtag'}</Text>
+              </Box>
+          }
+          {!isLoading && items.length > 0 && <Box gap={"8px"}>
+              {items.map((item) => item.content)}
+            </Box>
+          }
         </Box>
-        <Box gap={"8px"}>{items.map((item) => item.content)}</Box>
-      </Box>
+      </div>
 
       {showPopup && (
         <Layer

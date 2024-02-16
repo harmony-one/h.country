@@ -180,7 +180,7 @@ export const UserPage = (props: { id: string }) => {
             <Button key={hashtag} onClick={
               async (e) => {
                 e.preventDefault();
-                if (wallet !== undefined) {
+                if (wallet !== undefined && key !== undefined) {
                   const addressWithoutPrefix = wallet.address.slice(2);
                   await handleSubmit(e, addressWithoutPrefix, `#${hashtag} @${key}`);
                 } else {
@@ -210,14 +210,14 @@ export const UserPage = (props: { id: string }) => {
   return (
     <Box>
       <Box>
-        <HeaderList userId={key} title={"/"} items={urls.map(item => ({
+        <HeaderList userId={key} isLoading={isLoading} type={"url"} items={urls.map(item => ({
           content: (
             <Box key={item.id}>
               <Text>{item.text}</Text>
             </Box>
           ),
         }))} wallet={wallet} />
-        <HeaderList title={"#"} items={tagItems} wallet={wallet} userId={key} />
+        <HeaderList userId={key} isLoading={isLoading} type={"hashtag"} items={tagItems} wallet={wallet} />
       </Box>
       <Box>
         <Box direction={"row"} gap={"16px"}>

@@ -1,4 +1,4 @@
-import React, { ReactNode, useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { UserPage } from ".";
 import { Text } from "grommet";
@@ -35,7 +35,7 @@ export const UserPageBySocial = () => {
 
     useEffect(() => {
         loadUser();
-    }, [socialType, username])
+    }, [socialType, username, loadUser])
 
     if (loading) {
         return <Text>Loading...</Text>
