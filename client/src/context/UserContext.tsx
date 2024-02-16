@@ -62,7 +62,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       );
       // navigate('/welcome')
     }
-  }, [privateKeyLS]);
+  }, [privateKeyLS, location.pathname]);
 
   const value = useMemo(() => {
     return {
