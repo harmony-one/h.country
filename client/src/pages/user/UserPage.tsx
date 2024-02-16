@@ -143,8 +143,8 @@ export const UserPage = (props: { id: string }) => {
           });
         }
 
-        if (data.ig) {
-          const parts = data.ig.split('/');
+        if (data.ig && data.ig.url) {
+          const parts = data.ig.url.split('/');
           const usernameFromUrl = parts[parts.length - 2];
           linkItems.push({
             id: docSnap.id + "-instagram",
@@ -225,14 +225,14 @@ export const UserPage = (props: { id: string }) => {
   return (
     <Box>
       <Box>
-        <HeaderList title={"/"} items={urls.map(item => ({
+        <HeaderList isLoading={isLoading} type={"url"} items={urls.map(item => ({
           content: (
             <Box key={item.id}>
               <Text>{item.text}</Text>
             </Box>
           ),
         }))} wallet={wallet} />
-        <HeaderList title={"#"} items={tagItems} wallet={wallet} />
+        <HeaderList isLoading={isLoading} type={"hashtag"} items={tagItems} wallet={wallet} />
       </Box>
       <Box>
         <Box direction={"row"} gap={"16px"}>
