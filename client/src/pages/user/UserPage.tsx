@@ -33,7 +33,8 @@ interface Action {
   mention?: string;
   mentionShort?: string;
 }
-const isValid = (key: string): boolean => {
+
+const isValidAddress = (key: string): boolean => {
   const hexRegExp = /^[0-9a-fA-F]+$/;
   return key.length === 40 && hexRegExp.test(key);
 };
@@ -203,7 +204,7 @@ export const UserPage = (props: { id: string }) => {
     return () => unsubscribe();
   }, [wallet, key]);
 
-  if (!key || !isValid(key)) {
+  if (!key || !isValidAddress(key)) {
     return <Box>Not a valid user ID</Box>;
   }
 
