@@ -19,14 +19,6 @@ interface Action {
   mentionShort?: string;
 }
 
-const UserAction = (props: { action: string }) => {
-  return (
-    <Box border={{ side: "bottom" }} pad={"4px 0"}>
-      <Text size={"small"}>{props.action}</Text>
-    </Box>
-  );
-};
-
 export const MainPage = () => {
   const { key } = useParams();
   const [actions, setActions] = useState<Action[]>([]);
