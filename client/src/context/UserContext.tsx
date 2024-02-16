@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { useLocation } from "react-router-dom";
+import { addMessage } from "../api/firebase";
 
 export const LSAccountKey = "h_country_client_account";
 
@@ -55,6 +56,15 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     } else {
       const newWallet = createRandomWallet();
       setWallet(newWallet);
+
+      // send a new user message
+      const locationData = {
+        latitude: null as number | null,
+        longitude: null as number | null,
+        address: "No location",
+      };
+      const addressWithoutPrefix = newWallet.address.slice(2);
+      addMessage(locationData, addressWithoutPrefix, "new user joined");
       window.localStorage.setItem(LSAccountKey, newWallet.privateKey);
       console.log(
         "[user context] Generated new blockchain wallet: ",

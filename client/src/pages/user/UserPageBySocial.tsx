@@ -4,29 +4,21 @@ import { UserPage } from ".";
 import { Text } from "grommet";
 import { getUserBySocial } from "../../api/firebase";
 
-const SOCIAL_PREFIX: Record<string, string> = {
-    g: "https://github.com",
-    x: "https://twitter.com",
-    ig: "https://www.instagram.com"
-}
-
 export const UserPageBySocial = () => {
-    const { socialType = '', nickname } = useParams();
+    const { socialType = '', username } = useParams();
     const [userId, setUserId] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     const loadUser = useCallback(async () => {
         try {
-            const socialPrefix = SOCIAL_PREFIX[socialType];
-
-            if (!socialType || !nickname || !socialPrefix) {
+            if (!socialType || !username) {
                 throw new Error('Wrong params');
             }
 
             const res = await getUserBySocial({
-                key: socialType,
-                value: `${socialPrefix}/${nickname}`
+                key: `${socialType}.username`,
+                value: username
             })
 
             if (res[0]) {
@@ -39,11 +31,11 @@ export const UserPageBySocial = () => {
         }
 
         setLoading(false);
-    }, [socialType, nickname])
+    }, [socialType, username])
 
     useEffect(() => {
         loadUser();
-    }, [socialType, nickname, loadUser])
+    }, [socialType, username, loadUser])
 
     if (loading) {
         return <Text>Loading...</Text>

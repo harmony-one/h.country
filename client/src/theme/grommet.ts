@@ -15,7 +15,8 @@ export const theme: ThemeValue = {
         "light": "#ffffff"
       },
       blue1: '#2aaee9',
-      spinner: '#2aaee9'
+      spinner: '#2aaee9',
+      yellow1: '#FFF7AD',
     },
     focus: {
       border: {
