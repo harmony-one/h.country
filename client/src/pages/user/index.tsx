@@ -11,6 +11,8 @@ import {
   orderBy,
   where,
   getDocs,
+  getDoc,
+  doc
 } from "firebase/firestore";
 import { db } from "../../configs/firebase-config";
 import axios from "axios";
@@ -23,9 +25,8 @@ interface LocationData {
 }
 
 interface LinkItem {
-  id: number;
-  text: string;
-  isEditing: boolean;
+  id: string;
+  text: JSX.Element;
 }
 
 interface Message {
@@ -52,7 +53,6 @@ export const handleSubmit = async (
   text: string
 ) => {
   event.preventDefault();
-  console.log(wallet, text);
   let locationData = {
     latitude: null as number | null,
     longitude: null as number | null,
@@ -147,18 +147,6 @@ export const UserPage = () => {
   const [filterMode, setFilterMode] = useState<"all" | "key" | null>(null);
   const [urls, setUrls] = useState<LinkItem[]>([]);
 
-  const handleUrlSubmit = async (
-    event: React.FormEvent,
-    url: string
-  ) => {
-    event.preventDefault();
-    setUrls((prevUrls: LinkItem[]) => [
-      ...prevUrls,
-      // map ids (twitter url id = x, instagram url id = ig ...)
-      { id: prevUrls.length + 1, text: url, isEditing: false },
-    ]);
-  };
-
   useEffect(() => {
     const fetchAllMessages = async () => {
       const q = query(collection(db, "messages"), orderBy("timestamp", "desc"));
@@ -249,8 +237,43 @@ export const UserPage = () => {
 
   const [tagItems, setTagItems] = useState<Array<{ content: ReactNode }>>([]);
 
+  const renderedLinkItems = urls.map((item) => ({
+    content: (
+      <Box key={item.id}>
+        <Text>{item.text}</Text>
+      </Box>
+    ),
+  }));
+
   useEffect(() => {
-    console.log(key);
+    const fetchUserLinkById = async () => {
+      if (!key) return;
+
+      console.log("sdfsdfsdfsd", key)
+  
+      const docRef = doc(collection(db, "userLinks"), key);
+      const docSnap = await getDoc(docRef);
+  
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const usernameFromUrl = data.x.split('/').pop();
+        const linkItem = {
+          id: docSnap.id,
+          text: <a href={data.x} target="_blank" rel="noopener noreferrer">{`x/${usernameFromUrl}`}</a>,
+        };
+  
+        setUrls([linkItem]);
+      } else {
+        console.log("No such document!");
+        setUrls([]);
+      }
+    };
+  
+    fetchUserLinkById();
+  }, [key]);
+  
+
+  useEffect(() => {
     const messagesQuery = query(
       collection(db, "messages"),
       where("mentions", "array-contains", key)
@@ -296,8 +319,6 @@ export const UserPage = () => {
         })
       );
 
-      console.log(sortedHashtags);
-
       setTagItems(sortedHashtags);
     });
 
@@ -308,19 +329,16 @@ export const UserPage = () => {
     return <Box>Not a valid user ID</Box>;
   }
 
-  const renderedLinkItems = urls.map((item) => ({
-    content: (
-      <Box key={item.id}>
-        <Text>{item.text}</Text> {/* Display the URL text */}
-        {/* You can add more interactive elements here if needed */}
-      </Box>
-    ),
-  }));
-
   return (
     <Box>
       <Box>
-      <HeaderList title={"/"} items={renderedLinkItems} wallet={wallet} />
+      <HeaderList title={"/"} items={urls.map(item => ({
+          content: (
+            <Box key={item.id}>
+              <Text>{item.text}</Text>
+            </Box>
+          ),
+        }))} wallet={wallet}/>
         <HeaderList title={"#"} items={tagItems} wallet={wallet} />
       </Box>
       <Box>

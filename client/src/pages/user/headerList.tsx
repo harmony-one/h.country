@@ -4,11 +4,13 @@ import { handleSubmit } from '.';
 import { ethers } from 'ethers';
 import { useParams } from 'react-router-dom';
 import { doc, setDoc } from "firebase/firestore";
+import { db } from '../../configs/firebase-config';
 
 interface HeaderListProps {
   title: string;
   items: Array<{ content: ReactNode }>;
   wallet: ethers.Wallet | undefined;
+  onUrlSubmit?: (url: string) => void;
 }
 
 export const HeaderList = (props: HeaderListProps) => {
@@ -51,6 +53,21 @@ export const HeaderList = (props: HeaderListProps) => {
     return !!pattern.test(url);
   }
 
+  const onUrlSubmit = async (url: string) => {
+    if (!key) {
+      console.error("No key provided for URL submission.");
+      return;
+    }
+    try {
+      await setDoc(doc(db, "userLinks", key), {
+        x: url
+      });
+      console.log("Document successfully written!");
+    } catch (error) {
+      console.error("Error writing document: ", error);
+    }
+  };
+
   return (
     <Box>
       <Box direction={"row"} gap={"24px"} align={"center"}>
@@ -83,9 +100,10 @@ export const HeaderList = (props: HeaderListProps) => {
                   if (!isValidUrl(inputUrl)) {
                     alert('Enter a valid URL.');
                     return;
+                  } else {
+                    await onUrlSubmit(inputUrl);
                   }
                 }
-
                 if (wallet !== undefined) {
                   const addressWithoutPrefix = wallet.address.slice(2);
                   const submitText = popupType === 'hashtag' ? `#${inputText}` : inputUrl;
