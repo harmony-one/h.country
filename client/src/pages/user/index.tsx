@@ -1,5 +1,5 @@
 import React, { ReactNode, useState, useEffect } from "react";
-import { Box, Button, Text, TextInput } from "grommet";
+import { Box, Button, Text } from "grommet";
 import { PlainButton } from "../../components/button";
 import { useUserContext } from "../../context/UserContext";
 import { useParams } from "react-router-dom";
@@ -11,6 +11,7 @@ import {
   orderBy,
   where,
   getDocs,
+  doc
 } from "firebase/firestore";
 import { db } from "../../configs/firebase-config";
 import axios from "axios";
@@ -24,9 +25,8 @@ interface LocationData {
 }
 
 interface LinkItem {
-  id: number;
-  text: string;
-  isEditing: boolean;
+  id: string;
+  text: JSX.Element;
 }
 
 interface Message {
@@ -53,7 +53,6 @@ export const handleSubmit = async (
   text: string
 ) => {
   event.preventDefault();
-  console.log(wallet, text);
   let locationData = {
     latitude: null as number | null,
     longitude: null as number | null,
@@ -116,8 +115,10 @@ const addMessage = async (
   const duplicateCheckSnapshot = await getDocs(duplicateCheckQuery);
 
   if (!duplicateCheckSnapshot.empty) {
-    window.alert("Duplicate message detected. No duplicate messages allowed.");
-    return;
+    if (!text.includes("https://")) {
+      window.alert("Duplicate message detected. No duplicate messages allowed.");
+      return;
+    }
   }
 
   const mentions = [...text.matchAll(/@(\w+)/g)].map((match) => match[1]);
@@ -146,54 +147,7 @@ export const UserPage = () => {
   const { key } = useParams();
   const [actions, setActions] = useState<Action[]>([]);
   const [filterMode, setFilterMode] = useState<"all" | "key" | null>(null);
-
-  const [linkItems, setLinkItems] = useState<LinkItem[]>([
-    { id: 1, text: "𝕏/", isEditing: false },
-    { id: 2, text: "t/", isEditing: false },
-    { id: 3, text: "ig/", isEditing: false },
-    { id: 4, text: "l/", isEditing: false },
-    { id: 5, text: "d/", isEditing: false },
-  ]);
-
-  const toggleEdit = (id: number) => {
-    const walletKey = wallet?.address?.toLowerCase() ?? "";
-    const paramKey = key?.toLowerCase() ?? "foo";
-
-    if (walletKey.includes(paramKey)) {
-      setLinkItems((prevItems) =>
-        prevItems.map((item) =>
-          item.id === id ? { ...item, isEditing: !item.isEditing } : item
-        )
-      );
-    } else {
-      alert("You can only edit items when your wallet matches the user ID in the URL.");
-    }
-  };
-
-  const updateText = (id: number, text: string) => {
-    setLinkItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, text: text, isEditing: false } : item
-      )
-    );
-  };
-
-  const renderedLinkItems = linkItems.map((item) => ({
-    content: item.isEditing ? (
-      <TextInput
-        autoFocus
-        defaultValue={item.text}
-        onBlur={() => toggleEdit(item.id)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            updateText(item.id, e.currentTarget.value);
-          }
-        }}
-      />
-    ) : (
-      <Text onClick={() => toggleEdit(item.id)} style={{ cursor: 'pointer' }}>{item.text}</Text>
-    ),
-  }));
+  const [urls, setUrls] = useState<LinkItem[]>([]);
 
   useEffect(() => {
     const fetchAllMessages = async () => {
@@ -286,7 +240,49 @@ export const UserPage = () => {
   const [tagItems, setTagItems] = useState<Array<{ content: ReactNode }>>([]);
 
   useEffect(() => {
-    console.log(key);
+    if (!key) return;
+    const docRef = doc(db, "userLinks", key);
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        let linkItems: LinkItem[] = [];
+
+        if (data.x) {
+          const usernameFromUrl = data.x.split('/').pop();
+          linkItems.push({
+            id: docSnap.id + "-twitter",
+            text: (
+              <a href={data.x} target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
+                {`x/${usernameFromUrl}`}
+              </a>
+            ),
+          });
+        }
+
+        if (data.ig) {
+          const parts = data.ig.split('/');
+          const usernameFromUrl = parts[parts.length - 2];
+          linkItems.push({
+            id: docSnap.id + "-instagram",
+            text: (
+              <a href={data.ig} target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
+                {`ig/${usernameFromUrl}`}
+              </a>
+            ),
+          });
+        }
+
+        setUrls(linkItems);
+      } else {
+        console.log("No such document!");
+        setUrls([]);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [key]);
+
+  useEffect(() => {
     const messagesQuery = query(
       collection(db, "messages"),
       where("mentions", "array-contains", key)
@@ -322,7 +318,7 @@ export const UserPage = () => {
                   console.log("Invalid user wallet");
                 }
               }}
-            plain>
+              plain>
               <Box direction={"row"} key={hashtag}>
                 <Text>{hashtag}</Text>
                 <Text size={"xsmall"}>{count}</Text>
@@ -330,9 +326,7 @@ export const UserPage = () => {
             </Button>
           ),
         })
-      );
-
-      console.log(sortedHashtags);
+        );
 
       setTagItems(sortedHashtags);
     });
@@ -347,7 +341,13 @@ export const UserPage = () => {
   return (
     <Box>
       <Box>
-      <HeaderList title={"/"} items={renderedLinkItems} wallet={wallet} />
+        <HeaderList title={"/"} items={urls.map(item => ({
+          content: (
+            <Box key={item.id}>
+              <Text>{item.text}</Text>
+            </Box>
+          ),
+        }))} wallet={wallet} />
         <HeaderList title={"#"} items={tagItems} wallet={wallet} />
       </Box>
       <Box>
@@ -371,10 +371,10 @@ export const UserPage = () => {
         </Box>
       </Box>
       <Box>
-      {actions.map((action, index) => (
-        <UserAction key={index + action.timestamp} action={action} />
-      ))}
-    </Box>
+        {actions.map((action, index) => (
+          <UserAction key={index + action.timestamp} action={action} />
+        ))}
+      </Box>
     </Box>
   );
 };
