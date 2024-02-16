@@ -126,7 +126,7 @@ export const HeaderList = (props: HeaderListProps) => {
     <Box>
       <Box direction={"row"} gap={"24px"} align={"center"}>
         <Box width={"116px"} align={"center"} onClick={onTitleClick}>
-          <Text size={"164px"} color={"blue1"}>
+          <Text size={"164px"} weight={800} color={"blue1"}>
             {title}
           </Text>
         </Box>
