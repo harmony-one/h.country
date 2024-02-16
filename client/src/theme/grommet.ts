@@ -1,9 +1,19 @@
-import {ThemeValue} from "grommet";
+import { ThemeValue } from "grommet";
 
 export const theme: ThemeValue = {
   global: {
+    font: {
+      family: 'Nunito',
+      color: {
+        "dark": "#ffffff",
+        "light": '#323232'
+      },
+    },
     colors: {
-      background: '#323232',
+      background: {
+        "dark": '#323232',
+        "light": "#ffffff"
+      },
       blue1: '#2aaee9',
       spinner: '#2aaee9'
     },
