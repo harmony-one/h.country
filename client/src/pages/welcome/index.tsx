@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../context/UserContext";
 import { UserTopic } from "../../types";
-import { message, Typography, Spin } from "antd";
+import { Typography, Spin } from "antd";
 import {postUserTopics} from "../../api/firebase";
 
 const WelcomeContainer = styled(Box)`
@@ -123,7 +123,6 @@ export const WelcomePage: React.FC = () => {
   const { wallet } = useUserContext();
 
   const navigate = useNavigate();
-  const [messageApi, contextHolder] = message.useMessage();
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [isTopicsUpdating, setTopicsUpdating] = useState(false);
   const [topicList, setTopicList] = useState<UserTopic[]>();
@@ -192,7 +191,6 @@ export const WelcomePage: React.FC = () => {
       width={'700px'}
       margin={'0 auto'}
     >
-      {contextHolder}
       <Spin spinning={isTopicsUpdating} size={"large"}>
         <WelcomeContainer>
           {[1, 2, 3].map((group) => (
