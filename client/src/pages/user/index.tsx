@@ -46,14 +46,6 @@ const isValid = (key: string): boolean => {
   return key.length === 40 && hexRegExp.test(key);
 };
 
-const UserAction = (props: { action: string }) => {
-  return (
-    <Box border={{ side: "bottom" }} pad={"4px 0"}>
-      <Text size={"small"}>{props.action}</Text>
-    </Box>
-  );
-};
-
 export const handleSubmit = async (
   event: React.FormEvent,
   wallet: string,
@@ -161,7 +153,7 @@ export const UserPage = () => {
     { id: 4, text: "l/", isEditing: false },
     { id: 5, text: "d/", isEditing: false },
   ]);
-  
+
   const toggleEdit = (id: number) => {
     const walletKey = wallet?.address?.toLowerCase() ?? "";
     const paramKey = key?.toLowerCase() ?? "foo";
@@ -218,7 +210,7 @@ export const UserPage = () => {
             minute: "2-digit",
             hour12: true,
           }).replace(",", "").replace(/([AP]M)$/, " $1");
-  
+
           return {
             timestamp: formattedTimestamp,
             username: data.username,
@@ -229,9 +221,9 @@ export const UserPage = () => {
           };
         })
         .filter((action) => action.mention && action.hashtag);
-  
+
       setActions(formattedMessages);
-    };     
+    };
 
     const fetchMessagesByKey = async (key: string) => {
       const mentionsQuery = query(
@@ -240,14 +232,14 @@ export const UserPage = () => {
         where("mentions", "array-contains", key)
       );
       const mentionsSnapshot = await getDocs(mentionsQuery);
-    
+
       const usernameQuery = query(
         collection(db, "messages"),
         orderBy("timestamp", "desc"),
         where("username", "==", key)
       );
       const usernameSnapshot = await getDocs(usernameQuery);
-    
+
       const combinedActions = [
         ...mentionsSnapshot.docs,
         ...usernameSnapshot.docs,
@@ -268,7 +260,7 @@ export const UserPage = () => {
             minute: '2-digit',
             hour12: true
           }).replace(',', '').replace(/([AP]M)$/, ' $1');
-    
+
           return {
             timestamp: formattedTimestamp,
             username: data.username,
@@ -279,9 +271,9 @@ export const UserPage = () => {
           };
         })
         .filter((action) => action.mention && action.hashtag);
-    
+
       setActions(combinedActions);
-    };    
+    };
 
     if (filterMode === "all") {
       fetchAllMessages();
