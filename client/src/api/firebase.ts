@@ -23,6 +23,7 @@ export const getMessages = async (): Promise<Action[]> => {
         username: data.username,
         usernameShort: data.username.substring(0, 4),
         hashtag: data.hashtags?.[0],
+        link: data.links?.[0],
         mention: data.mentions?.[0],
         mentionShort: data.mentions?.[0]?.substring(0, 4),
       };
@@ -71,6 +72,7 @@ export const getMessagesByKey = async (key: string): Promise<Action[]> => {
         username: data.username,
         usernameShort: data.username.substring(0, 4),
         hashtag: data.hashtags?.[0],
+        link: data.links?.[0],
         mention: data.mentions?.[0],
         mentionShort: data.mentions?.[0]?.substring(0, 4),
       };

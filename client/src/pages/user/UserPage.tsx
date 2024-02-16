@@ -30,6 +30,7 @@ interface Action {
   username: string;
   usernameShort: string;
   hashtag?: string;
+  link?: string;
   mention?: string;
   mentionShort?: string;
 }
