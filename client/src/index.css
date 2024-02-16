@@ -13,9 +13,11 @@ code {
 }
 
 .link {
-  color: #ADD8E6; /* Very light blue */
+  color: #64ebfd; /* Very light blue */
+  text-decoration: none;
 }
 
 .link:visited {
-  color: #E6E6FA; /* Very light purple */
+  color: #eeb7ff; /* Very light purple */
+  text-decoration: none;
 }
