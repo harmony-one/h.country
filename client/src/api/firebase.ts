@@ -1,4 +1,4 @@
-import {addDoc, collection, getDocs, orderBy, query, where,} from "firebase/firestore";
+import { collection, getDocs, setDoc, doc, query, where, orderBy, addDoc } from 'firebase/firestore';
 import {db} from "../configs/firebase-config";
 import {Action, LocationData} from "../types";
 
@@ -120,3 +120,10 @@ export const addMessage = async (
     console.error("Could not send the message: ", error);
   }
 };
+
+export const postUserTopics = async (address: string, topics: string[]) => {
+  return await setDoc(doc(db, "users", address), {
+    ...topics,
+    created: Math.floor(Date.now() / 1000)
+  });
+}
