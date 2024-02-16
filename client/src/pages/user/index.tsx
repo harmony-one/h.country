@@ -71,7 +71,7 @@ const handleSubmit = async (
   text: string
 ) => {
   event.preventDefault();
-  console.log(wallet, text)
+  console.log(wallet, text);
   let locationData = {
     latitude: null as number | null,
     longitude: null as number | null,
@@ -151,6 +151,8 @@ export const UserPage = () => {
   const { wallet } = useUserContext();
   const { key } = useParams();
   const [text, setText] = useState("");
+  const [actions, setActions] = useState<string[]>([]);
+  const [filterMode, setFilterMode] = useState<"all" | "key" | null>(null);
 
   const linkItems = [
     {
@@ -164,22 +166,79 @@ export const UserPage = () => {
     },
   ];
 
-  const actions: string[] = [
-    "x/stse links Github g/stephen-tse",
-    "x/stse links Telegram g/stephentse",
-    "g/soph-neou 🤖by x/stse",
-  ];
+  useEffect(() => {
+    const fetchAllMessages = async () => {
+      const q = query(collection(db, "messages"), orderBy("timestamp", "desc"));
+      const querySnapshot = await getDocs(q);
+      const formattedMessages = querySnapshot.docs.reduce<string[]>(
+        (acc, doc) => {
+          const data = doc.data();
+          if (data.hashtags?.length > 0 && data.mentions?.length > 0) {
+            const messageString = `0/${data.username.substring(0, 4)} tags #${
+              data.hashtags[0]
+            } on 0/${data.mentions[0].substring(0, 4)}`;
+            acc.push(messageString);
+          }
+          return acc;
+        },
+        []
+      );
+
+      setActions(formattedMessages);
+    };
+
+    const fetchMessagesByKey = async (key: string) => {
+      const mentionsQuery = query(
+        collection(db, "messages"),
+        orderBy("timestamp", "desc"),
+        where("mentions", "array-contains", key)
+      );
+      const mentionsSnapshot = await getDocs(mentionsQuery);
+
+      const usernameQuery = query(
+        collection(db, "messages"),
+        orderBy("timestamp", "desc"),
+        where("username", "==", key)
+      );
+      const usernameSnapshot = await getDocs(usernameQuery);
+
+      const combinedActions = [
+        ...mentionsSnapshot.docs,
+        ...usernameSnapshot.docs,
+      ]
+        .map((doc) => ({ id: doc.id, data: doc.data() }))
+        .filter(
+          (value, index, self) =>
+            index === self.findIndex((t) => t.id === value.id)
+        )
+        .reduce<string[]>((acc, { data }) => {
+          if (data.hashtags?.length > 0 && data.mentions?.length > 0) {
+            const messageString = `0/${data.username.substring(0, 4)} tags #${
+              data.hashtags[0]
+            } on 0/${data.mentions[0].substring(0, 4)}`;
+            acc.push(messageString);
+          }
+          return acc;
+        }, []);
+
+      setActions(combinedActions);
+    };
+
+    if (filterMode === "all") {
+      fetchAllMessages();
+    } else if (filterMode === "key" && key) {
+      fetchMessagesByKey(key);
+    }
+  }, [filterMode, key]);
 
   const [tagItems, setTagItems] = useState<Array<{ content: ReactNode }>>([]);
 
   useEffect(() => {
-    console.log(key)
+    console.log(key);
     const messagesQuery = query(
       collection(db, "messages"),
       where("mentions", "array-contains", key)
     );
-
-    console.log(messagesQuery)
 
     const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
       const messages: Message[] = querySnapshot.docs.map((doc) => ({
@@ -208,7 +267,7 @@ export const UserPage = () => {
           ),
         }));
 
-      console.log(sortedHashtags)
+      console.log(sortedHashtags);
 
       setTagItems(sortedHashtags);
     });
@@ -231,7 +290,7 @@ export const UserPage = () => {
           e.preventDefault();
           if (wallet !== undefined) {
             const addressWithoutPrefix = wallet.address.slice(2);
-            handleSubmit(e, addressWithoutPrefix, text + ' @' + key);
+            handleSubmit(e, addressWithoutPrefix, text + " @" + key);
           } else {
             console.log("Invalid user wallet");
           }
@@ -248,14 +307,28 @@ export const UserPage = () => {
       </form>
       <Box>
         <Box direction={"row"} gap={"16px"}>
-          <PlainButton>All(91)</PlainButton>
-          <PlainButton>@stse(12)</PlainButton>
+          <PlainButton
+            onClick={() => setFilterMode("all")}
+            style={{
+              backgroundColor: filterMode === "all" ? "grey" : "initial",
+            }}
+          >
+            All
+          </PlainButton>
+          <PlainButton
+            onClick={() => setFilterMode("key")}
+            style={{
+              backgroundColor: filterMode === "key" ? "grey" : "initial",
+            }}
+          >
+            {key?.substring(0, 4)}
+          </PlainButton>
         </Box>
       </Box>
       <Box margin={{ top: "16px" }} gap={"4px"}>
-        {actions.map((action) => {
-          return <UserAction key={action} action={action} />;
-        })}
+        {actions.map((action) => (
+          <UserAction key={action} action={action} />
+        ))}
       </Box>
     </Box>
   );
