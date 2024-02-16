@@ -1,12 +1,8 @@
 import React from 'react'
 import { Box } from "grommet"
-import { Typography } from "antd"
 import { useUserContext } from "../../context/UserContext";
-import { shortenAddress } from '../../utils';
 
 export const AppMenu = () => {
-  const { wallet } = useUserContext();
-
   return <Box>
     <Box direction={'row'} justify={'between'}>
       <Box>h.country</Box>
