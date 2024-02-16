@@ -1,5 +1,5 @@
 import React, { ReactNode, useState, useEffect } from "react";
-import { Box, Text } from "grommet";
+import { Box, Button, Text } from "grommet";
 import { PlainButton } from "../../components/button";
 import { useUserContext } from "../../context/UserContext";
 import { useParams } from "react-router-dom";
@@ -15,11 +15,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../configs/firebase-config";
 import axios from "axios";
-
-interface HeaderListProps {
-  title: string;
-  items: Array<{ content: ReactNode }>;
-}
+import { HeaderList } from "./headerList";
 
 interface LocationData {
   latitude: number | null;
@@ -37,26 +33,6 @@ const isValid = (key: string): boolean => {
   return key.length === 40 && hexRegExp.test(key);
 };
 
-const isMyPage = (address: string | undefined, key: string): boolean => {
-  if (!address) return false;
-  return address.substring(2).toLowerCase() === key.toLowerCase();
-};
-
-const HeaderList = (props: HeaderListProps) => {
-  const { title, items } = props;
-
-  return (
-    <Box direction={"row"} gap={"24px"} align={"center"}>
-      <Box width={"116px"} align={"center"}>
-        <Text size={"164px"} color={"blue1"}>
-          {title}
-        </Text>
-      </Box>
-      <Box gap={"8px"}>{items.map((item) => item.content)}</Box>
-    </Box>
-  );
-};
-
 const UserAction = (props: { action: string }) => {
   return (
     <Box border={{ side: "bottom" }} pad={"4px 0"}>
@@ -65,7 +41,7 @@ const UserAction = (props: { action: string }) => {
   );
 };
 
-const handleSubmit = async (
+export const handleSubmit = async (
   event: React.FormEvent,
   wallet: string,
   text: string
@@ -135,7 +111,7 @@ const addMessage = async (
   const duplicateCheckSnapshot = await getDocs(duplicateCheckQuery);
 
   if (!duplicateCheckSnapshot.empty) {
-    console.error("Duplicate message detected. No duplicate messages allowed.");
+    window.alert("Duplicate message detected. No duplicate messages allowed.");
     return;
   }
 
@@ -164,7 +140,6 @@ const addMessage = async (
 export const UserPage = () => {
   const { wallet } = useUserContext();
   const { key } = useParams();
-  const [text, setText] = useState("");
   const [actions, setActions] = useState<string[]>([]);
   const [filterMode, setFilterMode] = useState<"all" | "key" | null>(null);
 
@@ -274,12 +249,25 @@ export const UserPage = () => {
         .slice(0, 3)
         .map(([hashtag, count]) => ({
           content: (
-            <Box direction={"row"} key={hashtag}>
-              <Text>{hashtag}</Text>
-              <Text size={"xsmall"}>{count}</Text>
-            </Box>
+            <Button key={hashtag} onClick={
+              async (e) => {
+                e.preventDefault();
+                if (wallet !== undefined) {
+                  const addressWithoutPrefix = wallet.address.slice(2);
+                  await handleSubmit(e, addressWithoutPrefix, `#${hashtag} @${key}`);
+                } else {
+                  console.log("Invalid user wallet");
+                }
+              }}
+            plain>
+              <Box direction={"row"} key={hashtag}>
+                <Text>{hashtag}</Text>
+                <Text size={"xsmall"}>{count}</Text>
+              </Box>
+            </Button>
           ),
-        }));
+        })
+      );
 
       console.log(sortedHashtags);
 
@@ -287,7 +275,7 @@ export const UserPage = () => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [wallet, key]);
 
   if (!key || !isValid(key)) {
     return <Box>Not a valid user ID</Box>;
@@ -296,29 +284,9 @@ export const UserPage = () => {
   return (
     <Box>
       <Box>
-        <HeaderList title={"/"} items={linkItems} />
-        <HeaderList title={"#"} items={tagItems} />
+        <HeaderList title={"/"} items={linkItems} wallet={wallet} />
+        <HeaderList title={"#"} items={tagItems} wallet={wallet} />
       </Box>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (wallet !== undefined) {
-            const addressWithoutPrefix = wallet.address.slice(2);
-            handleSubmit(e, addressWithoutPrefix, text + " @" + key);
-          } else {
-            console.log("Invalid user wallet");
-          }
-        }}
-      >
-        <div className="input-with-icon">
-          <input
-            type="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Enter text here"
-          />
-        </div>
-      </form>
       <Box>
         <Box direction={"row"} gap={"16px"}>
           <PlainButton

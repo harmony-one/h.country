@@ -10,7 +10,7 @@ export const AppMenu = () => {
   return <Box>
     <Box direction={'row'} justify={'between'}>
       <Box>h.country</Box>
-      <Box>0/beef</Box>
+      <Box>0/{wallet?.address.substring(2, 6)}</Box>
     </Box>
     {/*<Box align={'end'}>*/}
     {/*  <Box direction="row" gap={'8px'} align={'center'}>*/}
