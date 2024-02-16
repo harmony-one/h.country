@@ -98,7 +98,7 @@ export const HeaderList = (props: HeaderListProps) => {
         await onUrlSubmit(inputUrl);
       }
     }
-    if (wallet !== undefined) {
+    if (wallet !== undefined && key !== undefined) {
       const addressWithoutPrefix = wallet.address.slice(2);
       const submitText = popupType === 'hashtag' ? `#${inputText}` : inputUrl;
       await handleSubmit(e, addressWithoutPrefix, `${submitText} @${key}`);

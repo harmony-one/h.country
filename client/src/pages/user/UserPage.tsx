@@ -195,7 +195,7 @@ export const UserPage = (props: { id: string }) => {
             <Button key={hashtag} onClick={
               async (e) => {
                 e.preventDefault();
-                if (wallet !== undefined) {
+                if (wallet !== undefined && key !== undefined) {
                   const addressWithoutPrefix = wallet.address.slice(2);
                   await handleSubmit(e, addressWithoutPrefix, `#${hashtag} @${key}`);
                 } else {
