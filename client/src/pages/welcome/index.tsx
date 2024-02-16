@@ -72,9 +72,17 @@ const TopicItemContainer = styled(Box)<{ isSelected?: boolean }>`
     `} */
 `;
 
-const TopicItemImage = styled.img`
+const TopicItemImage = styled.img<{ isDark?: Boolean}>`
   max-width: 50%;
   max-height: 50%;
+  
+  ${(props) => props.isDark ? 
+      `filter: invert(100%)
+        sepia(92%) 
+        saturate(1%) 
+        hue-rotate(290deg) 
+        brightness(105%) 
+        contrast(101%);` : ''};
 `;
 
 const TopicItemAlias = styled(Box)`
@@ -93,6 +101,7 @@ interface TopicItemProps {
 const TopicItem = (props: TopicItemProps) => {
   const { topic, isSelected, onClick } = props;
   const [image, setImage] = useState(topic.light);
+  const [showLabel, setShowLabel] = useState(false)
 
   const themeMode = useDarkMode()
 
@@ -100,7 +109,7 @@ const TopicItem = (props: TopicItemProps) => {
     if (isSelected) {
       setImage(topic.color);
     } else {
-      const logo =  themeMode ? topic.dark : topic.light 
+      const logo = topic.light 
       setImage(logo);
     }
 
@@ -110,9 +119,9 @@ const TopicItem = (props: TopicItemProps) => {
   const prefix = "#"; // topic.type === 'blockchain' ? '$' : '#'
   return (
     <TopicItemContainer isSelected={isSelected} onClick={onClick}>
-      {image && <TopicItemImage src={image} alt={`${topic.name} logo`} />}
+      {image && <TopicItemImage isDark={!isSelected && themeMode} src={image}alt={`${topic.name} logo`} onLoad={() => isSelected && setShowLabel(true)} />}
       <TopicItemAlias>
-        {isSelected && (
+        {isSelected && showLabel && (
           <Typography.Text
             style={{ fontSize: "min(2.4vw, 0.8rem)", fontWeight: 600 }}
           >

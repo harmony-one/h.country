@@ -1,15 +1,24 @@
-<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g clip-path="url(#clip0_88_6383)">
-<path d="M32 64C49.6731 64 64 49.6731 64 32C64 14.3269 49.6731 0 32 0C14.3269 0 0 14.3269 0 32C0 49.6731 14.3269 64 32 64Z" fill="url(#paint0_linear_88_6383)"/>
-<path d="M21.2479 15.104L17.7919 18.56V32.256L21.2479 35.712H34.9439V42.624H28.1599V39.168H17.7919V46.08L21.2479 49.536H41.8559L45.3119 46.08V32.256L41.8559 28.8H28.1599V21.888H35.0719V25.344H45.4399V18.432L41.9839 14.976H21.2479V15.104Z" fill="white"/>
-</g>
-<defs>
-<linearGradient id="paint0_linear_88_6383" x1="13.7216" y1="11.3728" x2="53.5936" y2="56.3648" gradientUnits="userSpaceOnUse">
-<stop stop-color="#018EFC"/>
-<stop offset="1" stop-color="#01AEF0"/>
-</linearGradient>
-<clipPath id="clip0_88_6383">
-<rect width="64" height="64" fill="white"/>
-</clipPath>
-</defs>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 64 64">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-1, .cls-2 {
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        fill: #fff;
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="26.26" y1="-959.79" x2="27.05" y2="-958.9" gradientTransform="translate(-1299 48001) scale(50)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00adef"/>
+      <stop offset="1" stop-color="#0084ff"/>
+    </linearGradient>
+  </defs>
+  <circle class="cls-1" cx="32" cy="32" r="31.5"/>
+  <path class="cls-2" d="M21.63,14.85l-3.46,3.46v13.7l3.46,3.46h13.7v6.91h-6.78v-3.46h-10.37v6.91l3.46,3.46h20.61l3.46-3.46v-13.82l-3.46-3.46h-13.7v-6.91h6.91v3.46h10.37v-6.91l-3.46-3.46h-20.74v.13Z"/>
 </svg>
