@@ -1,6 +1,7 @@
 import { collection, getDocs, setDoc, doc, query, where, orderBy, addDoc } from 'firebase/firestore';
 import { db } from "../configs/firebase-config";
-import { Action, LocationData } from "../types";
+import { Action, AddressComponents, LocationData } from "../types";
+import axios from "axios";
 
 export const getMessages = async (): Promise<Action[]> => {
   const q = query(collection(db, "messages"), orderBy("timestamp", "desc"));
@@ -100,22 +101,55 @@ export const addMessage = async (
     }
   }
 
+  let addressComponents: AddressComponents = {};
+  if (locationData.latitude && locationData.longitude) {
+    try {
+      const response = await axios.get(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${locationData.latitude}&lon=${locationData.longitude}`
+      );
+      addressComponents = response.data.address;
+    } catch (error) {
+      console.error("Error fetching address: ", error);
+    }
+  }
+
   const mentions = [...text.matchAll(/@(\w+)/g)].map((match) => match[1]);
   const hashtags = [...text.matchAll(/#(\w+)/g)].map((match) => match[1]);
+  let type: string = "message";
 
-  let message = {
-    username: username || "Anonymous",
-    text,
-    timestamp,
-    address: locationData.address,
-    latitude: locationData.latitude,
-    longitude: locationData.longitude,
-    mentions,
-    hashtags,
+  const urlRegex = /https?:\/\/[^\s]+/;
+  if (urlRegex.test(text)) {
+    type = "link";
+  } else if (text.includes("check-in")) {
+    type = "check-in";
+  } else if (text.includes("new_user")) {
+    type = "new_user";
+  } else if (mentions.length > 0 && hashtags.length > 0) {
+    type = "tag";
+  }
+
+  let action = {
+    from: username,
+    to: mentions[0],
+    type: type,
+    payload: text,
+    address: {
+      house_number: addressComponents.house_number || "",
+      road: addressComponents.road || "",
+      city:
+        addressComponents.city ||
+        addressComponents.town ||
+        addressComponents.village ||
+        "",
+      state: addressComponents.state || "",
+      postcode: addressComponents.postcode || "",
+      country: addressComponents.country || "",
+    },
+    timestamp: timestamp,
   };
 
   try {
-    await addDoc(collection(db, "messages"), message);
+    await addDoc(collection(db, "actions"), action);
   } catch (error) {
     console.error("Could not send the message: ", error);
   }
