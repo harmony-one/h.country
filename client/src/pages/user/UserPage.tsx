@@ -10,7 +10,6 @@ import {
   doc
 } from "firebase/firestore";
 import { db } from "../../configs/firebase-config";
-import axios from "axios";
 import { HeaderList } from "./headerList";
 import { UserAction } from "../../components/action";
 import { addMessage, getMessages, getMessagesByKey } from "../../api/firebase";

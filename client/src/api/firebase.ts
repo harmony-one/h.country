@@ -19,9 +19,6 @@ export const getMessages = async (): Promise<Action[]> => {
         hour12: true,
       }).replace(",", "").replace(/([AP]M)$/, " $1");
 
-      const mentions = [...data.payload.matchAll(/@(\w+)/g)].map((match) => match[1]);
-      const hashtags = [...data.payload.matchAll(/#(\w+)/g)].map((match) => match[1]);
-
       return {
         timestamp: formattedTimestamp,
         from: data.from,
@@ -32,7 +29,7 @@ export const getMessages = async (): Promise<Action[]> => {
         type: data.type
       };
     })
-    .filter((action) => action.type == "tag"
+    .filter((action) => action.type === "tag"
       || action.type === "new_user")
 }
 
@@ -72,9 +69,6 @@ export const getMessagesByKey = async (key: string): Promise<Action[]> => {
         hour12: true
       }).replace(',', '').replace(/([AP]M)$/, ' $1');
 
-      const mentions = [...data.payload.matchAll(/@(\w+)/g)].map((match) => match[1]);
-      const hashtags = [...data.payload.matchAll(/#(\w+)/g)].map((match) => match[1]);
-
       return {
         timestamp: formattedTimestamp,
         from: data.from,
@@ -85,7 +79,7 @@ export const getMessagesByKey = async (key: string): Promise<Action[]> => {
         type: data.type
       };
     })
-    .filter((action) => action.type == "tag"
+    .filter((action) => action.type === "tag"
       || action.type === "new_user")
 };
 
