@@ -92,18 +92,28 @@ export const addMessage = async (
     where("username", "==", username),
     where("text", "==", text)
   );
-
   const duplicateCheckSnapshot = await getDocs(duplicateCheckQuery);
 
-  if (!duplicateCheckSnapshot.empty) {
-    if (!text.includes("https://")) {
-      window.alert("Duplicate message detected. No duplicate messages allowed.");
-      return;
-    }
+  if (!duplicateCheckSnapshot.empty && !text.includes("https://")) {
+    window.alert("Duplicate message detected. No duplicate messages allowed.");
+    return;
   }
 
-  const mentions = [...text.matchAll(/@(\w+)/g)].map((match) => match[1]);
-  const hashtags = [...text.matchAll(/#(\w+)/g)].map((match) => match[1]);
+  const urlRegex = /https?:\/\/[^\s@]+/g;
+  const mentionRegex = /@(\w+)/g;
+
+  let mentions: string[] = [];
+  let hashtags: string[] = [];
+  let links: string[] = [];
+
+  const urlMatch = text.match(urlRegex);
+  if (urlMatch) {
+    links = [...urlMatch];
+    mentions = [...text.matchAll(mentionRegex)].map((match) => match[1]);
+  } else {
+    hashtags = [...text.matchAll(/#(\w+)/g)].map((match) => match[1]);
+    mentions = [...text.matchAll(mentionRegex)].map((match) => match[1]);
+  }
 
   let message = {
     username: username || "Anonymous",
@@ -114,6 +124,7 @@ export const addMessage = async (
     longitude: locationData.longitude,
     mentions,
     hashtags,
+    links,
   };
 
   try {
@@ -122,6 +133,7 @@ export const addMessage = async (
     console.error("Could not send the message: ", error);
   }
 };
+
 
 export const postUserTopics = async (address: string, topics: string[]) => {
   return await setDoc(doc(db, "users", address), {
