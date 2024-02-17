@@ -17,6 +17,7 @@ export interface Action {
   hashtag?: string;
   mention?: string;
   mentionShort?: string;
+  text?: string;
 }
 
 export interface AddressComponents {

@@ -26,9 +26,11 @@ export const getMessages = async (): Promise<Action[]> => {
         hashtag: data.hashtags?.[0],
         mention: data.mentions?.[0],
         mentionShort: data.mentions?.[0]?.substring(0, 4),
+        text: data.text,
       };
     })
-    .filter((action) => action.mention && action.hashtag)
+    .filter((action) => (action.mention && action.hashtag)
+      || action.text === "new user joined")
 }
 
 export const getMessagesByKey = async (key: string): Promise<Action[]> => {
@@ -74,9 +76,11 @@ export const getMessagesByKey = async (key: string): Promise<Action[]> => {
         hashtag: data.hashtags?.[0],
         mention: data.mentions?.[0],
         mentionShort: data.mentions?.[0]?.substring(0, 4),
+        text: data.text,
       };
     })
-    .filter((action) => action.mention && action.hashtag)
+    .filter((action) => (action.mention && action.hashtag)
+      || action.text === "new user joined")
 };
 
 export const addMessage = async (

@@ -9,6 +9,7 @@ import { socialUrlParser } from '../../utils';
 interface HeaderListProps {
   userId: string;
   isLoading?: boolean
+  isUserPage: boolean
   type: 'url' | 'hashtag'
   items: Array<{ content: ReactNode }>;
   wallet: ethers.Wallet | undefined;
@@ -16,7 +17,7 @@ interface HeaderListProps {
 }
 
 export const HeaderList = (props: HeaderListProps) => {
-  const { userId: key, isLoading, type, items, wallet } = props;
+  const { userId: key, isLoading, isUserPage, type, items, wallet } = props;
 
   const onHashSubmit = async (hashtag: string) => {
     if (!wallet || !key) {
@@ -83,7 +84,7 @@ export const HeaderList = (props: HeaderListProps) => {
       <Box direction={"row"} gap={"24px"} align={"center"}>
         <Button plain onClick={onTitleClick}>
           <Box width={"116px"} align={"center"}>
-            <Text size={"164px"} weight={800} color={"blue1"}>
+            <Text size={"164px"} weight={800} color={isUserPage ? "blue1" : "yellow1"}>
               {type === 'hashtag' ? '#' : '/'}
             </Text>
           </Box>
