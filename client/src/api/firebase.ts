@@ -143,6 +143,8 @@ export const addMessage = async (
     type: type,
     payload: payload,
     address: {
+      lattitude: locationData.latitude || "",
+      longitude: locationData.longitude || "",
       house_number: addressComponents.house_number || "",
       road: addressComponents.road || "",
       city:
