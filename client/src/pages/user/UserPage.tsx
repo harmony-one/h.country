@@ -23,6 +23,7 @@ interface LinkItem {
 interface Message {
   id: string;
   hashtags?: string[];
+  link?: string[];
 }
 
 interface Action {

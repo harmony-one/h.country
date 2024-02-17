@@ -28,7 +28,7 @@ export const getMessages = async (): Promise<Action[]> => {
         mentionShort: data.mentions?.[0]?.substring(0, 4),
       };
     })
-    .filter((action) => action.mention && action.hashtag)
+    .filter((action) => action.mention && (action.hashtag || action.link))
 }
 
 export const getMessagesByKey = async (key: string): Promise<Action[]> => {
@@ -77,7 +77,7 @@ export const getMessagesByKey = async (key: string): Promise<Action[]> => {
         mentionShort: data.mentions?.[0]?.substring(0, 4),
       };
     })
-    .filter((action) => action.mention && action.hashtag)
+    .filter((action) => action.mention && (action.hashtag || action.link))
 };
 
 export const addMessage = async (

@@ -5,6 +5,7 @@ import '../../index.css'
 import {Action} from "../../types";
 import {UserAction} from "../../components/action";
 import {getMessages} from "../../api/firebase";
+import Typography from "antd/es/typography/Typography";
 
 export const MainPage = () => {
   const { key } = useParams();
