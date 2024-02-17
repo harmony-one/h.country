@@ -3,7 +3,9 @@ body {
   font-family: "Nunito", 'Helvetica Neue', sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
+  
+  height: 100svh;
+  height: -webkit-fill-available;
   .ant-typography {
     font-family: 'Nunito', 'Helvetica Neue', sans-serif !important;
     color: #323232; 
