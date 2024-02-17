@@ -14,6 +14,7 @@ import axios from "axios";
 import { HeaderList } from "./headerList";
 import { UserAction } from "../../components/action";
 import { addMessage, getMessages, getMessagesByKey } from "../../api/firebase";
+import { isSameAddress, isValidAddress } from "../../utils/user";
 
 interface LinkItem {
   id: string;
@@ -33,11 +34,6 @@ interface Action {
   mention?: string;
   mentionShort?: string;
 }
-
-const isValidAddress = (key: string): boolean => {
-  const hexRegExp = /^[0-9a-fA-F]+$/;
-  return key.length === 40 && hexRegExp.test(key);
-};
 
 export const handleSubmit = async (
   event: React.FormEvent | undefined,
@@ -99,7 +95,8 @@ export const UserPage = (props: { id: string }) => {
   const [actions, setActions] = useState<Action[]>([]);
   const [filterMode, setFilterMode] = useState<"all" | "key" | null>('key');
   const [urls, setUrls] = useState<LinkItem[]>([]);
-  const [isLoading, setLoading] = useState(false)
+  const [isLoading, setLoading] = useState(false);
+  const [isUserPage, setIsUserPage] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -155,6 +152,10 @@ export const UserPage = (props: { id: string }) => {
   }, [key]);
 
   useEffect(() => {
+    if (wallet) {
+      setIsUserPage(isSameAddress(wallet.address.substring(2), key));
+    }
+
     const messagesQuery = query(
       collection(db, "messages"),
       where("mentions", "array-contains", key)
@@ -213,14 +214,14 @@ export const UserPage = (props: { id: string }) => {
   return (
     <Box>
       <Box>
-        <HeaderList userId={key} isLoading={isLoading} type={"url"} items={urls.map(item => ({
+        <HeaderList userId={key} isLoading={isLoading} isUserPage={isUserPage} type={"url"} items={urls.map(item => ({
           content: (
             <Box key={item.id}>
               <Text>{item.text}</Text>
             </Box>
           ),
         }))} wallet={wallet} />
-        <HeaderList userId={key} isLoading={isLoading} type={"hashtag"} items={tagItems} wallet={wallet} />
+        <HeaderList userId={key} isLoading={isLoading} isUserPage={isUserPage} type={"hashtag"} items={tagItems} wallet={wallet} />
       </Box>
       <Box>
         <Box direction={"row"} gap={"16px"}>
@@ -238,7 +239,9 @@ export const UserPage = (props: { id: string }) => {
               backgroundColor: filterMode === "key" ? "grey" : "initial",
             }}
           >
-            {key?.substring(0, 4)}
+            <Text color={isUserPage ? "blue1" : "yellow1"}>
+              {key?.substring(0, 4)}
+            </Text>
           </PlainButton>
         </Box>
       </Box>
