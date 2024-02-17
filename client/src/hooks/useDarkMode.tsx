@@ -27,7 +27,7 @@ const useDarkMode = (): Boolean => {
   }, [listener])
 
   // Returning current dark mode state value
-  return isDark
+  return true // isDark
 }
 
 export default useDarkMode
