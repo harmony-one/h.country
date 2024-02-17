@@ -23,16 +23,18 @@ interface LinkItem {
 
 interface Message {
   id: string;
-  hashtags?: string[];
+  payload?: string[];
 }
 
 interface Action {
   timestamp: string;
-  username: string;
-  usernameShort: string;
-  hashtag?: string;
-  mention?: string;
-  mentionShort?: string;
+  from: string;
+  to?: string;
+  type: string;
+  payload?: string;
+  // address import address thing
+  toShort?: string;
+  fromShort: string;
 }
 
 export const handleSubmit = async (
@@ -139,8 +141,9 @@ export const UserPage = (props: { id: string }) => {
     }
 
     const messagesQuery = query(
-      collection(db, "messages"),
-      where("mentions", "array-contains", key)
+      collection(db, "actions"),
+      where("to", "==", key),
+      where("type", "==", "tag")
     );
 
     const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
@@ -149,7 +152,9 @@ export const UserPage = (props: { id: string }) => {
         id: doc.id,
       })) as Message[];
 
-      const allHashtags = messages.flatMap((msg) => msg.hashtags || []);
+      console.log(messages)
+
+      const allHashtags = messages.flatMap((msg) => msg.payload || []);
       const hashtagFrequency = allHashtags.reduce<Record<string, number>>(
         (acc, hashtag) => {
           acc[hashtag] = (acc[hashtag] || 0) + 1;
@@ -157,6 +162,8 @@ export const UserPage = (props: { id: string }) => {
         },
         {}
       );
+
+      console.log(allHashtags)
 
       const sortedHashtags = Object.entries(hashtagFrequency)
         .sort((a, b) => b[1] - a[1])

@@ -4,7 +4,7 @@ import { Action, AddressComponents, LocationData } from "../types";
 import axios from "axios";
 
 export const getMessages = async (): Promise<Action[]> => {
-  const q = query(collection(db, "messages"), orderBy("timestamp", "desc"));
+  const q = query(collection(db, "actions"), orderBy("timestamp", "desc"));
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs
     .map((doc) => {
@@ -19,32 +19,35 @@ export const getMessages = async (): Promise<Action[]> => {
         hour12: true,
       }).replace(",", "").replace(/([AP]M)$/, " $1");
 
+      const mentions = [...data.payload.matchAll(/@(\w+)/g)].map((match) => match[1]);
+      const hashtags = [...data.payload.matchAll(/#(\w+)/g)].map((match) => match[1]);
+
       return {
         timestamp: formattedTimestamp,
-        username: data.username,
-        usernameShort: data.username.substring(0, 4),
-        hashtag: data.hashtags?.[0],
-        mention: data.mentions?.[0],
-        mentionShort: data.mentions?.[0]?.substring(0, 4),
-        text: data.text,
+        from: data.from,
+        fromShort: data.from.substring(0, 4),
+        payload: data.payload,
+        to: data.to,
+        toShort: typeof data.to === 'string' ? data.to.substring(0, 4) : '',
+        type: data.type
       };
     })
-    .filter((action) => (action.mention && action.hashtag)
-      || action.text === "new user joined")
+    .filter((action) => action.type == "tag"
+      || action.type === "new_user")
 }
 
 export const getMessagesByKey = async (key: string): Promise<Action[]> => {
   const mentionsQuery = query(
-    collection(db, "messages"),
+    collection(db, "actions"),
     orderBy("timestamp", "desc"),
-    where("mentions", "array-contains", key)
+    where("payload", "array-contains", key)
   );
   const mentionsSnapshot = await getDocs(mentionsQuery);
 
   const usernameQuery = query(
-    collection(db, "messages"),
+    collection(db, "actions"),
     orderBy("timestamp", "desc"),
-    where("username", "==", key)
+    where("from", "==", key)
   );
   const usernameSnapshot = await getDocs(usernameQuery);
 
@@ -69,41 +72,45 @@ export const getMessagesByKey = async (key: string): Promise<Action[]> => {
         hour12: true
       }).replace(',', '').replace(/([AP]M)$/, ' $1');
 
+      const mentions = [...data.payload.matchAll(/@(\w+)/g)].map((match) => match[1]);
+      const hashtags = [...data.payload.matchAll(/#(\w+)/g)].map((match) => match[1]);
+
       return {
         timestamp: formattedTimestamp,
-        username: data.username,
-        usernameShort: data.username.substring(0, 4),
-        hashtag: data.hashtags?.[0],
-        mention: data.mentions?.[0],
-        mentionShort: data.mentions?.[0]?.substring(0, 4),
-        text: data.text,
+        from: data.from,
+        fromShort: data.from.substring(0, 4),
+        payload: data.payload?.[0],
+        to: data.to,
+        toShort: typeof data.to === 'string' ? data.to.substring(0, 4) : '',
+        type: data.type
       };
     })
-    .filter((action) => (action.mention && action.hashtag)
-      || action.text === "new user joined")
+    .filter((action) => action.type == "tag"
+      || action.type === "new_user")
 };
 
 export const addMessage = async (
   locationData: LocationData,
-  username: string,
+  from: string,
   text: string
 ) => {
   const timestamp = new Date().toISOString();
 
-  const duplicateCheckQuery = query(
-    collection(db, "messages"),
-    where("username", "==", username),
-    where("text", "==", text)
-  );
+  // TODO: Conditional check based on determined type
+  // const duplicateCheckQuery = query(
+  //   collection(db, "actions"),
+  //   where("from", "==", from),
+  //   where("payload", "==", payload)
+  // );
 
-  const duplicateCheckSnapshot = await getDocs(duplicateCheckQuery);
+  // const duplicateCheckSnapshot = await getDocs(duplicateCheckQuery);
 
-  if (!duplicateCheckSnapshot.empty) {
-    if (!text.includes("https://")) {
-      window.alert("Duplicate message detected. No duplicate messages allowed.");
-      return;
-    }
-  }
+  // if (!duplicateCheckSnapshot.empty) {
+  //   if (!text.includes("https://")) {
+  //     window.alert("Duplicate message detected. No duplicate messages allowed.");
+  //     return;
+  //   }
+  // }
 
   let addressComponents: AddressComponents = {};
   if (locationData.latitude && locationData.longitude) {
@@ -120,23 +127,27 @@ export const addMessage = async (
   const mentions = [...text.matchAll(/@(\w+)/g)].map((match) => match[1]);
   const hashtags = [...text.matchAll(/#(\w+)/g)].map((match) => match[1]);
   let type: string = "message";
+  let payload: string = text;
 
   const urlRegex = /https?:\/\/[^\s]+/;
-  if (urlRegex.test(text)) {
+  const urlMatch = text.match(urlRegex);
+  if (urlMatch) {
     type = "link";
+    payload = urlMatch[0];
   } else if (text.includes("check-in")) {
     type = "check-in";
   } else if (text.includes("new_user")) {
     type = "new_user";
   } else if (mentions.length > 0 && hashtags.length > 0) {
     type = "tag";
+    payload = hashtags[0]
   }
 
   let action = {
-    from: username,
+    from: from,
     to: mentions[0],
     type: type,
-    payload: text,
+    payload: payload,
     address: {
       house_number: addressComponents.house_number || "",
       road: addressComponents.road || "",

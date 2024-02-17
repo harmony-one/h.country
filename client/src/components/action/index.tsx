@@ -7,21 +7,20 @@ export const UserAction = (props: { action: Action }) => {
   const { action } = props
 
   return <Box border={{ side: "bottom" }} pad={"4px 0"}>
-    {/* TODO: add types to the action to determine the displayed information */}
-    {action.text === "new user joined" ? 
+    {action.type === "new_user" ? 
       (<Text size={"small"}>
         {action.timestamp} - {" "}
-        {action.text} {" "}
-        <Link className="link" to={`/0/${action.username}`}>0/{action.usernameShort}</Link>
+        {action.fromShort} {" "}
+        <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
       </Text>)
       :
       (<Text size={"small"}>
         {action.timestamp} - {" "}
-        <Link className="link" to={`/0/${action.username}`}>0/{action.usernameShort}</Link>
+        <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
         {" tags #"}
-        {action.hashtag}
+        {action.payload}
         {" on "}
-        <Link className="link" to={`/0/${action.mention}`}>0/{action.mentionShort}</Link>
+        <Link className="link" to={`/0/${action.to}`}>0/{action.toShort}</Link>
       </Text>)
     }
   </Box>

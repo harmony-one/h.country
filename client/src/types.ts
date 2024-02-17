@@ -12,12 +12,13 @@ export interface UserTopic {
 
 export interface Action {
   timestamp: string;
-  username: string;
-  usernameShort: string;
-  hashtag?: string;
-  mention?: string;
-  mentionShort?: string;
-  text?: string;
+  from: string;
+  to?: string;
+  type: string;
+  payload?: string;
+  // address import address thing
+  toShort?: string;
+  fromShort: string;
 }
 
 export interface AddressComponents {
