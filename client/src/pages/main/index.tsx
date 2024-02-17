@@ -26,7 +26,6 @@ export const MainPage = () => {
       try {
         setLoading(true)
         const items = await getMessages()
-        console.log(items)
         setActions(items)
       } catch (e) {
         console.error('Failed to load messages:', e)
