@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box, Text } from "grommet"
 import { useUserContext } from '../../context/UserContext'
-import {useNavigate, useParams} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export const AppMenu = () => {
   const navigate = useNavigate()
