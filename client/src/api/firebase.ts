@@ -37,7 +37,7 @@ export const getMessagesByKey = async (key: string): Promise<Action[]> => {
   const mentionsQuery = query(
     collection(db, "actions"),
     orderBy("timestamp", "desc"),
-    where("payload", "array-contains", key)
+    where("to", "==", key)
   );
   const mentionsSnapshot = await getDocs(mentionsQuery);
 
@@ -73,7 +73,7 @@ export const getMessagesByKey = async (key: string): Promise<Action[]> => {
         timestamp: formattedTimestamp,
         from: data.from,
         fromShort: data.from.substring(0, 4),
-        payload: data.payload?.[0],
+        payload: data.payload,
         to: data.to,
         toShort: typeof data.to === 'string' ? data.to.substring(0, 4) : '',
         type: data.type
@@ -81,7 +81,7 @@ export const getMessagesByKey = async (key: string): Promise<Action[]> => {
     })
     .filter((action) => action.type === "tag"
       || action.type === "new_user")
-};
+}
 
 export const addMessage = async (
   locationData: LocationData,
