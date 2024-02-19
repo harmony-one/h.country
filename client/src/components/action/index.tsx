@@ -15,7 +15,7 @@ const handleActionType = (type: ActionType) => {
     case 'other':
       return "#FFF7AD !important";
     default:
-      return "#64ebfd"; // self
+      return "#64ebfd !important"; // self
   }
 };
 
