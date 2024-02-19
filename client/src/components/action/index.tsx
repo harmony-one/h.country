@@ -4,8 +4,19 @@ import {Link} from "react-router-dom";
 import moment from 'moment'
 import {Action} from "../../types";
 
-export const UserAction = (props: { action: Action }) => {
+export interface UserActionProps {
+  action: Action
+  onTagClicked?: (hashtag: string) => void
+}
+
+export const UserAction = (props: UserActionProps) => {
   const { action } = props
+
+  const onTagClicked = () => {
+    if(props.onTagClicked && action.payload) {
+      props.onTagClicked(action.payload)
+    }
+  }
 
   return <Box border={{ side: "bottom", color: '#565654' }} pad={"4px 0"}>
     {action.type === "new_user" ?
@@ -20,8 +31,8 @@ export const UserAction = (props: { action: Action }) => {
         <Box>
           <Text size={"small"} style={{ wordBreak: 'break-all' }}>
             <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
-            {" tags #"}
-            {action.payload}
+            {" tags "}
+            <Text size={"small"} onClick={onTagClicked}>#{action.payload}</Text>
             {" on "}
             <Link className="link" to={`/0/${action.to}`}>0/{action.toShort}</Link>
           </Text>

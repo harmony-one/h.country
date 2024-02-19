@@ -14,6 +14,7 @@ import { HeaderList } from "./headerList";
 import { UserAction } from "../../components/action";
 import { addMessage, getMessages, getMessagesByKey } from "../../api/firebase";
 import { isSameAddress, isValidAddress } from "../../utils/user";
+import {ActionFilter} from "../../types";
 
 interface LinkItem {
   id: string;
@@ -76,25 +77,29 @@ export const UserPage = (props: { id: string }) => {
   const { wallet } = useUserContext();
   const { id: key } = props;
   const [actions, setActions] = useState<Action[]>([]);
-  const [filterMode, setFilterMode] = useState<"all" | "key" | null>('key');
+  const [filterMode, setFilterMode] = useState<"all" | "address" | "hashtag" | null>('address');
   const [urls, setUrls] = useState<LinkItem[]>([]);
   const [isLoading, setLoading] = useState(false);
   const [isUserPage, setIsUserPage] = useState(false);
+  const [tagItems, setTagItems] = useState<Array<{ content: ReactNode }>>([]);
+  const [filters, setFilters] = useState<ActionFilter[]>([])
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true)
       setActions([])
-      console.log('filterMode', filterMode)
+
+      console.log('Loading actions...')
 
       try {
         let items: Action[] = []
         if (filterMode === "all") {
           items = await getMessages();
-        } else if (filterMode === "key" && key) {
+        } else if (filterMode === "address" && key) {
           items = await getMessagesByKey(key);
         }
         setActions(items)
+        console.log('Actions loaded:', items)
       } catch (e) {
         console.error('Failed to load messages:', e)
       } finally {
@@ -102,9 +107,7 @@ export const UserPage = (props: { id: string }) => {
       }
     }
     loadData()
-  }, [filterMode, key]);
-
-  const [tagItems, setTagItems] = useState<Array<{ content: ReactNode }>>([]);
+  }, [filterMode, key, filters.length]);
 
   useEffect(() => {
     if (!key) return;
@@ -151,8 +154,6 @@ export const UserPage = (props: { id: string }) => {
         id: doc.id,
       })) as Message[];
 
-      console.log(messages)
-
       const allHashtags = messages.flatMap((msg) => msg.payload || []);
       const hashtagFrequency = allHashtags.reduce<Record<string, number>>(
         (acc, hashtag) => {
@@ -161,8 +162,6 @@ export const UserPage = (props: { id: string }) => {
         },
         {}
       );
-
-      console.log(allHashtags)
 
       const sortedHashtags = Object.entries(hashtagFrequency)
         .sort((a, b) => b[1] - a[1])
@@ -193,10 +192,20 @@ export const UserPage = (props: { id: string }) => {
     });
 
     return () => unsubscribe();
-  }, [wallet, key]);
+  }, [wallet, key, filters.length]);
 
   if (!key || !isValidAddress(key)) {
     return <Box>Not a valid user ID</Box>;
+  }
+
+  const onTagClicked = (hashtag: string) => {
+    if(!filters.find(item => item.value === hashtag)) {
+      setFilters([...filters, {
+        type: 'hashtag',
+        value: hashtag
+      }])
+      setFilterMode('hashtag')
+    }
   }
 
   return (
@@ -214,23 +223,34 @@ export const UserPage = (props: { id: string }) => {
       <Box pad={'0 16px'}>
         <Box direction={"row"} gap={"16px"}>
           <PlainButton
+            isActive={filterMode === "all"}
             onClick={() => setFilterMode("all")}
-            style={{
-              backgroundColor: filterMode === "all" ? "grey" : "initial",
-            }}
           >
             All
           </PlainButton>
           <PlainButton
-            onClick={() => setFilterMode("key")}
-            style={{
-              backgroundColor: filterMode === "key" ? "grey" : "initial",
-            }}
+            isActive={filterMode === "address"}
+            onClick={() => setFilterMode("address")}
           >
             <Text color={isUserPage ? "blue1" : "yellow1"}>
               {key?.substring(0, 4)}
             </Text>
           </PlainButton>
+          {filters.map(filter => {
+            const { value } = filter
+            const onClick = () => {
+              setFilters(filters.filter(item => item.value !== value))
+            }
+
+            return <PlainButton
+              isActive={filters.length > 0}
+              onClick={onClick}
+            >
+              <Text color={isUserPage ? "blue1" : "yellow1"}>
+                {value}
+              </Text>
+            </PlainButton>
+          })}
         </Box>
       </Box>
       <Box margin={{ top: '16px' }}>
@@ -241,11 +261,15 @@ export const UserPage = (props: { id: string }) => {
         }
         {!isLoading && actions.length === 0 &&
           <Box align={'center'}>
-            <Text>No messages found</Text>
+            <Text>No actions found</Text>
           </Box>
         }
         {actions.map((action, index) => (
-          <UserAction key={index + action.timestamp} action={action} />
+          <UserAction
+            key={index + action.timestamp}
+            action={action}
+            onTagClicked={onTagClicked}
+          />
         ))}
       </Box>
     </Box>
