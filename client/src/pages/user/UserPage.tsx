@@ -264,6 +264,7 @@ export const UserPage = (props: { id: string }) => {
             }
 
             return <PlainButton
+              key={value}
               isActive={filters.length > 0}
               onClick={onClick}
             >
