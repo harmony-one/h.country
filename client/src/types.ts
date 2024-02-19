@@ -37,3 +37,11 @@ export interface LocationData {
   longitude: number | null;
   addressComponents?: AddressComponents;
 }
+
+export type ActionFilterType = 'all' | 'address' | 'hashtag'
+
+export interface ActionFilter {
+  type: ActionFilterType
+  value: string
+}
+
