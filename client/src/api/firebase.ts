@@ -1,26 +1,49 @@
-import { collection, getDocs, setDoc, doc, query, where, orderBy, addDoc } from 'firebase/firestore';
-import { db } from "../configs/firebase-config";
+import { collection, getDocs, setDoc, doc, query, where, orderBy, addDoc, DocumentData, QueryDocumentSnapshot} from 'firebase/firestore';
+import {db} from "../configs/firebase-config";
 import {Action, ActionFilter, AddressComponents, LocationData} from "../types";
 import axios from "axios";
 
 export const getMessages = async (filters: ActionFilter[] = []): Promise<Action[]> => {
   let q = query(
-    collection(db, "actions"), orderBy("timestamp", "desc")
+    collection(db, "actions"),
+    orderBy("timestamp", "desc"),
   );
 
-  for(const filter of filters) {
-    const { type, value } = filter
-    if(type === 'address') {
-      q = query(q, where('from', '==', value))
-    } else if(type === 'hashtag') {
+  // If query contains "address" ("from" OR "to"), we need to execute second query to get "to" field entries
+  let mentions: QueryDocumentSnapshot<DocumentData, DocumentData>[] = []
+  const addressFilter = filters.find((filter) => filter.type === 'address')
+  if(addressFilter) {
+    // "from" filter
+    q = query(q, where('from', '==', addressFilter.value))
+
+    // "to" query
+    const toQuery = query(
+      collection(db, "actions"),
+      orderBy("timestamp", "desc"),
+      where("to", "==", addressFilter.value)
+    );
+    const toSnapshot = await getDocs(toQuery);
+    mentions = toSnapshot.docs
+  }
+
+  for (const filter of filters) {
+    const {type, value} = filter
+    if (type === 'hashtag') {
       q = query(q, where('payload', '==', value))
     }
   }
 
   const querySnapshot = await getDocs(q);
-  return querySnapshot.docs
+  const actions = querySnapshot.docs
+
+  return [...mentions, ...actions]
+    .map((doc) => ({ id: doc.id, data: doc.data() }))
+    .filter(
+      (value, index, self) =>
+        index === self.findIndex((t) => t.id === value.id)
+    )
     .map((doc) => {
-      const data = doc.data();
+      const { data } = doc
       return {
         timestamp: data.timestamp,
         from: data.from,
