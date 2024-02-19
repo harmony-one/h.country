@@ -27,8 +27,8 @@ export const UserAction = (props: UserActionProps) => {
         </Text>
       </Box>
       :
-      <Box direction={'row'} justify={'between'} pad={'0 16px'}>
-        <Box>
+      <Box direction={'row'} justify={'start'} pad={'0 16px'}>
+        <Box basis="50%">
           <Text size={"small"} style={{ wordBreak: 'break-all' }}>
             <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
             {" tags "}
@@ -37,7 +37,12 @@ export const UserAction = (props: UserActionProps) => {
             <Link className="link" to={`/0/${action.to}`}>0/{action.toShort}</Link>
           </Text>
         </Box>
-        <Box align={'end'} style={{ minWidth: '32px' }}>
+        <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
+          <Text style={{ textAlign: "right" }} size={"small"}>
+            {action.address.road}
+          </Text>
+        </Box>
+        <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
           <Text size={"small"}>
             {moment(action.timestamp).fromNow()}
           </Text>

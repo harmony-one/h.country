@@ -16,7 +16,7 @@ export interface Action {
   to?: string;
   type: string;
   payload?: string;
-  // address import address thing
+  address: AddressComponents;
   toShort?: string;
   fromShort: string;
 }

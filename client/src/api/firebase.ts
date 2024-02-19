@@ -45,6 +45,7 @@ export const getMessages = async (filters: ActionFilter[] = []): Promise<Action[
     .map((doc) => {
       const { data } = doc
       return {
+        address: data.address,
         timestamp: data.timestamp,
         from: data.from,
         fromShort: data.from.substring(0, 4),
