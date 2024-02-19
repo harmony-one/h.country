@@ -76,9 +76,12 @@ export const HeaderList = (props: HeaderListProps) => {
       }
 
       const addressWithoutPrefix = wallet.address.slice(2);
-      const submitText = `link ${socialObj.name} ${socialObj.username}`;
 
-      await handleSubmit(undefined, addressWithoutPrefix, submitText);
+      await handleSubmit(
+        undefined,
+        addressWithoutPrefix,
+        `@${socialObj.username} ${socialObj.url}`
+      );
 
       console.log("Document successfully updated or created with URL.");
     } catch (error) {
