@@ -12,8 +12,9 @@ import {
 import { db } from "../../configs/firebase-config";
 import { HeaderList } from "./headerList";
 import { UserAction } from "../../components/action";
-import { addMessage, getMessages, getMessagesByKey } from "../../api/firebase";
+import { addMessage, getMessages } from "../../api/firebase";
 import { isSameAddress, isValidAddress } from "../../utils/user";
+import {ActionFilter, ActionFilterType} from "../../types";
 
 interface LinkItem {
   id: string;
@@ -72,29 +73,50 @@ export const handleSubmit = async (
   }
 };
 
+const DefaultFilterMode: ActionFilterType = 'address'
+
 export const UserPage = (props: { id: string }) => {
   const { wallet } = useUserContext();
   const { id: key } = props;
   const [actions, setActions] = useState<Action[]>([]);
-  const [filterMode, setFilterMode] = useState<"all" | "key" | null>('key');
+  const [filterMode, setFilterMode] = useState<"all" | "address" | "hashtag">(DefaultFilterMode);
   const [urls, setUrls] = useState<LinkItem[]>([]);
   const [isLoading, setLoading] = useState(false);
   const [isUserPage, setIsUserPage] = useState(false);
+  const [tagItems, setTagItems] = useState<Array<{ content: ReactNode }>>([]);
+  const [filters, setFilters] = useState<ActionFilter[]>([])
+
+  useEffect(() => {
+    // Drop sub-filters if user select All of <Address> filter
+    if(filterMode !== 'hashtag') {
+      setFilters([])
+    }
+  }, [filterMode]);
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true)
       setActions([])
-      console.log('filterMode', filterMode)
 
       try {
-        let items: Action[] = []
-        if (filterMode === "all") {
-          items = await getMessages();
-        } else if (filterMode === "key" && key) {
-          items = await getMessagesByKey(key);
+        let items: Action[]
+        let actionFilters: ActionFilter[] = []
+        if (filterMode === "address" && key) {
+          actionFilters.push({
+            type: 'address',
+            value: key
+          })
+        } else if(filterMode === 'hashtag' && filters.length > 0) {
+          const [{ value }] = filters
+          actionFilters.push({
+            type: 'hashtag',
+            value: value
+          })
         }
+        console.log('Fetching actions...', actionFilters)
+        items = await getMessages(actionFilters);
         setActions(items)
+        console.log('Actions loaded:', items)
       } catch (e) {
         console.error('Failed to load messages:', e)
       } finally {
@@ -102,9 +124,7 @@ export const UserPage = (props: { id: string }) => {
       }
     }
     loadData()
-  }, [filterMode, key]);
-
-  const [tagItems, setTagItems] = useState<Array<{ content: ReactNode }>>([]);
+  }, [filterMode, key, filters]);
 
   useEffect(() => {
     if (!key) return;
@@ -151,8 +171,6 @@ export const UserPage = (props: { id: string }) => {
         id: doc.id,
       })) as Message[];
 
-      console.log(messages)
-
       const allHashtags = messages.flatMap((msg) => msg.payload || []);
       const hashtagFrequency = allHashtags.reduce<Record<string, number>>(
         (acc, hashtag) => {
@@ -161,8 +179,6 @@ export const UserPage = (props: { id: string }) => {
         },
         {}
       );
-
-      console.log(allHashtags)
 
       const sortedHashtags = Object.entries(hashtagFrequency)
         .sort((a, b) => b[1] - a[1])
@@ -193,10 +209,20 @@ export const UserPage = (props: { id: string }) => {
     });
 
     return () => unsubscribe();
-  }, [wallet, key]);
+  }, [wallet, key, filters.length]);
 
   if (!key || !isValidAddress(key)) {
     return <Box>Not a valid user ID</Box>;
+  }
+
+  const onTagClicked = (hashtag: string) => {
+    if(!filters.find(item => item.value === hashtag)) {
+      setFilters([...filters, {
+        type: 'hashtag',
+        value: hashtag
+      }])
+      setFilterMode('hashtag')
+    }
   }
 
   return (
@@ -214,23 +240,39 @@ export const UserPage = (props: { id: string }) => {
       <Box pad={'0 16px'}>
         <Box direction={"row"} gap={"16px"}>
           <PlainButton
+            isActive={filterMode === "all"}
             onClick={() => setFilterMode("all")}
-            style={{
-              backgroundColor: filterMode === "all" ? "grey" : "initial",
-            }}
           >
             All
           </PlainButton>
           <PlainButton
-            onClick={() => setFilterMode("key")}
-            style={{
-              backgroundColor: filterMode === "key" ? "grey" : "initial",
-            }}
+            isActive={filterMode === "address"}
+            onClick={() => setFilterMode("address")}
           >
             <Text color={isUserPage ? "blue1" : "yellow1"}>
               {key?.substring(0, 4)}
             </Text>
           </PlainButton>
+          {filters.map(filter => {
+            const { value } = filter
+            const onClick = () => {
+              const newFilters = filters.filter(item => item.value !== value)
+              setFilters(newFilters)
+              if(newFilters.length === 0) {
+                setFilterMode(DefaultFilterMode)
+              }
+            }
+
+            return <PlainButton
+              key={value}
+              isActive={filters.length > 0}
+              onClick={onClick}
+            >
+              <Text color={isUserPage ? "blue1" : "yellow1"}>
+                #{value}
+              </Text>
+            </PlainButton>
+          })}
         </Box>
       </Box>
       <Box margin={{ top: '16px' }}>
@@ -241,11 +283,15 @@ export const UserPage = (props: { id: string }) => {
         }
         {!isLoading && actions.length === 0 &&
           <Box align={'center'}>
-            <Text>No messages found</Text>
+            <Text>No actions found</Text>
           </Box>
         }
         {actions.map((action, index) => (
-          <UserAction key={index + action.timestamp} action={action} />
+          <UserAction
+            key={index + action.timestamp}
+            action={action}
+            onTagClicked={onTagClicked}
+          />
         ))}
       </Box>
     </Box>
