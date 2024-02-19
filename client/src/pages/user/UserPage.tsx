@@ -211,7 +211,7 @@ export const UserPage = (props: { id: string }) => {
         }))} wallet={wallet} />
         <HeaderList userId={key} isLoading={isLoading} isUserPage={isUserPage} type={"hashtag"} items={tagItems} wallet={wallet} />
       </Box>
-      <Box>
+      <Box pad={'0 16px'}>
         <Box direction={"row"} gap={"16px"}>
           <PlainButton
             onClick={() => setFilterMode("all")}

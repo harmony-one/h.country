@@ -18,7 +18,7 @@ export const AppLayout = () => {
     <Box
       width={'700px'}
       margin={'0px auto'}
-      pad={'8px 16px 16px'}
+      pad={'8px 0'}
     >
       <Outlet />
     </Box>

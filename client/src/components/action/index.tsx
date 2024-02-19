@@ -7,14 +7,16 @@ import {Action} from "../../types";
 export const UserAction = (props: { action: Action }) => {
   const { action } = props
 
-  return <Box border={{ side: "bottom" }} pad={"4px 0"}>
+  return <Box border={{ side: "bottom", color: '#565654' }} pad={"4px 0"}>
     {action.type === "new_user" ?
-      (<Text size={"small"}>
-        <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
-        {" joins"}
-      </Text>)
+      <Box pad={'0 16px'}>
+        <Text size={"small"}>
+          <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
+          {" joins"}
+        </Text>
+      </Box>
       :
-      <Box direction={'row'} justify={'between'}>
+      <Box direction={'row'} justify={'between'} pad={'0 16px'}>
         <Box>
           <Text size={"small"} style={{ wordBreak: 'break-all' }}>
             <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
