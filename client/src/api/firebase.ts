@@ -1,54 +1,49 @@
-import { collection, getDocs, setDoc, doc, query, where, orderBy, addDoc } from 'firebase/firestore';
-import { db } from "../configs/firebase-config";
-import { Action, AddressComponents, LocationData } from "../types";
+import { collection, getDocs, setDoc, doc, query, where, orderBy, addDoc, DocumentData, QueryDocumentSnapshot} from 'firebase/firestore';
+import {db} from "../configs/firebase-config";
+import {Action, ActionFilter, AddressComponents, LocationData} from "../types";
 import axios from "axios";
 
-export const getMessages = async (): Promise<Action[]> => {
-  const q = query(collection(db, "actions"), orderBy("timestamp", "desc"));
+export const getMessages = async (filters: ActionFilter[] = []): Promise<Action[]> => {
+  let q = query(
+    collection(db, "actions"),
+    orderBy("timestamp", "desc"),
+  );
+
+  // If query contains "address" ("from" OR "to"), we need to execute second query to get "to" field entries
+  let mentions: QueryDocumentSnapshot<DocumentData, DocumentData>[] = []
+  const addressFilter = filters.find((filter) => filter.type === 'address')
+  if(addressFilter) {
+    // "from" filter
+    q = query(q, where('from', '==', addressFilter.value))
+
+    // "to" query
+    const toQuery = query(
+      collection(db, "actions"),
+      orderBy("timestamp", "desc"),
+      where("to", "==", addressFilter.value)
+    );
+    const toSnapshot = await getDocs(toQuery);
+    mentions = toSnapshot.docs
+  }
+
+  for (const filter of filters) {
+    const {type, value} = filter
+    if (type === 'hashtag') {
+      q = query(q, where('payload', '==', value))
+    }
+  }
+
   const querySnapshot = await getDocs(q);
-  return querySnapshot.docs
-    .map((doc) => {
-      const data = doc.data();
-      return {
-        timestamp: data.timestamp,
-        from: data.from,
-        fromShort: data.from.substring(0, 4),
-        payload: data.payload,
-        to: data.to,
-        toShort: typeof data.to === 'string' ? data.to.substring(0, 4) : '',
-        type: data.type
-      };
-    })
-    .filter((action) => action.type === "tag"
-      || action.type === "new_user")
-}
+  const actions = querySnapshot.docs
 
-export const getMessagesByKey = async (key: string): Promise<Action[]> => {
-  const mentionsQuery = query(
-    collection(db, "actions"),
-    orderBy("timestamp", "desc"),
-    where("to", "==", key)
-  );
-  const mentionsSnapshot = await getDocs(mentionsQuery);
-
-  const usernameQuery = query(
-    collection(db, "actions"),
-    orderBy("timestamp", "desc"),
-    where("from", "==", key)
-  );
-  const usernameSnapshot = await getDocs(usernameQuery);
-
-  return [
-    ...mentionsSnapshot.docs,
-    ...usernameSnapshot.docs,
-  ]
+  return [...mentions, ...actions]
     .map((doc) => ({ id: doc.id, data: doc.data() }))
     .filter(
       (value, index, self) =>
         index === self.findIndex((t) => t.id === value.id)
     )
     .map((doc) => {
-      const data = doc.data;
+      const { data } = doc
       return {
         timestamp: data.timestamp,
         from: data.from,
@@ -61,6 +56,9 @@ export const getMessagesByKey = async (key: string): Promise<Action[]> => {
     })
     .filter((action) => action.type === "tag"
       || action.type === "new_user")
+    .sort((a, b) => {
+      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    })
 }
 
 export const addMessage = async (
