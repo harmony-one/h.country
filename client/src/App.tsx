@@ -8,6 +8,9 @@ import {UserProvider} from "./context/UserContext";
 import {theme} from "./theme/grommet";
 import useDarkMode from './hooks/useDarkMode';
 import { MetaTags } from './components/metatags';
+import {updateMomentJSConfig} from "./configs/moment-js";
+
+updateMomentJSConfig()
 
 function App() {
   return (
