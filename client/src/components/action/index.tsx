@@ -64,11 +64,11 @@ export const UserAction = (props: UserActionProps) => {
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
         <Box basis="50%">
           <Text size={"small"} style={{ wordBreak: 'break-all' }}>
-            <Link className="link" to={`/0/${action.from}`} style={{ }}>0/{action.fromShort}</Link>
+          <ActionLink className="link" to={`/0/${action.from}`} style={{ }} type={actionType}>0/{action.fromShort}</ActionLink>
             {" tags "}
             <Text size={"small"} onClick={onTagClicked}>#{action.payload}</Text>
             {" on "}
-            <Link className="link" to={`/0/${action.to}`}>0/{action.toShort}</Link>
+            <ActionLink className="link" to={`/0/${action.to}`} type={actionType}>0/{action.toShort}</ActionLink>
           </Text>
         </Box>
         <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
