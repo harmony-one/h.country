@@ -36,7 +36,6 @@ export const UserAction = (props: UserActionProps) => {
   const { wallet } = useUserContext();
   const [actionType, setActionType] = useState<ActionType>('self')
   
-  console.log('ADDRESS', wallet)
   useEffect(() => {
     const myAddress = wallet?.address.slice(2);
     if (myAddress === action.from) {
