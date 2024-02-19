@@ -17,7 +17,7 @@ interface HeaderListProps {
 }
 
 export const HeaderList = (props: HeaderListProps) => {
-  const { userId: key, isLoading, isUserPage, type, items, wallet } = props;
+  const { userId: key, isUserPage, type, items, wallet } = props;
 
   const onHashSubmit = async (hashtag: string) => {
     if (!wallet || !key) {
@@ -89,7 +89,7 @@ export const HeaderList = (props: HeaderListProps) => {
             </Text>
           </Box>
         </Button>
-        {!isLoading && items.length > 0 && <Box gap={"8px"}>
+        {<Box gap={"8px"}>
             {items.map((item) => item.content)}
           </Box>
         }

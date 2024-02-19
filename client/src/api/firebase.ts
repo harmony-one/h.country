@@ -9,18 +9,8 @@ export const getMessages = async (): Promise<Action[]> => {
   return querySnapshot.docs
     .map((doc) => {
       const data = doc.data();
-      const date = new Date(data.timestamp);
-      const formattedTimestamp = date.toLocaleString("en-US", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      }).replace(",", "").replace(/([AP]M)$/, " $1");
-
       return {
-        timestamp: formattedTimestamp,
+        timestamp: data.timestamp,
         from: data.from,
         fromShort: data.from.substring(0, 4),
         payload: data.payload,
@@ -59,18 +49,8 @@ export const getMessagesByKey = async (key: string): Promise<Action[]> => {
     )
     .map((doc) => {
       const data = doc.data;
-      const date = new Date(data.timestamp);
-      const formattedTimestamp = date.toLocaleString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      }).replace(',', '').replace(/([AP]M)$/, ' $1');
-
       return {
-        timestamp: formattedTimestamp,
+        timestamp: data.timestamp,
         from: data.from,
         fromShort: data.from.substring(0, 4),
         payload: data.payload,
