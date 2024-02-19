@@ -14,7 +14,7 @@ import { HeaderList } from "./headerList";
 import { UserAction } from "../../components/action";
 import { addMessage, getMessages } from "../../api/firebase";
 import { isSameAddress, isValidAddress } from "../../utils/user";
-import {ActionFilter, ActionFilterType, AddressComponents} from "../../types";
+import { ActionFilter, ActionFilterType, AddressComponents } from "../../types";
 
 interface LinkItem {
   id: string;
@@ -76,10 +76,12 @@ export const handleSubmit = async (
 const DefaultFilterMode: ActionFilterType = 'address'
 
 export const UserPage = (props: { id: string }) => {
-  const { wallet } = useUserContext();
+  const { wallet, firstTimeVisit } = useUserContext();
   const { id: key } = props;
   const [actions, setActions] = useState<Action[]>([]);
-  const [filterMode, setFilterMode] = useState<"all" | "address" | "hashtag">(DefaultFilterMode);
+  const [filterMode, setFilterMode] = useState<"all" | "address" | "hashtag">(
+    firstTimeVisit ? 'all' : DefaultFilterMode
+  );
   const [urls, setUrls] = useState<LinkItem[]>([]);
   const [isLoading, setLoading] = useState(false);
   const [isUserPage, setIsUserPage] = useState(false);
@@ -88,7 +90,7 @@ export const UserPage = (props: { id: string }) => {
 
   useEffect(() => {
     // Drop sub-filters if user select All of <Address> filter
-    if(filterMode !== 'hashtag') {
+    if (filterMode !== 'hashtag') {
       setFilters([])
     }
   }, [filterMode]);
@@ -106,7 +108,7 @@ export const UserPage = (props: { id: string }) => {
             type: 'address',
             value: key
           })
-        } else if(filterMode === 'hashtag' && filters.length > 0) {
+        } else if (filterMode === 'hashtag' && filters.length > 0) {
           const [{ value }] = filters
           actionFilters.push({
             type: 'hashtag',
@@ -217,7 +219,7 @@ export const UserPage = (props: { id: string }) => {
   }
 
   const onTagClicked = (hashtag: string) => {
-    if(!filters.find(item => item.value === hashtag)) {
+    if (!filters.find(item => item.value === hashtag)) {
       setFilters([...filters, {
         type: 'hashtag',
         value: hashtag
@@ -259,7 +261,7 @@ export const UserPage = (props: { id: string }) => {
             const onClick = () => {
               const newFilters = filters.filter(item => item.value !== value)
               setFilters(newFilters)
-              if(newFilters.length === 0) {
+              if (newFilters.length === 0) {
                 setFilterMode(DefaultFilterMode)
               }
             }

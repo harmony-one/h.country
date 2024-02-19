@@ -13,10 +13,12 @@ import { useLocation } from "react-router-dom";
 import { addMessage } from "../api/firebase";
 
 export const LSAccountKey = "h_country_client_account";
+export const LSIsPageVisited = "h_country_page_visited";
 
 interface UserContextType {
   wallet: Wallet | undefined;
   setWallet: Dispatch<SetStateAction<Wallet | undefined>>;
+  firstTimeVisit: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -26,6 +28,13 @@ interface UserProviderProps {
 }
 
 const privateKeyLS = window.localStorage.getItem(LSAccountKey);
+const firstTimeVisit = !window.localStorage.getItem(LSIsPageVisited);
+
+if (firstTimeVisit) {
+  setTimeout(() => {
+    window.localStorage.setItem(LSIsPageVisited, 'true');
+  }, 3000);
+}
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const location = useLocation();
@@ -78,6 +87,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     return {
       wallet,
       setWallet,
+      firstTimeVisit,
     } as any;
   }, [wallet]);
 

@@ -24,6 +24,7 @@ export interface Action {
 export interface AddressComponents {
   house_number?: string;
   road?: string;
+  short?: string;
   city?: string;
   town?: string;
   village?: string;

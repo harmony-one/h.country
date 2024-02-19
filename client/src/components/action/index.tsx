@@ -3,7 +3,7 @@ import { Box, Text } from "grommet";
 import { Link } from "react-router-dom";
 import moment from 'moment'
 import { Action } from "../../types";
-import { socialUrlParser } from "../../utils";
+import { socialUrlParser, formatAddress } from "../../utils";
 
 export interface UserActionProps {
   action: Action
@@ -40,7 +40,7 @@ export const UserAction = (props: UserActionProps) => {
         </Box>
         <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
           <Text style={{ textAlign: "right" }} size={"small"}>
-            {action.address.road}
+            {action.address.short || formatAddress(action.address.road)}
           </Text>
         </Box>
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
@@ -65,7 +65,7 @@ export const UserAction = (props: UserActionProps) => {
         </Box>
         <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
           <Text style={{ textAlign: "right" }} size={"small"}>
-            {action.address.road}
+            {action.address.short || formatAddress(action.address.road)}
           </Text>
         </Box>
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
