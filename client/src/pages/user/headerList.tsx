@@ -55,10 +55,6 @@ export const HeaderList = (props: HeaderListProps) => {
 
     const socialObj = socialUrlParser(url)[0];
 
-    console.log(1111, socialObj);
-
-    //return;
-
     if (!socialObj) {
       alert('Enter a valid URL.');
       return;
@@ -73,6 +69,20 @@ export const HeaderList = (props: HeaderListProps) => {
 
     try {
       await setDoc(doc(db, "userLinks", key), updateData, { merge: true });
+
+      if (!wallet || !key) {
+        console.log("Invalid user wallet or key");
+        return;
+      }
+
+      const addressWithoutPrefix = wallet.address.slice(2);
+
+      await handleSubmit(
+        undefined,
+        addressWithoutPrefix,
+        `@${socialObj.username} ${socialObj.url}`
+      );
+
       console.log("Document successfully updated or created with URL.");
     } catch (error) {
       console.error("Error writing document: ", error);

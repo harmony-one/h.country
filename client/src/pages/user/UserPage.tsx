@@ -14,7 +14,7 @@ import { HeaderList } from "./headerList";
 import { UserAction } from "../../components/action";
 import { addMessage, getMessages } from "../../api/firebase";
 import { isSameAddress, isValidAddress } from "../../utils/user";
-import {ActionFilter, ActionFilterType} from "../../types";
+import {ActionFilter, ActionFilterType, AddressComponents} from "../../types";
 
 interface LinkItem {
   id: string;
@@ -32,7 +32,7 @@ interface Action {
   to?: string;
   type: string;
   payload?: string;
-  // address import address thing
+  address: AddressComponents;
   toShort?: string;
   fromShort: string;
 }
@@ -115,6 +115,7 @@ export const UserPage = (props: { id: string }) => {
         }
         console.log('Fetching actions...', actionFilters)
         items = await getMessages(actionFilters);
+
         setActions(items)
         console.log('Actions loaded:', items)
       } catch (e) {

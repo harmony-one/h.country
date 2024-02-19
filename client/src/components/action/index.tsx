@@ -1,8 +1,9 @@
 import React from "react";
-import {Box, Text} from "grommet";
-import {Link} from "react-router-dom";
+import { Box, Text } from "grommet";
+import { Link } from "react-router-dom";
 import moment from 'moment'
-import {Action} from "../../types";
+import { Action } from "../../types";
+import { socialUrlParser } from "../../utils";
 
 export interface UserActionProps {
   action: Action
@@ -13,22 +14,22 @@ export const UserAction = (props: UserActionProps) => {
   const { action } = props
 
   const onTagClicked = () => {
-    if(props.onTagClicked && action.payload) {
+    if (props.onTagClicked && action.payload) {
       props.onTagClicked(action.payload)
     }
   }
 
   return <Box border={{ side: "bottom", color: '#565654' }} pad={"4px 0"}>
-    {action.type === "new_user" ?
+    {action.type === "new_user" &&
       <Box pad={'0 16px'}>
         <Text size={"small"}>
           <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
           {" joins"}
         </Text>
-      </Box>
-      :
-      <Box direction={'row'} justify={'between'} pad={'0 16px'}>
-        <Box>
+      </Box>}
+    {action.type === 'tag' &&
+      <Box direction={'row'} justify={'start'} pad={'0 16px'}>
+        <Box basis="50%">
           <Text size={"small"} style={{ wordBreak: 'break-all' }}>
             <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
             {" tags "}
@@ -37,12 +38,41 @@ export const UserAction = (props: UserActionProps) => {
             <Link className="link" to={`/0/${action.to}`}>0/{action.toShort}</Link>
           </Text>
         </Box>
-        <Box align={'end'} style={{ minWidth: '32px' }}>
+        <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
+          <Text style={{ textAlign: "right" }} size={"small"}>
+            {action.address.road}
+          </Text>
+        </Box>
+        <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
           <Text size={"small"}>
             {moment(action.timestamp).fromNow()}
           </Text>
         </Box>
-      </Box>
-    }
+      </Box>}
+    {action.type === 'link' &&
+      <Box direction={'row'} justify={'start'} pad={'0 16px'}>
+        <Box basis="50%">
+          <Text size={"small"} style={{ wordBreak: 'break-all' }}>
+            <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
+            {" links "}
+            <Text size={"small"}>{socialUrlParser(action.payload || '')[0]?.name}</Text>
+            {' '}
+            <Link className="link" to={`/0/${action.from}`}>{
+              socialUrlParser(action.payload || '')[0]?.type + '/' + socialUrlParser(action.payload || '')[0]?.username
+            }
+            </Link>
+          </Text>
+        </Box>
+        <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
+          <Text style={{ textAlign: "right" }} size={"small"}>
+            {action.address.road}
+          </Text>
+        </Box>
+        <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
+          <Text size={"small"}>
+            {moment(action.timestamp).fromNow()}
+          </Text>
+        </Box>
+      </Box>}
   </Box>
 }
