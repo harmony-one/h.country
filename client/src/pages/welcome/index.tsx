@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../context/UserContext";
 import { UserTopic } from "../../types";
 import { Typography, Spin } from "antd";
-import {postUserTopics} from "../../api/firebase";
+import {addMessage, postUserTopics} from "../../api/firebase";
 import useDarkMode from "../../hooks/useDarkMode";
 
 const WelcomeContainer = styled(Box)`
@@ -60,11 +60,6 @@ const TopicItemContainer = styled(Box)<{ isSelected?: boolean }>`
   justify-content: center;
   align-items: center;
   transition: transform 250ms;
-
-  // &:hover {
-  //     transform: scale(1.04);
-  // }
-
   /* ${(props) =>
   props.isSelected &&
   `
@@ -87,7 +82,7 @@ const TopicItemImage = styled.img<{ isDark?: Boolean}>`
 
 const TopicItemAlias = styled(Box)`
   position: absolute;
-  bottom: 5%;
+  bottom: 2%;
   text-align: center;
   /* right: 5%; */
 `;
@@ -152,21 +147,41 @@ export const WelcomePage: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    const tagsTopic = async () => {
+      let locationData = {
+        latitude: null as number | null,
+        longitude: null as number | null,
+        address: "No Address",
+      };
+      if (wallet) {
+        const addressWithoutPrefix = wallet.address.slice(2);
+        const tags = [...selectedTopics, addressWithoutPrefix]
+        try {
+          await Promise.all(tags.map((tag: string) => addMessage(locationData, addressWithoutPrefix, `#${tag} @${addressWithoutPrefix}`)));
+        } catch (e) {
+          console.log(e)
+        }
+      }
+    }
+
     if (selectedTopics.length === 4 && wallet?.address) {
       setTopicsUpdating(true);
-      postUserTopics(wallet.address, selectedTopics)
-        .then(() => {
-          // toast.success(`Added ${selectedTopics.length} topics!`, { autoClose: 10000 });
-          navigate("/");
-        })
-        .catch((e: any) => {
-          toast.error(`Cannot add topics: ${e.message}`, { autoClose: 10000 });
-        })
-        .finally(() => {
-          setTopicsUpdating(false);
-        });
+      tagsTopic()
+      .then(() => {
+        postUserTopics(wallet.address, selectedTopics) //[...selectedTopics, wallet.address]
+          .then(() => {
+            // toast.success(`Added ${selectedTopics.length} topics!`, { autoClose: 10000 });
+            navigate("/");
+          })
+          .catch((e: any) => {
+            toast.error(`Cannot add topics: ${e.message}`, { autoClose: 10000 });
+          })
+          .finally(() => {
+            setTopicsUpdating(false);
+          });
+      })
     }
-  }, [selectedTopics, wallet?.address, navigate]);
+  }, [selectedTopics, wallet, wallet?.address, navigate]);
 
   const handleTopicClick = (topic: UserTopic) => {
     const { name } = topic;
