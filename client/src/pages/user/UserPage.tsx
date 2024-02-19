@@ -269,7 +269,7 @@ export const UserPage = (props: { id: string }) => {
               onClick={onClick}
             >
               <Text color={isUserPage ? "blue1" : "yellow1"}>
-                {value}
+                #{value}
               </Text>
             </PlainButton>
           })}
