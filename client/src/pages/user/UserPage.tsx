@@ -124,7 +124,7 @@ export const UserPage = (props: { id: string }) => {
       }
     }
     loadData()
-  }, [filterMode, key, filters.length]);
+  }, [filterMode, key, filters]);
 
   useEffect(() => {
     if (!key) return;
