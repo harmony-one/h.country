@@ -2,6 +2,7 @@ import { collection, getDocs, setDoc, doc, query, where, orderBy, addDoc, Docume
 import {db} from "../configs/firebase-config";
 import {Action, ActionFilter, AddressComponents, LocationData} from "../types";
 import axios from "axios";
+import { formatAddress } from '../utils';
 
 export const getMessages = async (filters: ActionFilter[] = []): Promise<Action[]> => {
   let q = query(
@@ -122,6 +123,7 @@ export const addMessage = async (
     type: type,
     payload: payload,
     address: {
+      short: formatAddress(addressComponents.road || ""),
       lattitude: locationData.latitude || "",
       longitude: locationData.longitude || "",
       house_number: addressComponents.house_number || "",
