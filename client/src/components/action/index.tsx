@@ -44,6 +44,7 @@ export const UserAction = (props: UserActionProps) => {
     } else {
       setActionType('other')
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   
   const onTagClicked = () => {
