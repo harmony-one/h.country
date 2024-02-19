@@ -10,6 +10,8 @@ import { Typography, Spin } from "antd";
 import {addMessage, postUserTopics} from "../../api/firebase";
 import useDarkMode from "../../hooks/useDarkMode";
 
+const TOPIC_SELECTED_TRIGGER = 3
+
 const WelcomeContainer = styled(Box)`
   margin: 0 auto !important;
   display: flex;
@@ -164,7 +166,7 @@ export const WelcomePage: React.FC = () => {
       }
     }
 
-    if (selectedTopics.length === 4 && wallet?.address) {
+    if (selectedTopics.length === TOPIC_SELECTED_TRIGGER && wallet?.address) {
       setTopicsUpdating(true);
       tagsTopic()
       .then(() => {
