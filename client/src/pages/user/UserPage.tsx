@@ -12,9 +12,9 @@ import {
 import { db } from "../../configs/firebase-config";
 import { HeaderList } from "./headerList";
 import { UserAction } from "../../components/action";
-import { addMessage, getMessages, getMessagesByKey } from "../../api/firebase";
+import { addMessage, getMessages } from "../../api/firebase";
 import { isSameAddress, isValidAddress } from "../../utils/user";
-import {ActionFilter} from "../../types";
+import {ActionFilter, ActionFilterType} from "../../types";
 
 interface LinkItem {
   id: string;
@@ -73,11 +73,13 @@ export const handleSubmit = async (
   }
 };
 
+const DefaultFilterMode: ActionFilterType = 'address'
+
 export const UserPage = (props: { id: string }) => {
   const { wallet } = useUserContext();
   const { id: key } = props;
   const [actions, setActions] = useState<Action[]>([]);
-  const [filterMode, setFilterMode] = useState<"all" | "address" | "hashtag" | null>('address');
+  const [filterMode, setFilterMode] = useState<"all" | "address" | "hashtag">(DefaultFilterMode);
   const [urls, setUrls] = useState<LinkItem[]>([]);
   const [isLoading, setLoading] = useState(false);
   const [isUserPage, setIsUserPage] = useState(false);
@@ -85,19 +87,34 @@ export const UserPage = (props: { id: string }) => {
   const [filters, setFilters] = useState<ActionFilter[]>([])
 
   useEffect(() => {
+    // Drop sub-filters if user select All of <Address> filter
+    if(filterMode !== 'hashtag') {
+      setFilters([])
+    }
+  }, [filterMode]);
+
+  useEffect(() => {
     const loadData = async () => {
       setLoading(true)
       setActions([])
 
-      console.log('Loading actions...')
-
       try {
-        let items: Action[] = []
-        if (filterMode === "all") {
-          items = await getMessages();
-        } else if (filterMode === "address" && key) {
-          items = await getMessagesByKey(key);
+        let items: Action[]
+        let actionFilters: ActionFilter[] = []
+        if (filterMode === "address" && key) {
+          actionFilters.push({
+            type: 'address',
+            value: key
+          })
+        } else if(filterMode === 'hashtag' && filters.length > 0) {
+          const [{ value }] = filters
+          actionFilters.push({
+            type: 'hashtag',
+            value: value
+          })
         }
+        console.log('Fetching actions...', actionFilters)
+        items = await getMessages(actionFilters);
         setActions(items)
         console.log('Actions loaded:', items)
       } catch (e) {
@@ -239,7 +256,11 @@ export const UserPage = (props: { id: string }) => {
           {filters.map(filter => {
             const { value } = filter
             const onClick = () => {
-              setFilters(filters.filter(item => item.value !== value))
+              const newFilters = filters.filter(item => item.value !== value)
+              setFilters(newFilters)
+              if(newFilters.length === 0) {
+                setFilterMode(DefaultFilterMode)
+              }
             }
 
             return <PlainButton
