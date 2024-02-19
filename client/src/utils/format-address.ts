@@ -1,5 +1,5 @@
 export const removeSpacesAndSpecialChars = (str: string) => {
-    return str.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '');
+    return str.replace(/[\s~`!@#$%^&*(){};:"'<,.>?\\|_+=-]/g, '');
   }
 
 export const formatAddress = (address?: string) => {
