@@ -57,7 +57,7 @@ export const getMessages = async (filters: ActionFilter[] = []): Promise<Action[
     .filter((action) => action.type === "tag"
       || action.type === "new_user")
     .sort((a, b) => {
-      return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     })
 }
 
