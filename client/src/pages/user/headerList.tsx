@@ -17,15 +17,8 @@ interface HeaderListProps {
   onUrlSubmit?: (url: string) => void;
 }
 
-const HeaderText = styled(Text)`
-  span {
-    font-size: min(1em, 3vw);
-  }
-` 
-
 export const HeaderList = (props: HeaderListProps) => {
   const { userId: key, isUserPage, type, items, wallet } = props;
-
   const onHashSubmit = async (hashtag: string) => {
     if (!wallet || !key) {
       console.log("Invalid user wallet or key");
@@ -131,7 +124,7 @@ export const HeaderList = (props: HeaderListProps) => {
                     textAlign: "left"
                   }}
                 >
-                  <HeaderText>{item.content}</HeaderText>
+                  {item.content}
                 </div>
               ))}
             </div>
