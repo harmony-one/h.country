@@ -79,9 +79,9 @@ export const UserAction = (props: UserActionProps) => {
         <Box basis="50%">
           <Text size={"small"} style={{ wordBreak: 'break-all' }}>
           <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
-            {" tags "}
+            {" "}
             <ActionText size={"small"} onClick={onTagClicked} type={actionType}>#{action.payload}</ActionText>
-            {" on "}
+            {" "}
             <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
           </Text>
         </Box>
