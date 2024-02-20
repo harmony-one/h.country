@@ -219,7 +219,9 @@ export const UserPage = (props: { id: string }) => {
   }, [wallet, key, filters.length]);
 
   const extendedUrls = useMemo<LinkItem[]>(() => {
-    const latestLocation = actions.find(a => !!a.address.road)?.address;
+    const latestLocation = actions.find(
+      a => a.from === wallet?.address.slice(2) && !!a.address.road
+    )?.address;
 
     if (!latestLocation?.road) {
       return urls;
@@ -238,7 +240,7 @@ export const UserPage = (props: { id: string }) => {
         </a>
       )
     }, ...urls]
-  }, [actions, urls])
+  }, [actions, urls, wallet, wallet?.address])
 
   if (!key || !isValidAddress(key)) {
     return <Box>Not a valid user ID</Box>;
