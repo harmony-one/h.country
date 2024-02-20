@@ -145,7 +145,7 @@ export const addMessage = async (
 
   let action = {
     from: from,
-    to: mentions[0],
+    to: mentions[0] || "",
     type: type,
     payload: payload,
     address: {

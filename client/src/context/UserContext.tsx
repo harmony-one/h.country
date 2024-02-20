@@ -73,7 +73,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         address: "No location",
       };
       const addressWithoutPrefix = newWallet.address.slice(2);
-      addMessage(locationData, addressWithoutPrefix, "new user joined");
+      try {
+        addMessage(locationData, addressWithoutPrefix, "new_user");
+      } catch (error) {
+        console.error("Failed to add message: ", error);
+      }
       window.localStorage.setItem(LSAccountKey, newWallet.privateKey);
       console.log(
         "[user context] Generated new blockchain wallet: ",
