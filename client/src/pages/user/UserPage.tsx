@@ -76,6 +76,9 @@ export const handleSubmit = async (
 
 const DefaultFilterMode: ActionFilterType = 'address'
 
+function isHex(num: string): Boolean {
+  return Boolean(num.match(/^0x[0-9a-f]+$/i)) || Boolean(`0x${num}`.match(/^0x[0-9a-f]+$/i))
+}
 export const UserPage = (props: { id: string }) => {
   const { wallet, firstTimeVisit } = useUserContext();
   const { id: key } = props;
@@ -183,10 +186,10 @@ export const UserPage = (props: { id: string }) => {
         },
         {}
       );
-
+      
       const sortedHashtags = Object.entries(hashtagFrequency)
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
+        .slice(0, 9)
         .map(([hashtag, count]) => ({
           content: (
             <Button key={hashtag} onClick={
@@ -201,7 +204,7 @@ export const UserPage = (props: { id: string }) => {
               }}
               plain>
               <Box direction={"row"} key={hashtag}>
-                <Text>{hashtag}</Text>
+                <Text>{isHex(hashtag) ? `0/${hashtag.substring(0, 4)}` : hashtag}</Text>
                 <Text size={"xsmall"}>{count}</Text>
               </Box>
             </Button>

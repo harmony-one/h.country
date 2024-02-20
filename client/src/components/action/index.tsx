@@ -7,13 +7,13 @@ import { socialUrlParser, formatAddress } from "../../utils";
 import { useUserContext } from "../../context/UserContext";
 import styled from "styled-components";
 
-enum ActionType {
+export enum ActionType {
   self = 'self',
   other = 'other',
   verified = 'verified',
   none = 'none'
 } 
-const handleActionType = (type: ActionType) => {
+const handleActionTypeColor = (type: ActionType) => {
   switch (type) {
     case 'verified':
       return "#a0ffa0 !important"
@@ -26,16 +26,25 @@ const handleActionType = (type: ActionType) => {
   }
 };
 
-const ActionText = styled(Text)<{ type?: ActionType }>`
-  color: ${(props) => props.type && handleActionType(props.type)};
+export const handleActionType = (action: Action, walletAddress: string) => {
+  const myAddress = walletAddress ? walletAddress.slice(2) : '';
+  if (myAddress === action.from) {
+    return ActionType.self
+  } else {
+    return ActionType.other
+  }
+}
+
+export const ActionText = styled(Text)<{ type?: ActionType }>`
+  color: ${(props) => props.type && handleActionTypeColor(props.type)};
   cursor: ${(props) => props.type && props.type !== 'none' ? 'pointer' : 'auto'};
 `
-const ActionLink = styled(Link)<{ type?: ActionType }>`
+export const ActionLink = styled(Link)<{ type?: ActionType }>`
   :visited, :link, :hover, :active {
-    color: ${(props) => props.type && handleActionType(props.type)};
+    color: ${(props) => props.type && handleActionTypeColor(props.type)};
   }
   
-  text-decoration: ${(props) => props.type && props.type !== 'none' ? 'underline' : 'none'}
+  text-decoration: ${(props) => props.type && props.type !== 'none' ? 'underline' : 'none'};
 `;
 
 export interface UserActionProps {
@@ -49,12 +58,7 @@ export const UserAction = (props: UserActionProps) => {
   const [actionType, setActionType] = useState<ActionType>(ActionType.none)
   
   useEffect(() => {
-    const myAddress = wallet?.address.slice(2);
-    if (myAddress === action.from) {
-      setActionType(ActionType.self)
-    } else {
-      setActionType(ActionType.other)
-    }
+    setActionType(handleActionType(action, wallet?.address || ''))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   
