@@ -70,6 +70,7 @@ export const getLatestLocation = async (address: string): Promise<Action> => {
     where('from', '==', address),
     where('address.road', '!=', ''),
     orderBy("timestamp", "desc"),
+    limit(1)
   );
 
   const toSnapshot = await getDocs(fromQuery);
