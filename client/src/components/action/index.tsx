@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import moment from 'moment'
 import { Action } from "../../types";
 import { socialUrlParser, formatAddress } from "../../utils";
-import { useUserContext } from "../../context/UserContext";
 import styled from "styled-components";
 
 export enum ActionType {
