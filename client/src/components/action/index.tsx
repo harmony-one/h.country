@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import moment from 'moment'
 import { Action } from "../../types";
 import { socialUrlParser, formatAddress } from "../../utils";
-import { useUserContext } from "../../context/UserContext";
 import styled from "styled-components";
 
 export enum ActionType {
@@ -27,8 +26,8 @@ const handleActionTypeColor = (type: ActionType) => {
 };
 
 export const handleActionType = (action: Action, walletAddress: string) => {
-  const myAddress = walletAddress ? walletAddress.slice(2) : '';
-  if (myAddress === action.from) {
+  // const myAddress = walletAddress ? walletAddress.slice(2) : '';
+  if (walletAddress === action.from) {
     return ActionType.self
   } else {
     return ActionType.other
@@ -48,17 +47,16 @@ export const ActionLink = styled(Link)<{ type?: ActionType }>`
 `;
 
 export interface UserActionProps {
+  userId?: any
   action: Action
   onTagClicked?: (hashtag: string) => void
 }
 
 export const UserAction = (props: UserActionProps) => {
-  const { action } = props
-  const { wallet } = useUserContext();
+  const { action, userId } = props
   const [actionType, setActionType] = useState<ActionType>(ActionType.none)
-  
   useEffect(() => {
-    setActionType(handleActionType(action, wallet?.address || ''))
+    setActionType(handleActionType(action, userId || ''))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   

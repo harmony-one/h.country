@@ -18,7 +18,6 @@ interface HeaderListProps {
 
 export const HeaderList = (props: HeaderListProps) => {
   const { userId: key, isUserPage, type, items, wallet } = props;
-
   const onHashSubmit = async (hashtag: string) => {
     if (!wallet || !key) {
       console.log("Invalid user wallet or key");
@@ -121,7 +120,7 @@ export const HeaderList = (props: HeaderListProps) => {
                     gridRowStart: (index % 3) + 1,
                     gridColumnStart: Math.floor(index / 3) + 1,
                     width: "100%",
-                    textAlign: "left",
+                    textAlign: "left"
                   }}
                 >
                   {item.content}
