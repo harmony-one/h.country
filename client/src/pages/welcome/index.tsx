@@ -136,7 +136,7 @@ export const WelcomePage: React.FC = () => {
   const { wallet } = useUserContext();
 
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [isTopicsUpdating, setTopicsUpdating] = useState(false);
   const [topicList, setTopicList] = useState<UserTopic[]>();
