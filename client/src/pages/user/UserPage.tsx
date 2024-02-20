@@ -246,7 +246,7 @@ export const UserPage = (props: { id: string }) => {
     });
 
     return () => unsubscribe();
-  }, [wallet, key, filters.length]);
+  }, [wallet, key, filters.length, topicsQueryParam]);
 
   const extendedUrls = useMemo<LinkItem[]>(() => {
     const latestLocation = actions.find(

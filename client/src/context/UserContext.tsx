@@ -9,7 +9,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import {useLocation, useNavigate} from "react-router-dom";
+import {useLocation} from "react-router-dom";
 import { addMessage } from "../api/firebase";
 
 export const LSAccountKey = "h_country_client_account";
@@ -38,7 +38,6 @@ if (firstTimeVisit) {
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const navigate = useNavigate()
   const location = useLocation();
   const [wallet, setWallet] = useState<Wallet | undefined>(undefined);
 

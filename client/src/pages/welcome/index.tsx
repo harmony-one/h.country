@@ -193,7 +193,7 @@ export const WelcomePage: React.FC = () => {
       console.log('Set topics from query: ', topicsQueryParam)
       navigate(`/0/${wallet.address.substring(2)}?topics=${topicsQueryParam}`);
     }
-  }, [topicsQueryParam, wallet]);
+  }, [topicsQueryParam, wallet, navigate]);
 
   const handleTopicClick = (topic: UserTopic) => {
     const { name } = topic;
