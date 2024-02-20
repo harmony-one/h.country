@@ -5,6 +5,7 @@ import { ethers } from "ethers";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../configs/firebase-config";
 import { socialUrlParser } from "../../utils";
+import styled from "styled-components";
 
 interface HeaderListProps {
   userId: string;
@@ -15,6 +16,12 @@ interface HeaderListProps {
   wallet: ethers.Wallet | undefined;
   onUrlSubmit?: (url: string) => void;
 }
+
+const HeaderText = styled(Text)`
+  span {
+    font-size: min(1em, 3vw);
+  }
+` 
 
 export const HeaderList = (props: HeaderListProps) => {
   const { userId: key, isUserPage, type, items, wallet } = props;
@@ -121,10 +128,10 @@ export const HeaderList = (props: HeaderListProps) => {
                     gridRowStart: (index % 3) + 1,
                     gridColumnStart: Math.floor(index / 3) + 1,
                     width: "100%",
-                    textAlign: "left",
+                    textAlign: "left"
                   }}
                 >
-                  {item.content}
+                  <HeaderText>{item.content}</HeaderText>
                 </div>
               ))}
             </div>
