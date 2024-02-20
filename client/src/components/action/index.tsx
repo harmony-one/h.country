@@ -55,7 +55,6 @@ export interface UserActionProps {
 
 export const UserAction = (props: UserActionProps) => {
   const { action, userId } = props
-  const { wallet } = useUserContext();
   const [actionType, setActionType] = useState<ActionType>(ActionType.none)
   useEffect(() => {
     setActionType(handleActionType(action, userId || ''))

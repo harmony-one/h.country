@@ -5,7 +5,6 @@ import { ethers } from "ethers";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../configs/firebase-config";
 import { socialUrlParser } from "../../utils";
-import styled from "styled-components";
 
 interface HeaderListProps {
   userId: string;
