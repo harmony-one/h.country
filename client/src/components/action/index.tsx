@@ -66,6 +66,9 @@ export const UserAction = (props: UserActionProps) => {
     }
   }
 
+  const address = action.address.short ||
+    formatAddress(action.address.road)
+
   return <Box border={{ side: "bottom", color: '#565654' }} pad={"4px 0"}>
     {action.type === "new_user" &&
       <Box pad={'0 16px'}>
@@ -76,7 +79,7 @@ export const UserAction = (props: UserActionProps) => {
       </Box>}
     {action.type === 'tag' &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
-        <Box basis="50%">
+        <Box basis={address ? "50%" : "90%"}>
           <Text size={"small"} style={{ wordBreak: 'break-all' }}>
           <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
             {/* {" tags "} */}
@@ -85,11 +88,11 @@ export const UserAction = (props: UserActionProps) => {
             <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
           </Text>
         </Box>
-        <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
+        {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
           <Text style={{ textAlign: "right" }} size={"small"}>
             {action.address.short || formatAddress(action.address.road)}
           </Text>
-        </Box>
+        </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
           <Text size={"small"}>
             {moment(action.timestamp).fromNow()}
