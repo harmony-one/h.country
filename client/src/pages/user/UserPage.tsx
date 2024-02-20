@@ -30,6 +30,12 @@ const SmallHeaderText = styled(Text)`
   }
 `
 
+const predefinedLinks = [
+  { key: 'x', displayText: 'Twitter' },
+  { key: 'ig', displayText: 'Instagram' },
+  { key: 'g', displayText: 'Github' },
+];
+
 interface LinkItem {
   id: string;
   text: JSX.Element;
@@ -129,27 +135,40 @@ export const UserPage = (props: { id: string }) => {
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-
-        let linkItems: LinkItem[] = Object.keys(data)
-          .filter(key => data[key].username && data[key].url)
-          .map(key => ({
-            id: docSnap.id + key,
-            text: (
-              <a href={data[key].url} target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
-                {`${key}/${data[key].username}`}
-              </a>
-            )
-          }));
-
+  
+        let linkItems: LinkItem[] = predefinedLinks.map(({ key, displayText }) => {
+          // Check if the key exists in the fetched data
+          if (data[key] && data[key].username && data[key].url) {
+            return {
+              id: docSnap.id + key,
+              text: (
+                <a href={data[key].url} target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
+                  {`${key}/${data[key].username}`}
+                </a>
+              ),
+            };
+          } else {
+            // Return a default link item with the display text if the key does not exist
+            return {
+              id: docSnap.id + key,
+              text: <Text>{displayText}</Text>,
+            };
+          }
+        });
+  
         setUrls(linkItems);
       } else {
         console.log("No such document!");
-        setUrls([]);
+        // Here you can handle the case where there are no user links at all
+        setUrls(predefinedLinks.map(({ key, displayText }) => ({
+          id: 'default' + key,
+          text: <Text>{displayText}</Text>,
+        })));
       }
     });
-
+  
     return () => unsubscribe();
-  }, [key]);
+  }, [key]);  
 
   useEffect(() => {
     if (wallet) {
