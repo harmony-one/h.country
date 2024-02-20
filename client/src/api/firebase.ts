@@ -1,6 +1,6 @@
-import { collection, getDocs, setDoc, doc, query, where, orderBy, addDoc, DocumentData, QueryDocumentSnapshot} from 'firebase/firestore';
-import {db} from "../configs/firebase-config";
-import {Action, ActionFilter, AddressComponents, LocationData} from "../types";
+import { collection, getDocs, setDoc, doc, query, where, orderBy, addDoc, DocumentData, QueryDocumentSnapshot, limit } from 'firebase/firestore';
+import { db } from "../configs/firebase-config";
+import { Action, ActionFilter, AddressComponents, LocationData } from "../types";
 import axios from "axios";
 import { formatAddress } from '../utils';
 
@@ -13,7 +13,7 @@ export const getMessages = async (filters: ActionFilter[] = []): Promise<Action[
   // If query contains "address" ("from" OR "to"), we need to execute second query to get "to" field entries
   let mentions: QueryDocumentSnapshot<DocumentData, DocumentData>[] = []
   const addressFilter = filters.find((filter) => filter.type === 'address')
-  if(addressFilter) {
+  if (addressFilter) {
     // "from" filter
     q = query(q, where('from', '==', addressFilter.value))
 
@@ -28,7 +28,7 @@ export const getMessages = async (filters: ActionFilter[] = []): Promise<Action[
   }
 
   for (const filter of filters) {
-    const {type, value} = filter
+    const { type, value } = filter
     if (type === 'hashtag') {
       q = query(q, where('payload', '==', value))
     }
@@ -61,6 +61,31 @@ export const getMessages = async (filters: ActionFilter[] = []): Promise<Action[
     .sort((a, b) => {
       return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     })
+}
+
+export const getLatestLocation = async (address: string): Promise<Action> => {
+  const fromQuery = query(
+    collection(db, "actions"),
+    orderBy("address.road", "desc"),
+    where('from', '==', address),
+    where('address.road', '!=', ''),
+    orderBy("timestamp", "desc"),
+  );
+
+  const toSnapshot = await getDocs(fromQuery);
+
+  const data = toSnapshot.docs[0]?.data();
+
+  return data && {
+    address: data.address,
+    timestamp: data.timestamp,
+    from: data.from,
+    fromShort: data.from.substring(0, 4),
+    payload: data.payload,
+    to: data.to,
+    toShort: typeof data.to === 'string' ? data.to.substring(0, 4) : '',
+    type: data.type
+  }
 }
 
 export const addMessage = async (
