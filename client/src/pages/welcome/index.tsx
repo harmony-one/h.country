@@ -141,7 +141,7 @@ export const WelcomePage: React.FC = () => {
   const [isTopicsUpdating, setTopicsUpdating] = useState(false);
   const [topicList, setTopicList] = useState<UserTopic[]>();
 
-  const topicsQueryParam = searchParams.get('name')
+  const topicsQueryParam = searchParams.get('topics')
 
   useEffect(() => {
     const getTopics = async () => {
@@ -189,14 +189,11 @@ export const WelcomePage: React.FC = () => {
   }, [selectedTopics, wallet, wallet?.address, navigate]);
 
   useEffect(() => {
-    if(topicsQueryParam) {
-      const topicsFromQuery = topicsQueryParam.split(',')
-      if(topicsFromQuery.length > 0) {
-        setSelectedTopics(topicsFromQuery)
-        console.log('Set topic from query: ', topicsFromQuery)
-      }
+    if(topicsQueryParam && wallet && wallet.address) {
+      console.log('Set topics from query: ', topicsQueryParam)
+      navigate(`/0/${wallet.address.substring(2)}?topics=${topicsQueryParam}`);
     }
-  }, [topicsQueryParam]);
+  }, [topicsQueryParam, wallet]);
 
   const handleTopicClick = (topic: UserTopic) => {
     const { name } = topic;
