@@ -15,7 +15,7 @@ import { UserAction } from "../../components/action";
 import { addMessage, getMessages } from "../../api/firebase";
 import { isSameAddress, isValidAddress } from "../../utils/user";
 import { ActionFilter, ActionFilterType, AddressComponents } from "../../types";
-import { formatAddress } from "../../utils";
+import { formatAddress, linkToMapByAddress } from "../../utils";
 
 interface LinkItem {
   id: string;
@@ -186,7 +186,7 @@ export const UserPage = (props: { id: string }) => {
         },
         {}
       );
-      
+
       const sortedHashtags = Object.entries(hashtagFrequency)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 9)
@@ -219,26 +219,28 @@ export const UserPage = (props: { id: string }) => {
   }, [wallet, key, filters.length]);
 
   const extendedUrls = useMemo<LinkItem[]>(() => {
-    const latestLocation = actions.find(a => !!a.address.road)?.address;
+    const latestLocation = actions.find(
+      a => a.from === wallet?.address.slice(2) && !!a.address.road
+    )?.address;
 
     if (!latestLocation?.road) {
       return urls;
     }
 
-    const place = latestLocation.road.replace(/ /g, '+')
-
-    const hrefToMap = `https://www.google.ca/maps/place/${place}`
-    // const hrefToMap = `https://www.google.com/maps/search/?api=1&query=${latestLocation.lattitude},${latestLocation.longitude}`
-
     return [{
       id: 'latest_location' + latestLocation?.postcode,
       text: (
-        <a href={hrefToMap} target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
+        <a
+          href={linkToMapByAddress(latestLocation)}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: 'white', textDecoration: 'none' }}
+        >
           {`l/${latestLocation?.short || formatAddress(latestLocation?.road)}`}
         </a>
       )
     }, ...urls]
-  }, [actions, urls])
+  }, [actions, urls, wallet?.address])
 
   if (!key || !isValidAddress(key)) {
     return <Box>Not a valid user ID</Box>;
