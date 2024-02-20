@@ -3,8 +3,10 @@ import { useParams } from "react-router-dom";
 import { UserPage } from ".";
 import { Text } from "grommet";
 import { getUserBySocial } from "../../api/firebase";
+import { useUserContext } from "../../context/UserContext";
 
 export const UserPageBySocial = () => {
+    const { setPageOwnerAddress } = useUserContext();
     const { socialType = '', username } = useParams();
     const [userId, setUserId] = useState('');
     const [loading, setLoading] = useState(true);
@@ -36,6 +38,12 @@ export const UserPageBySocial = () => {
     useEffect(() => {
         loadUser();
     }, [socialType, username, loadUser])
+
+    useEffect(() => {
+        if (userId) {
+            setPageOwnerAddress(userId);
+        }
+    }, [userId, setPageOwnerAddress])
 
     if (loading) {
         return <Text>Loading...</Text>

@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { Box, Button, Text } from "grommet";
-import { handleSubmit } from ".";
+import { addMessageWithGeolocation } from "../../api";
 import { ethers } from "ethers";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../configs/firebase-config";
@@ -26,7 +26,7 @@ export const HeaderList = (props: HeaderListProps) => {
     const addressWithoutPrefix = wallet.address.slice(2);
     const submitText = `#${hashtag} @${key}`;
 
-    await handleSubmit(undefined, addressWithoutPrefix, submitText);
+    await addMessageWithGeolocation(addressWithoutPrefix, submitText);
   };
 
   const onTitleClick = async () => {
@@ -78,8 +78,7 @@ export const HeaderList = (props: HeaderListProps) => {
 
       const addressWithoutPrefix = wallet.address.slice(2);
 
-      await handleSubmit(
-        undefined,
+      await addMessageWithGeolocation(
         addressWithoutPrefix,
         `@${socialObj.username} ${socialObj.url}`
       );
