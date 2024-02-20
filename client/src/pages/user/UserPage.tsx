@@ -16,6 +16,23 @@ import { addMessage, getMessages } from "../../api/firebase";
 import { isSameAddress, isValidAddress } from "../../utils/user";
 import { ActionFilter, ActionFilterType, AddressComponents } from "../../types";
 import { formatAddress, linkToMapByAddress } from "../../utils";
+import styled from "styled-components";
+
+const HeaderText = styled(Text)`
+  font-size: min(1em, 3vw);
+` 
+const SmallHeaderText = styled(Text)`
+  font-size: min(0.8em, 2.5vw);
+  line-height: 2.3em;
+
+  @media only screen and (min-width: 380px) {
+    line-height: 2em;
+  }
+
+  @media only screen and (min-width: 450px) {
+    line-height: 1em;
+  }
+` 
 
 interface LinkItem {
   id: string;
@@ -204,8 +221,8 @@ export const UserPage = (props: { id: string }) => {
               }}
               plain>
               <Box direction={"row"} key={hashtag}>
-                <Text>{isHex(hashtag) ? `0/${hashtag.substring(0, 4)}` : hashtag}</Text>
-                <Text size={"xsmall"}>{count}</Text>
+                <HeaderText>{isHex(hashtag) ? `0/${hashtag.substring(0, 4)}` : hashtag}</HeaderText>
+                <SmallHeaderText>{count}</SmallHeaderText>
               </Box>
             </Button>
           ),
@@ -262,7 +279,7 @@ export const UserPage = (props: { id: string }) => {
         <HeaderList userId={key} isLoading={isLoading} isUserPage={isUserPage} type={"url"} items={extendedUrls.map(item => ({
           content: (
             <Box key={item.id}>
-              <Text>{item.text}</Text>
+              <HeaderText>{item.text}</HeaderText>
             </Box>
           ),
         }))} wallet={wallet} />
@@ -319,6 +336,7 @@ export const UserPage = (props: { id: string }) => {
         }
         {actions.map((action, index) => (
           <UserAction
+            userId={key}
             key={index + action.timestamp}
             action={action}
             onTagClicked={onTagClicked}
