@@ -9,7 +9,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { useLocation } from "react-router-dom";
+import {useLocation} from "react-router-dom";
 import { addMessage } from "../api/firebase";
 
 export const LSAccountKey = "h_country_client_account";
@@ -29,6 +29,7 @@ interface UserProviderProps {
 
 const privateKeyLS = window.localStorage.getItem(LSAccountKey);
 const firstTimeVisit = !window.localStorage.getItem(LSIsPageVisited);
+let forceGenerateNewWallet = false
 
 if (firstTimeVisit) {
   setTimeout(() => {
@@ -47,14 +48,21 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       // navigate('/messages')
     }
 
-    if (privateKeyLS) {
+    if (location.pathname === "/new") {
+      console.log("[user context] /new: forced to generate a new wallet; current wallet will be rewritten");
+      forceGenerateNewWallet = true
+    }
+
+    if (privateKeyLS && !forceGenerateNewWallet) {
       try {
-        const data = getWalletFromPrivateKey(privateKeyLS);
-        setWallet(data);
-        console.log(
-          "[user context] Restored blockchain wallet from private key: ",
-          data.address
-        );
+        if(privateKeyLS) {
+          const data = getWalletFromPrivateKey(privateKeyLS);
+          setWallet(data);
+          console.log(
+            "[user context] Restored blockchain wallet from private key: ",
+            data.address
+          );
+        }
         // navigate('/messages')
       } catch (error) {
         console.error(
@@ -80,10 +88,14 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       }
       window.localStorage.setItem(LSAccountKey, newWallet.privateKey);
       console.log(
-        "[user context] Generated new blockchain wallet: ",
+        "[user context] Generated new blockchain address: ",
         newWallet.address
       );
       // navigate('/welcome')
+
+      if(forceGenerateNewWallet) {
+        window.location.replace('/')
+      }
     }
   }, [location.pathname]);
 

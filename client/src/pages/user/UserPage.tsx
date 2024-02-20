@@ -1,26 +1,21 @@
-import React, { ReactNode, useState, useEffect, useMemo } from "react";
-import { Box, Button, Spinner, Text } from "grommet";
-import { PlainButton } from "../../components/button";
-import { useUserContext } from "../../context/UserContext";
-import {
-  collection,
-  query,
-  onSnapshot,
-  where,
-  doc
-} from "firebase/firestore";
-import { db } from "../../configs/firebase-config";
-import { HeaderList } from "./headerList";
-import { UserAction } from "../../components/action";
-import { addMessage, getMessages } from "../../api/firebase";
-import { isSameAddress, isValidAddress } from "../../utils/user";
-import { ActionFilter, ActionFilterType, AddressComponents } from "../../types";
-import { formatAddress, linkToMapByAddress } from "../../utils";
+import React, {ReactNode, useEffect, useMemo, useState} from "react";
+import {Box, Button, Spinner, Text} from "grommet";
+import {PlainButton} from "../../components/button";
+import {useUserContext} from "../../context/UserContext";
+import {collection, doc, onSnapshot, query, where} from "firebase/firestore";
+import {db} from "../../configs/firebase-config";
+import {HeaderList} from "./headerList";
+import {UserAction} from "../../components/action";
+import {addMessage, getMessages} from "../../api/firebase";
+import {isSameAddress, isValidAddress} from "../../utils/user";
+import {ActionFilter, ActionFilterType, AddressComponents} from "../../types";
+import {formatAddress, linkToMapByAddress} from "../../utils";
 import styled from "styled-components";
+import {useSearchParams} from "react-router-dom";
 
 const HeaderText = styled(Text)`
   font-size: min(1em, 3vw);
-` 
+`
 const SmallHeaderText = styled(Text)`
   font-size: min(0.8em, 2.5vw);
   line-height: 2.3em;
@@ -32,7 +27,7 @@ const SmallHeaderText = styled(Text)`
   @media only screen and (min-width: 450px) {
     line-height: 1em;
   }
-` 
+`
 
 interface LinkItem {
   id: string;
@@ -93,6 +88,17 @@ export const handleSubmit = async (
 
 const DefaultFilterMode: ActionFilterType = 'address'
 
+const parseTagsFromUrl = (hashtagList: string): [string, number][] => {
+  const topics = hashtagList.split(',')
+  return topics.map(topic => {
+    const [tag, counter = '1'] = topic.split('^')
+    return [
+      tag,
+      Number(counter) || 0
+    ]
+  })
+}
+
 function isHex(num: string): Boolean {
   return Boolean(num.match(/^0x[0-9a-f]+$/i)) || Boolean(`0x${num}`.match(/^0x[0-9a-f]+$/i))
 }
@@ -108,6 +114,8 @@ export const UserPage = (props: { id: string }) => {
   const [isUserPage, setIsUserPage] = useState(false);
   const [tagItems, setTagItems] = useState<Array<{ content: ReactNode }>>([]);
   const [filters, setFilters] = useState<ActionFilter[]>([])
+  const [searchParams] = useSearchParams();
+  const topicsQueryParam = searchParams.get('topics')
 
   useEffect(() => {
     // Drop sub-filters if user select All of <Address> filter
@@ -204,7 +212,12 @@ export const UserPage = (props: { id: string }) => {
         {}
       );
 
-      const sortedHashtags = Object.entries(hashtagFrequency)
+      const tagsFromUrl = parseTagsFromUrl(topicsQueryParam || '')
+      console.log('Tags from Url: ', tagsFromUrl)
+
+      const tagsList = tagsFromUrl.length ? tagsFromUrl : Object.entries(hashtagFrequency)
+
+      const sortedHashtags = tagsList
         .sort((a, b) => b[1] - a[1])
         .slice(0, 9)
         .map(([hashtag, count]) => ({
@@ -233,7 +246,7 @@ export const UserPage = (props: { id: string }) => {
     });
 
     return () => unsubscribe();
-  }, [wallet, key, filters.length]);
+  }, [wallet, key, filters.length, topicsQueryParam]);
 
   const extendedUrls = useMemo<LinkItem[]>(() => {
     const latestLocation = actions.find(
@@ -273,17 +286,32 @@ export const UserPage = (props: { id: string }) => {
     }
   }
 
+  const headersListProps = {
+    userId: key,
+    isLoading,
+    isUserPage,
+    wallet
+  }
+
   return (
     <Box>
       <Box>
-        <HeaderList userId={key} isLoading={isLoading} isUserPage={isUserPage} type={"url"} items={extendedUrls.map(item => ({
-          content: (
-            <Box key={item.id}>
-              <HeaderText>{item.text}</HeaderText>
-            </Box>
-          ),
-        }))} wallet={wallet} />
-        <HeaderList userId={key} isLoading={isLoading} isUserPage={isUserPage} type={"hashtag"} items={tagItems} wallet={wallet} />
+        <HeaderList
+          {...headersListProps}
+          type={"url"}
+          items={extendedUrls.map(item => ({
+            content: (
+              <Box key={item.id}>
+                <HeaderText>{item.text}</HeaderText>
+              </Box>
+            ),
+          }))}
+        />
+        <HeaderList
+          {...headersListProps}
+          type={"hashtag"}
+          items={tagItems}
+        />
       </Box>
       <Box pad={'0 16px'}>
         <Box direction={"row"} gap={"16px"}>
