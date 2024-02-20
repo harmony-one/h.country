@@ -240,7 +240,7 @@ export const UserPage = (props: { id: string }) => {
         </a>
       )
     }, ...urls]
-  }, [actions, urls, wallet, wallet?.address])
+  }, [actions, urls, wallet?.address])
 
   if (!key || !isValidAddress(key)) {
     return <Box>Not a valid user ID</Box>;

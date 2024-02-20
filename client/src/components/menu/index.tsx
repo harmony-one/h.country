@@ -24,7 +24,7 @@ export const AppMenu = () => {
     const intervalId = setInterval(syncUserLocation, 5000);
 
     return clearInterval(intervalId);
-  }, [wallet?.address]);
+  }, [wallet?.address, syncUserLocation]);
 
   return <Box>
     <Box direction={'row'} justify={'between'}>
