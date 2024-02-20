@@ -1,16 +1,16 @@
-import React, { ReactNode } from 'react';
-import { Box, Button, Text } from 'grommet';
-import { handleSubmit } from '.';
-import { ethers } from 'ethers';
+import React, { ReactNode } from "react";
+import { Box, Button, Text } from "grommet";
+import { handleSubmit } from ".";
+import { ethers } from "ethers";
 import { doc, setDoc } from "firebase/firestore";
-import { db } from '../../configs/firebase-config';
-import { socialUrlParser } from '../../utils';
+import { db } from "../../configs/firebase-config";
+import { socialUrlParser } from "../../utils";
 
 interface HeaderListProps {
   userId: string;
-  isLoading?: boolean
-  isUserPage: boolean
-  type: 'url' | 'hashtag'
+  isLoading?: boolean;
+  isUserPage: boolean;
+  type: "url" | "hashtag";
   items: Array<{ content: ReactNode }>;
   wallet: ethers.Wallet | undefined;
   onUrlSubmit?: (url: string) => void;
@@ -31,19 +31,21 @@ export const HeaderList = (props: HeaderListProps) => {
   };
 
   const onTitleClick = async () => {
-    const input = window.prompt(type === 'hashtag' ? 'Enter Hashtag (without #):' : 'Enter URL:');
+    const input = window.prompt(
+      type === "hashtag" ? "Enter Hashtag (without #):" : "Enter URL:"
+    );
 
     if (input === null) {
-      console.log('Prompt was cancelled.');
+      console.log("Prompt was cancelled.");
       return;
     }
 
-    if (type === 'hashtag' && !input.trim().includes(' ')) {
+    if (type === "hashtag" && !input.trim().includes(" ")) {
       await onHashSubmit(input.trim());
-    } else if (type === 'url') {
+    } else if (type === "url") {
       await onUrlSubmit(input);
     } else {
-      alert('Enter a valid input.');
+      alert("Enter a valid input.");
     }
   };
 
@@ -56,7 +58,7 @@ export const HeaderList = (props: HeaderListProps) => {
     const socialObj = socialUrlParser(url)[0];
 
     if (!socialObj) {
-      alert('Enter a valid URL.');
+      alert("Enter a valid URL.");
       return;
     }
 
@@ -64,8 +66,8 @@ export const HeaderList = (props: HeaderListProps) => {
       [socialObj.type]: {
         username: socialObj.username,
         url: socialObj.url,
-      }
-    }
+      },
+    };
 
     try {
       await setDoc(doc(db, "userLinks", key), updateData, { merge: true });
@@ -94,13 +96,38 @@ export const HeaderList = (props: HeaderListProps) => {
       <Box direction={"row"} gap={"24px"} align={"center"}>
         <Button plain onClick={onTitleClick}>
           <Box width={"116px"} align={"center"}>
-            <Text size={"164px"} weight={800} color={isUserPage ? "blue1" : "yellow1"}>
-              {type === 'hashtag' ? '#' : '/'}
+            <Text
+              size={"164px"}
+              weight={800}
+              color={isUserPage ? "blue1" : "yellow1"}
+            >
+              {type === "hashtag" ? "#" : "/"}
             </Text>
           </Box>
         </Button>
-        {<Box gap={"8px"}>
-            {items.map((item) => item.content)}
+        {
+          <Box style={{ flex: '5'}}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateRows: "repeat(3, 1fr)",
+                gridAutoColumns: "1fr",
+              }}
+            >
+              {items.map((item, index) => (
+                <div
+                  key={index}
+                  style={{
+                    gridRowStart: (index % 3) + 1,
+                    gridColumnStart: Math.floor(index / 3) + 1,
+                    width: "100%",
+                    textAlign: "left",
+                  }}
+                >
+                  {item.content}
+                </div>
+              ))}
+            </div>
           </Box>
         }
       </Box>
