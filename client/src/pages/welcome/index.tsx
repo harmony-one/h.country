@@ -3,7 +3,7 @@ import { Box } from "grommet";
 import { toast } from "react-toastify";
 import { getTopicLits } from "../../constants";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import {useNavigate, useSearchParams} from "react-router-dom";
 import { useUserContext } from "../../context/UserContext";
 import { UserTopic } from "../../types";
 import { Typography, Spin } from "antd";
@@ -106,7 +106,7 @@ const TopicItem = (props: TopicItemProps) => {
     if (isSelected) {
       setImage(topic.color);
     } else {
-      const logo = topic.light 
+      const logo = topic.light
       setImage(logo);
     }
 
@@ -136,9 +136,12 @@ export const WelcomePage: React.FC = () => {
   const { wallet } = useUserContext();
 
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [isTopicsUpdating, setTopicsUpdating] = useState(false);
   const [topicList, setTopicList] = useState<UserTopic[]>();
+
+  const topicsQueryParam = searchParams.get('name')
 
   useEffect(() => {
     const getTopics = async () => {
@@ -166,7 +169,7 @@ export const WelcomePage: React.FC = () => {
       }
     }
 
-    if (selectedTopics.length === TOPIC_SELECTED_TRIGGER && wallet?.address) {
+    if (selectedTopics.length >= TOPIC_SELECTED_TRIGGER && wallet?.address) {
       setTopicsUpdating(true);
       tagsTopic()
       .then(() => {
@@ -184,6 +187,16 @@ export const WelcomePage: React.FC = () => {
       })
     }
   }, [selectedTopics, wallet, wallet?.address, navigate]);
+
+  useEffect(() => {
+    if(topicsQueryParam) {
+      const topicsFromQuery = topicsQueryParam.split(',')
+      if(topicsFromQuery.length > 0) {
+        setSelectedTopics(topicsFromQuery)
+        console.log('Set topic from query: ', topicsFromQuery)
+      }
+    }
+  }, [topicsQueryParam]);
 
   const handleTopicClick = (topic: UserTopic) => {
     const { name } = topic;

@@ -76,7 +76,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       addMessage(locationData, addressWithoutPrefix, "new user joined");
       window.localStorage.setItem(LSAccountKey, newWallet.privateKey);
       console.log(
-        "[user context] Generated new blockchain wallet: ",
+        "[user context] Generated new blockchain address: ",
         newWallet.address
       );
       // navigate('/welcome')
