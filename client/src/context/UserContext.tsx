@@ -27,26 +27,29 @@ interface UserProviderProps {
   children: ReactNode;
 }
 
-const privateKeyLS = window.localStorage.getItem(LSAccountKey);
-const firstTimeVisit = !window.localStorage.getItem(LSIsPageVisited);
-
-if (firstTimeVisit) {
-  setTimeout(() => {
-    window.localStorage.setItem(LSIsPageVisited, 'true');
-  }, 3000);
-}
-
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const location = useLocation();
   const [wallet, setWallet] = useState<Wallet | undefined>(undefined);
 
+  const privateKeyLS = window.localStorage.getItem(LSAccountKey);
+  const firstTimeVisit = !window.localStorage.getItem(LSIsPageVisited);
+
+  useEffect(()=> {
+    if (firstTimeVisit) {
+      setTimeout(() => {
+        window.localStorage.setItem(LSIsPageVisited, 'true');
+      }, 3000);
+    } 
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   useEffect(() => {
     if (location.pathname === "/auth" || location.pathname === "/") {
       console.log("[user context] /auth route, special handling");
       // navigate('/messages')
     }
 
+    if (wallet) return
     if (privateKeyLS) {
       try {
         const data = getWalletFromPrivateKey(privateKeyLS);
@@ -79,8 +82,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         "[user context] Generated new blockchain wallet: ",
         newWallet.address
       );
-      // navigate('/welcome')
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   const value = useMemo(() => {
@@ -89,6 +92,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       setWallet,
       firstTimeVisit,
     } as any;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wallet]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

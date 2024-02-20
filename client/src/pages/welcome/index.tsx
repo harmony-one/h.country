@@ -139,7 +139,6 @@ export const WelcomePage: React.FC = () => {
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [isTopicsUpdating, setTopicsUpdating] = useState(false);
   const [topicList, setTopicList] = useState<UserTopic[]>();
-
   useEffect(() => {
     const getTopics = async () => {
       const topics = await getTopicLits();
@@ -173,7 +172,7 @@ export const WelcomePage: React.FC = () => {
         postUserTopics(wallet.address, selectedTopics) //[...selectedTopics, wallet.address]
           .then(() => {
             // toast.success(`Added ${selectedTopics.length} topics!`, { autoClose: 10000 });
-            navigate("/");
+            navigate(`/0/${wallet.address.substring(2)}`);
           })
           .catch((e: any) => {
             toast.error(`Cannot add topics: ${e.message}`, { autoClose: 10000 });
