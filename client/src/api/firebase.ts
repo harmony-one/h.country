@@ -89,11 +89,13 @@ export const getLatestLocation = async (address: string): Promise<Action> => {
   }
 }
 
-export const addMessage = async (
+export const addMessage = async (params: {
   locationData: LocationData,
   from: string,
-  text: string
-) => {
+  text: string,
+  customPayload?: any,
+}) => {
+  const { locationData, from, text, customPayload } = params;
   const timestamp = new Date().toISOString();
 
   // TODO: Conditional check based on determined type
@@ -134,6 +136,9 @@ export const addMessage = async (
   if (urlMatch) {
     type = "link";
     payload = urlMatch[0];
+  } else if (text.includes("location")) {
+    type = "location";
+    payload = customPayload || hashtags[0]
   } else if (text.includes("check-in")) {
     type = "check-in";
   } else if (text.includes("new_user")) {

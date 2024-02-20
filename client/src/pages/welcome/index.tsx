@@ -3,11 +3,11 @@ import { Box } from "grommet";
 import { toast } from "react-toastify";
 import { getTopicLits } from "../../constants";
 import styled from "styled-components";
-import {useNavigate, useSearchParams} from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useUserContext } from "../../context/UserContext";
 import { UserTopic } from "../../types";
 import { Typography, Spin } from "antd";
-import {addMessage, postUserTopics} from "../../api/firebase";
+import { addMessage, postUserTopics } from "../../api/firebase";
 import useDarkMode from "../../hooks/useDarkMode";
 
 const TOPIC_SELECTED_TRIGGER = 3
@@ -47,7 +47,7 @@ const TopicsContainer = styled(Box)`
   }
 `;
 
-const TopicItemContainer = styled(Box)<{ isSelected?: boolean }>`
+const TopicItemContainer = styled(Box) <{ isSelected?: boolean }>`
   position: relative;
   aspect-ratio: 1 / 1;
   width: 100%;
@@ -63,18 +63,18 @@ const TopicItemContainer = styled(Box)<{ isSelected?: boolean }>`
   align-items: center;
   transition: transform 250ms;
   /* ${(props) =>
-  props.isSelected &&
-  `
+    props.isSelected &&
+    `
       box-shadow: 0px 0px 0px 4px #69fabd inset;
     `} */
 `;
 
-const TopicItemImage = styled.img<{ isDark?: Boolean}>`
+const TopicItemImage = styled.img<{ isDark?: Boolean }>`
   max-width: 50%;
   max-height: 50%;
   
-  ${(props) => props.isDark ? 
-      `filter: invert(100%)
+  ${(props) => props.isDark ?
+    `filter: invert(100%)
         sepia(92%) 
         saturate(1%) 
         hue-rotate(290deg) 
@@ -110,13 +110,13 @@ const TopicItem = (props: TopicItemProps) => {
       setImage(logo);
     }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSelected, themeMode]);
 
   const prefix = "#"; // topic.type === 'blockchain' ? '$' : '#'
   return (
     <TopicItemContainer isSelected={isSelected} onClick={onClick}>
-      {image && <TopicItemImage isDark={!isSelected && themeMode} src={image}alt={`${topic.name} logo`} onLoad={() => isSelected && setShowLabel(true)} />}
+      {image && <TopicItemImage isDark={!isSelected && themeMode} src={image} alt={`${topic.name} logo`} onLoad={() => isSelected && setShowLabel(true)} />}
       <TopicItemAlias>
         {isSelected && showLabel && (
           <Typography.Text
@@ -162,7 +162,11 @@ export const WelcomePage: React.FC = () => {
         const addressWithoutPrefix = wallet.address.slice(2);
         const tags = [...selectedTopics, addressWithoutPrefix]
         try {
-          await Promise.all(tags.map((tag: string) => addMessage(locationData, addressWithoutPrefix, `#${tag} @${addressWithoutPrefix}`)));
+          await Promise.all(tags.map((tag: string) => addMessage({
+            locationData,
+            from: addressWithoutPrefix,
+            text: `#${tag} @${addressWithoutPrefix}`
+          })));
         } catch (e) {
           console.log(e)
         }
@@ -172,24 +176,24 @@ export const WelcomePage: React.FC = () => {
     if (selectedTopics.length >= TOPIC_SELECTED_TRIGGER && wallet?.address) {
       setTopicsUpdating(true);
       tagsTopic()
-      .then(() => {
-        postUserTopics(wallet.address, selectedTopics) //[...selectedTopics, wallet.address]
-          .then(() => {
-            // toast.success(`Added ${selectedTopics.length} topics!`, { autoClose: 10000 });
-            navigate("/");
-          })
-          .catch((e: any) => {
-            toast.error(`Cannot add topics: ${e.message}`, { autoClose: 10000 });
-          })
-          .finally(() => {
-            setTopicsUpdating(false);
-          });
-      })
+        .then(() => {
+          postUserTopics(wallet.address, selectedTopics) //[...selectedTopics, wallet.address]
+            .then(() => {
+              // toast.success(`Added ${selectedTopics.length} topics!`, { autoClose: 10000 });
+              navigate("/");
+            })
+            .catch((e: any) => {
+              toast.error(`Cannot add topics: ${e.message}`, { autoClose: 10000 });
+            })
+            .finally(() => {
+              setTopicsUpdating(false);
+            });
+        })
     }
   }, [selectedTopics, wallet, wallet?.address, navigate]);
 
   useEffect(() => {
-    if(topicsQueryParam && wallet && wallet.address) {
+    if (topicsQueryParam && wallet && wallet.address) {
       console.log('Set topics from query: ', topicsQueryParam)
       navigate(`/0/${wallet.address.substring(2)}?topics=${topicsQueryParam}`);
     }
