@@ -1,43 +1,38 @@
-import { collection, getDocs, setDoc, doc, query, where, orderBy, addDoc, DocumentData, QueryDocumentSnapshot, limit } from 'firebase/firestore';
+import { collection, getDocs, setDoc, doc, query, where, orderBy, addDoc, DocumentData, QueryDocumentSnapshot, limit, WhereFilterOp } from 'firebase/firestore';
 import { db } from "../configs/firebase-config";
-import { Action, ActionFilter, AddressComponents, LocationData } from "../types";
+import { Action, AddressComponents, LocationData } from "../types";
 import axios from "axios";
 import { formatAddress } from '../utils';
 
-export const getMessages = async (filters: ActionFilter[] = []): Promise<Action[]> => {
-  let q = query(
-    collection(db, "actions"),
-    orderBy("timestamp", "desc"),
-  );
+export interface IFilter { fieldPath: string; opStr: WhereFilterOp; value: any; }
 
-  // If query contains "address" ("from" OR "to"), we need to execute second query to get "to" field entries
-  let mentions: QueryDocumentSnapshot<DocumentData, DocumentData>[] = []
-  const addressFilter = filters.find((filter) => filter.type === 'address')
-  if (addressFilter) {
-    // "from" filter
-    q = query(q, where('from', '==', addressFilter.value))
+export const genFilter = (fieldPath: string, opStr: WhereFilterOp, value: any) => ({ fieldPath, opStr, value })
 
-    // "to" query
-    const toQuery = query(
+export const getMessages = async (filters: IFilter[] = []): Promise<Action[]> => {
+  let data: QueryDocumentSnapshot<DocumentData, DocumentData>[] = []
+
+  if (filters.length) {
+    const res = await Promise.all(filters.map(async filter => {
+      const q = query(
+        collection(db, "actions"),
+        orderBy("timestamp", "desc"),
+        where(filter.fieldPath, filter.opStr, filter.value)
+      );
+
+      return (await getDocs(q)).docs;
+    }))
+
+    data = [].concat.apply([], res as any);
+  } else {
+    const q = query(
       collection(db, "actions"),
-      orderBy("timestamp", "desc"),
-      where("to", "==", addressFilter.value)
+      orderBy("timestamp", "desc")
     );
-    const toSnapshot = await getDocs(toQuery);
-    mentions = toSnapshot.docs
+
+    data = (await getDocs(q)).docs;
   }
 
-  for (const filter of filters) {
-    const { type, value } = filter
-    if (type === 'hashtag') {
-      q = query(q, where('payload', '==', value))
-    }
-  }
-
-  const querySnapshot = await getDocs(q);
-  const actions = querySnapshot.docs
-
-  return [...mentions, ...actions]
+  return data
     .map((doc) => ({ id: doc.id, data: doc.data() }))
     .filter(
       (value, index, self) =>
