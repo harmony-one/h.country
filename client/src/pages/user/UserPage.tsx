@@ -244,7 +244,7 @@ export const UserPage = (props: { id: string }) => {
 
   return (
     <Box>
-      <Box gap={'16px'}>
+      <Box gap={'16px'} pad={'0 16px'}>
         <HeaderList
           {...headerListProps}
           type={"url"}
