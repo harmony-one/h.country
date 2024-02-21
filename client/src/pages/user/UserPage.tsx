@@ -6,13 +6,12 @@ import {collection, doc, onSnapshot, query, where} from "firebase/firestore";
 import {db} from "../../configs/firebase-config";
 import {HeaderList} from "./headerList";
 import {UserAction} from "../../components/action";
-import {getMessages} from "../../api/firebase";
 import {isSameAddress, isValidAddress} from "../../utils/user";
-import {ActionFilter, ActionFilterType, AddressComponents} from "../../types";
 import {formatAddress, linkToMapByAddress} from "../../utils";
 import styled from "styled-components";
 import {useSearchParams} from "react-router-dom";
 import { addMessageWithGeolocation } from "../../api";
+import { useActionsContext } from "../../context";
 
 const HeaderText = styled(Text)`
   font-size: min(1em, 3vw);
@@ -46,19 +45,6 @@ interface Message {
   payload?: string[];
 }
 
-interface Action {
-  timestamp: string;
-  from: string;
-  to?: string;
-  type: string;
-  payload?: string;
-  address: AddressComponents;
-  toShort?: string;
-  fromShort: string;
-}
-
-const DefaultFilterMode: ActionFilterType = 'address'
-
 const parseTagsFromUrl = (hashtagList: string): [string, number][] => {
   const topics = hashtagList.split(',')
   return topics.map(topic => {
@@ -74,60 +60,22 @@ function isHex(num: string): Boolean {
   return Boolean(num.match(/^0x[0-9a-f]+$/i)) || Boolean(`0x${num}`.match(/^0x[0-9a-f]+$/i))
 }
 export const UserPage = (props: { id: string }) => {
-  const { wallet, firstTimeVisit } = useUserContext();
+  const { wallet } = useUserContext();
   const { id: key } = props;
-  const [actions, setActions] = useState<Action[]>([]);
-  const [filterMode, setFilterMode] = useState<"all" | "address" | "hashtag">(
-    firstTimeVisit ? 'all' : DefaultFilterMode
-  );
   const [urls, setUrls] = useState<LinkItem[]>([]);
-  const [isLoading, setLoading] = useState(false);
   const [isUserPage, setIsUserPage] = useState(false);
   const [tagItems, setTagItems] = useState<Array<{ content: ReactNode }>>([]);
-  const [filters, setFilters] = useState<ActionFilter[]>([])
   const [searchParams] = useSearchParams();
   const topicsQueryParam = searchParams.get('topics')
-
-  useEffect(() => {
-    // Drop sub-filters if user select All of <Address> filter
-    if (filterMode !== 'hashtag') {
-      setFilters([])
-    }
-  }, [filterMode]);
-
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true)
-      setActions([])
-
-      try {
-        let items: Action[]
-        let actionFilters: ActionFilter[] = []
-        if (filterMode === "address" && key) {
-          actionFilters.push({
-            type: 'address',
-            value: key
-          })
-        } else if (filterMode === 'hashtag' && filters.length > 0) {
-          const [{ value }] = filters
-          actionFilters.push({
-            type: 'hashtag',
-            value: value
-          })
-        }
-        console.log('Fetching actions...', actionFilters)
-        items = await getMessages(actionFilters);
-
-        setActions(items)
-        console.log('Actions loaded:', items)
-      } catch (e) {
-        console.error('Failed to load messages:', e)
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadData()
-  }, [filterMode, key, filters]);
+  const { 
+    actions, 
+    filters, 
+    setFilters,
+    filterMode, 
+    setFilterMode, 
+    DefaultFilterMode,
+    isLoading 
+  } = useActionsContext();
 
   useEffect(() => {
     if (!key) return;
