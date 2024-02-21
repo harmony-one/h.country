@@ -19,6 +19,8 @@ interface UserContextType {
   wallet: Wallet | undefined;
   setWallet: Dispatch<SetStateAction<Wallet | undefined>>;
   firstTimeVisit: boolean;
+  pageOwnerAddress: string;
+  setPageOwnerAddress: (address: string) => void
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -27,34 +29,48 @@ interface UserProviderProps {
   children: ReactNode;
 }
 
-const privateKeyLS = window.localStorage.getItem(LSAccountKey);
-const firstTimeVisit = !window.localStorage.getItem(LSIsPageVisited);
-
-if (firstTimeVisit) {
-  setTimeout(() => {
-    window.localStorage.setItem(LSIsPageVisited, 'true');
-  }, 3000);
-}
+let forceGenerateNewWallet = false
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const location = useLocation();
   const [wallet, setWallet] = useState<Wallet | undefined>(undefined);
+  const [pageOwnerAddress, setPageOwnerAddress] = useState<string | undefined>(undefined);
 
+  const privateKeyLS = window.localStorage.getItem(LSAccountKey);
+  const firstTimeVisit = !window.localStorage.getItem(LSIsPageVisited);
+
+  useEffect(()=> {
+    if (firstTimeVisit) {
+      setTimeout(() => {
+        window.localStorage.setItem(LSIsPageVisited, 'true');
+      }, 3000);
+    } 
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   useEffect(() => {
     if (location.pathname === "/auth" || location.pathname === "/") {
       console.log("[user context] /auth route, special handling");
       // navigate('/messages')
     }
 
-    if (privateKeyLS) {
+    if (location.pathname === "/new") {
+      console.log("[user context] /new: forced to generate a new wallet; current wallet will be rewritten");
+      forceGenerateNewWallet = true
+    }
+
+    if (wallet && !forceGenerateNewWallet) return
+    
+    if (privateKeyLS && !forceGenerateNewWallet) {
       try {
-        const data = getWalletFromPrivateKey(privateKeyLS);
-        setWallet(data);
-        console.log(
-          "[user context] Restored blockchain wallet from private key: ",
-          data.address
-        );
+        if (privateKeyLS) {
+          const data = getWalletFromPrivateKey(privateKeyLS);
+          setWallet(data);
+          console.log(
+            "[user context] Restored blockchain wallet from private key: ",
+            data.address
+          );
+        }
         // navigate('/messages')
       } catch (error) {
         console.error(
@@ -74,17 +90,26 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       };
       const addressWithoutPrefix = newWallet.address.slice(2);
       try {
-        addMessage(locationData, addressWithoutPrefix, "new_user");
+        addMessage({
+          locationData,
+          from: addressWithoutPrefix,
+          text: "new_user"
+        });
       } catch (error) {
         console.error("Failed to add message: ", error);
       }
       window.localStorage.setItem(LSAccountKey, newWallet.privateKey);
       console.log(
-        "[user context] Generated new blockchain wallet: ",
+        "[user context] Generated new blockchain address: ",
         newWallet.address
       );
-      // navigate('/welcome')
+
+      if (forceGenerateNewWallet) {
+        window.location.replace('/')
+      }
+
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   const value = useMemo(() => {
@@ -92,8 +117,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       wallet,
       setWallet,
       firstTimeVisit,
+      pageOwnerAddress,
+      setPageOwnerAddress
     } as any;
-  }, [wallet]);
+  }, [wallet, pageOwnerAddress, firstTimeVisit]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };

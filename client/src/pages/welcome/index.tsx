@@ -3,11 +3,11 @@ import { Box } from "grommet";
 import { toast } from "react-toastify";
 import { getTopicLits } from "../../constants";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useUserContext } from "../../context/UserContext";
 import { UserTopic } from "../../types";
 import { Typography, Spin } from "antd";
-import {addMessage, postUserTopics} from "../../api/firebase";
+import { addMessage, postUserTopics } from "../../api/firebase";
 import useDarkMode from "../../hooks/useDarkMode";
 
 const TOPIC_SELECTED_TRIGGER = 3
@@ -47,7 +47,7 @@ const TopicsContainer = styled(Box)`
   }
 `;
 
-const TopicItemContainer = styled(Box)<{ isSelected?: boolean }>`
+const TopicItemContainer = styled(Box) <{ isSelected?: boolean }>`
   position: relative;
   aspect-ratio: 1 / 1;
   width: 100%;
@@ -63,18 +63,18 @@ const TopicItemContainer = styled(Box)<{ isSelected?: boolean }>`
   align-items: center;
   transition: transform 250ms;
   /* ${(props) =>
-  props.isSelected &&
-  `
+    props.isSelected &&
+    `
       box-shadow: 0px 0px 0px 4px #69fabd inset;
     `} */
 `;
 
-const TopicItemImage = styled.img<{ isDark?: Boolean}>`
+const TopicItemImage = styled.img<{ isDark?: Boolean }>`
   max-width: 50%;
   max-height: 50%;
   
-  ${(props) => props.isDark ? 
-      `filter: invert(100%)
+  ${(props) => props.isDark ?
+    `filter: invert(100%)
         sepia(92%) 
         saturate(1%) 
         hue-rotate(290deg) 
@@ -106,17 +106,17 @@ const TopicItem = (props: TopicItemProps) => {
     if (isSelected) {
       setImage(topic.color);
     } else {
-      const logo = topic.light 
+      const logo = topic.light
       setImage(logo);
     }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSelected, themeMode]);
 
   const prefix = "#"; // topic.type === 'blockchain' ? '$' : '#'
   return (
     <TopicItemContainer isSelected={isSelected} onClick={onClick}>
-      {image && <TopicItemImage isDark={!isSelected && themeMode} src={image}alt={`${topic.name} logo`} onLoad={() => isSelected && setShowLabel(true)} />}
+      {image && <TopicItemImage isDark={!isSelected && themeMode} src={image} alt={`${topic.name} logo`} onLoad={() => isSelected && setShowLabel(true)} />}
       <TopicItemAlias>
         {isSelected && showLabel && (
           <Typography.Text
@@ -133,12 +133,15 @@ const TopicItem = (props: TopicItemProps) => {
 
 export const WelcomePage: React.FC = () => {
   // const { user } = useUser();
-  const { wallet } = useUserContext();
+  const { wallet, firstTimeVisit } = useUserContext();
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [isTopicsUpdating, setTopicsUpdating] = useState(false);
   const [topicList, setTopicList] = useState<UserTopic[]>();
+
+  const topicsQueryParam = searchParams.get('topics')
 
   useEffect(() => {
     const getTopics = async () => {
@@ -157,23 +160,27 @@ export const WelcomePage: React.FC = () => {
       };
       if (wallet) {
         const addressWithoutPrefix = wallet.address.slice(2);
-        const tags = [...selectedTopics, addressWithoutPrefix]
+        const tags = firstTimeVisit ? [...selectedTopics, addressWithoutPrefix] : selectedTopics
         try {
-          await Promise.all(tags.map((tag: string) => addMessage(locationData, addressWithoutPrefix, `#${tag} @${addressWithoutPrefix}`)));
+          await Promise.all(tags.map((tag: string) => addMessage({
+            locationData,
+            from: addressWithoutPrefix,
+            text: `#${tag} @${addressWithoutPrefix}`
+          })));
         } catch (e) {
           console.log(e)
         }
       }
     }
 
-    if (selectedTopics.length === TOPIC_SELECTED_TRIGGER && wallet?.address) {
+    if (selectedTopics.length >= TOPIC_SELECTED_TRIGGER && wallet?.address) {
       setTopicsUpdating(true);
       tagsTopic()
       .then(() => {
-        postUserTopics(wallet.address, selectedTopics) //[...selectedTopics, wallet.address]
+        postUserTopics(wallet.address, selectedTopics)
           .then(() => {
             // toast.success(`Added ${selectedTopics.length} topics!`, { autoClose: 10000 });
-            navigate("/");
+            navigate(`/0/${wallet.address.substring(2)}`);
           })
           .catch((e: any) => {
             toast.error(`Cannot add topics: ${e.message}`, { autoClose: 10000 });
@@ -183,7 +190,14 @@ export const WelcomePage: React.FC = () => {
           });
       })
     }
-  }, [selectedTopics, wallet, wallet?.address, navigate]);
+  }, [selectedTopics, wallet, wallet?.address, navigate, firstTimeVisit]);
+
+  useEffect(() => {
+    if (topicsQueryParam && wallet && wallet.address) {
+      console.log('Set topics from query: ', topicsQueryParam)
+      navigate(`/0/${wallet.address.substring(2)}?topics=${topicsQueryParam}`);
+    }
+  }, [topicsQueryParam, wallet, navigate]);
 
   const handleTopicClick = (topic: UserTopic) => {
     const { name } = topic;

@@ -8,18 +8,21 @@ import {getMessages} from "../../api/firebase";
 import { useUserContext } from "../../context/UserContext";
 
 export const MainPage = () => {
-  const { wallet } = useUserContext();
+  const { wallet, firstTimeVisit } = useUserContext();
   const navigate = useNavigate();
   const { key } = useParams();
   const [actions, setActions] = useState<Action[]>([]);
   const [isLoading, setLoading] = useState(false)
 
-  // NOTE: for now, we will redirect all the users to their own page
   useEffect(() => {
     if (wallet && wallet.address) {
-      navigate(`/0/${wallet.address.substring(2)}`);
+      if (firstTimeVisit) {
+        navigate('/hash');
+      } else {
+        navigate(`/0/${wallet.address.substring(2)}`);
+      }
     }
-  }, [wallet, navigate]);
+  }, [wallet, navigate, firstTimeVisit]);
 
   useEffect(() => {
     const loadData = async () => {

@@ -1,26 +1,21 @@
-import React, { ReactNode, useState, useEffect, useMemo } from "react";
-import { Box, Button, Spinner, Text } from "grommet";
-import { PlainButton } from "../../components/button";
-import { useUserContext } from "../../context/UserContext";
-import {
-  collection,
-  query,
-  onSnapshot,
-  where,
-  doc
-} from "firebase/firestore";
-import { db } from "../../configs/firebase-config";
-import { HeaderList } from "./headerList";
-import { UserAction } from "../../components/action";
-import { addMessage, getMessages } from "../../api/firebase";
-import { isSameAddress, isValidAddress } from "../../utils/user";
-import { ActionFilter, ActionFilterType, AddressComponents } from "../../types";
-import { formatAddress, linkToMapByAddress } from "../../utils";
+import React, {ReactNode, useEffect, useMemo, useState} from "react";
+import {Box, Button, Spinner, Text} from "grommet";
+import {PlainButton} from "../../components/button";
+import {useUserContext} from "../../context/UserContext";
+import {collection, doc, onSnapshot, query, where} from "firebase/firestore";
+import {db} from "../../configs/firebase-config";
+import {HeaderList} from "./headerList";
+import {UserAction} from "../../components/action";
+import {isSameAddress, isValidAddress} from "../../utils/user";
+import {formatAddress, linkToMapByAddress} from "../../utils";
 import styled from "styled-components";
+import {useSearchParams} from "react-router-dom";
+import { addMessageWithGeolocation } from "../../api";
+import { useActionsContext } from "../../context";
 
 const HeaderText = styled(Text)`
   font-size: min(1em, 3vw);
-` 
+`
 const SmallHeaderText = styled(Text)`
   font-size: min(0.8em, 2.5vw);
   line-height: 2.3em;
@@ -32,7 +27,7 @@ const SmallHeaderText = styled(Text)`
   @media only screen and (min-width: 450px) {
     line-height: 1em;
   }
-` 
+`
 
 const predefinedLinks = [
   { key: 'x', displayText: 'Twitter' },
@@ -56,111 +51,37 @@ interface Message {
   payload?: string[];
 }
 
-interface Action {
-  timestamp: string;
-  from: string;
-  to?: string;
-  type: string;
-  payload?: string;
-  address: AddressComponents;
-  toShort?: string;
-  fromShort: string;
+const parseTagsFromUrl = (hashtagList: string): [string, number][] => {
+  const topics = hashtagList.split(',')
+  return topics.map(topic => {
+    const [tag, counter = '1'] = topic.split('^')
+    return [
+      tag,
+      Number(counter) || 0
+    ]
+  })
 }
-
-export const handleSubmit = async (
-  event: React.FormEvent | undefined,
-  wallet: string,
-  text: string
-) => {
-  if (event) {
-    event.preventDefault();
-  }
-  let locationData = {
-    latitude: null as number | null,
-    longitude: null as number | null,
-    address: "No Address",
-  };
-
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          locationData.latitude = position.coords.latitude;
-          locationData.longitude = position.coords.longitude;
-        } catch (error) {
-          console.error("Error fetching address: ", error);
-        } finally {
-          await addMessage(locationData, wallet, text);
-        }
-      },
-      async () => {
-        await addMessage(locationData, wallet, text);
-      }
-    );
-  } else {
-    console.error("Geolocation is not supported by your browser");
-    await addMessage(locationData, wallet, text);
-  }
-};
-
-const DefaultFilterMode: ActionFilterType = 'address'
 
 function isHex(num: string): Boolean {
   return Boolean(num.match(/^0x[0-9a-f]+$/i)) || Boolean(`0x${num}`.match(/^0x[0-9a-f]+$/i))
 }
 export const UserPage = (props: { id: string }) => {
-  const { wallet, firstTimeVisit } = useUserContext();
+  const { wallet } = useUserContext();
   const { id: key } = props;
-  const [actions, setActions] = useState<Action[]>([]);
-  const [filterMode, setFilterMode] = useState<"all" | "address" | "hashtag">(
-    firstTimeVisit ? 'all' : DefaultFilterMode
-  );
   const [urls, setUrls] = useState<LinkItem[]>([]);
-  const [isLoading, setLoading] = useState(false);
   const [isUserPage, setIsUserPage] = useState(false);
   const [tagItems, setTagItems] = useState<TagItem[]>([]);
-  const [filters, setFilters] = useState<ActionFilter[]>([])
-
-  useEffect(() => {
-    // Drop sub-filters if user select All of <Address> filter
-    if (filterMode !== 'hashtag') {
-      setFilters([])
-    }
-  }, [filterMode]);
-
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true)
-      setActions([])
-
-      try {
-        let items: Action[]
-        let actionFilters: ActionFilter[] = []
-        if (filterMode === "address" && key) {
-          actionFilters.push({
-            type: 'address',
-            value: key
-          })
-        } else if (filterMode === 'hashtag' && filters.length > 0) {
-          const [{ value }] = filters
-          actionFilters.push({
-            type: 'hashtag',
-            value: value
-          })
-        }
-        console.log('Fetching actions...', actionFilters)
-        items = await getMessages(actionFilters);
-
-        setActions(items)
-        console.log('Actions loaded:', items)
-      } catch (e) {
-        console.error('Failed to load messages:', e)
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadData()
-  }, [filterMode, key, filters]);
+  const [searchParams] = useSearchParams();
+  const topicsQueryParam = searchParams.get('topics')
+  const { 
+    actions, 
+    filters, 
+    setFilters,
+    filterMode, 
+    setFilterMode, 
+    DefaultFilterMode,
+    isLoading 
+  } = useActionsContext();
 
   useEffect(() => {
     if (!key) return;
@@ -224,6 +145,7 @@ export const UserPage = (props: { id: string }) => {
       })) as Message[];
 
       const allHashtags = messages.flatMap((msg) => msg.payload || []);
+
       const hashtagFrequency = allHashtags.reduce<Record<string, number>>(
         (acc, hashtag) => {
           acc[hashtag] = (acc[hashtag] || 0) + 1;
@@ -232,11 +154,15 @@ export const UserPage = (props: { id: string }) => {
         {}
       );
 
-      const sortedHashtags = Object.entries(hashtagFrequency)
-  .sort((a, b) => b[1] - a[1])
-  .slice(0, 9)
-  .map(([hashtag, count]) => ({
-    id: hashtag, // Use hashtag as a unique ID
+      const tagsFromUrl = topicsQueryParam ? parseTagsFromUrl(topicsQueryParam || '') : []
+
+      const tagsList = tagsFromUrl.length ? tagsFromUrl : Object.entries(hashtagFrequency)
+
+      const sortedHashtags = tagsList.filter(item => item[0] !== '')
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 9)
+        .map(([hashtag, count]) => ({
+          id: hashtag, // Use hashtag as a unique ID
     text: (
       <Button onClick={async (e) => {
           e.preventDefault();
@@ -254,14 +180,14 @@ export const UserPage = (props: { id: string }) => {
         </Box>
       </Button>
     )
-  }));
-
+  })
+        );
 
       setTagItems(sortedHashtags);
     });
 
     return () => unsubscribe();
-  }, [wallet, key, filters.length]);
+  }, [wallet, key, filters.length, topicsQueryParam]);
 
   const extendedUrls = useMemo<LinkItem[]>(() => {
     const latestLocation = actions.find(
@@ -281,7 +207,7 @@ export const UserPage = (props: { id: string }) => {
           rel="noopener noreferrer"
           style={{ color: 'white', textDecoration: 'none' }}
         >
-          {`l/${latestLocation?.short || formatAddress(latestLocation?.road)}`}
+          {`m/${latestLocation?.short || formatAddress(latestLocation?.road)}`}
         </a>
       )
     }, ...urls]
@@ -299,6 +225,13 @@ export const UserPage = (props: { id: string }) => {
       }])
       setFilterMode('hashtag')
     }
+  }
+
+  const headersListProps = {
+    userId: key,
+    isLoading,
+    isUserPage,
+    wallet
   }
 
   return (
