@@ -412,14 +412,16 @@ export const UserPage = (props: { id: string }) => {
             <Text>No actions found</Text>
           </Box>
         )}
-        {actions.map((action, index) => (
-          <UserAction
-            userId={key}
-            key={index + action.timestamp}
-            action={action}
-            onTagClicked={onTagClicked}
-            onLocationClicked={onLocationClicked}
-          />
+        {!isLoading && actions
+            .slice(0, 30)
+            .map((action, index) => (
+              <UserAction
+                userId={key}
+                key={index + action.timestamp}
+                action={action}
+                onTagClicked={onTagClicked}
+                onLocationClicked={onLocationClicked}
+              />
         ))}
       </Box>
     </UserPageBox>
