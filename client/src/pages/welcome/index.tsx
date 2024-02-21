@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { Box } from "grommet";
 import { toast } from "react-toastify";
@@ -6,7 +7,7 @@ import styled from "styled-components";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useUserContext } from "../../context/UserContext";
 import { UserTopic } from "../../types";
-import { Typography, Spin } from "antd";
+import { Typography } from "antd"; // Spin
 import { addMessage, postUserTopics } from "../../api/firebase";
 import useDarkMode from "../../hooks/useDarkMode";
 
@@ -83,8 +84,8 @@ const TopicItemImage = styled.img<{ isDark?: Boolean }>`
 `;
 
 const TopicItemAlias = styled(Box)`
-  position: absolute;
-  bottom: 2%;
+  /* position: absolute;
+  bottom: 2%; */
   text-align: center;
   /* right: 5%; */
 `;
@@ -98,7 +99,7 @@ interface TopicItemProps {
 const TopicItem = (props: TopicItemProps) => {
   const { topic, isSelected, onClick } = props;
   const [image, setImage] = useState(topic.light);
-  const [showLabel, setShowLabel] = useState(false)
+  const [showLabel, setShowLabel] = useState(true) // false
 
   const themeMode = useDarkMode()
 
@@ -113,14 +114,29 @@ const TopicItem = (props: TopicItemProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSelected, themeMode]);
 
-  const prefix = "#"; // topic.type === 'blockchain' ? '$' : '#'
+  const prefix = '' // "#"; // topic.type === 'blockchain' ? '$' : '#'
+
+//   <TopicItemContainer isSelected={isSelected} onClick={onClick}>
+// {/* {image && <TopicItemImage isDark={!isSelected && themeMode} src={image} alt={`${topic.name} logo`} onLoad={() => isSelected && setShowLabel(true)} />} */}
+// <TopicItemAlias>
+//   {isSelected && showLabel && (
+//     <Typography.Text
+//       style={{ fontSize: "min(2.4vw, 0.8rem)", fontWeight: 600 }}
+//     >
+//       {prefix}
+//       {topic.name}
+//     </Typography.Text>
+//   )}
+// </TopicItemAlias>
+// </TopicItemContainer>
+
   return (
     <TopicItemContainer isSelected={isSelected} onClick={onClick}>
-      {image && <TopicItemImage isDark={!isSelected && themeMode} src={image} alt={`${topic.name} logo`} onLoad={() => isSelected && setShowLabel(true)} />}
+      {/* {image && <TopicItemImage isDark={!isSelected && themeMode} src={image} alt={`${topic.name} logo`} onLoad={() => isSelected && setShowLabel(true)} />} */}
       <TopicItemAlias>
-        {isSelected && showLabel && (
+        {showLabel && (
           <Typography.Text
-            style={{ fontSize: "min(2.4vw, 0.8rem)", fontWeight: 600 }}
+            style={{ fontSize: "min(3.2vw, 1.1rem)", fontWeight: 600, color: isSelected ? '#64ebfd' : 'white' }}
           >
             {prefix}
             {topic.name}
@@ -131,6 +147,8 @@ const TopicItem = (props: TopicItemProps) => {
   );
 };
 
+
+
 export const WelcomePage: React.FC = () => {
   // const { user } = useUser();
   const { wallet, firstTimeVisit } = useUserContext();
@@ -138,7 +156,7 @@ export const WelcomePage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  const [isTopicsUpdating, setTopicsUpdating] = useState(false);
+  // const [isTopicsUpdating, setTopicsUpdating] = useState(false);
   const [topicList, setTopicList] = useState<UserTopic[]>();
 
   const topicsQueryParam = searchParams.get('topics')
@@ -174,7 +192,7 @@ export const WelcomePage: React.FC = () => {
     }
 
     if (selectedTopics.length >= TOPIC_SELECTED_TRIGGER && wallet?.address) {
-      setTopicsUpdating(true);
+      // setTopicsUpdating(true);
       tagsTopic()
       .then(() => {
         postUserTopics(wallet.address, selectedTopics)
@@ -185,9 +203,9 @@ export const WelcomePage: React.FC = () => {
           .catch((e: any) => {
             toast.error(`Cannot add topics: ${e.message}`, { autoClose: 10000 });
           })
-          .finally(() => {
-            setTopicsUpdating(false);
-          });
+          // .finally(() => {
+          //   setTopicsUpdating(false);
+          // });
       })
     }
   }, [selectedTopics, wallet, wallet?.address, navigate, firstTimeVisit]);
@@ -238,13 +256,13 @@ export const WelcomePage: React.FC = () => {
       width={'700px'}
       margin={'0 auto'}
     >
-      <Spin spinning={isTopicsUpdating} size={"large"}>
-        <WelcomeContainer>
-          {[1, 2, 3].map((group) => (
-            <Box key={group}>{renderTopicsContainer(group)}</Box>
-          ))}
-        </WelcomeContainer>
-      </Spin>
+      {/* <Spin spinning={isTopicsUpdating} size={"large"}> */}
+      <WelcomeContainer>
+        {[1, 2, 3].map((group) => (
+          <Box key={group}>{renderTopicsContainer(group)}</Box>
+        ))}
+      </WelcomeContainer>
+      {/* </Spin> */}
     </Box>
   );
 };
