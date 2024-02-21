@@ -170,10 +170,10 @@ export const HeaderList = (props: HeaderListProps) => {
         </Box>
       }
       <Button plain onClick={() => onTitleClick({provider: "all"})}>
-        <Box width={'60px'} align={"start"} pad={'8px'}>
+        <Box width={'60px'} align={"start"} pad={'8px'} style={{ objectFit: 'fill'}}>
           {type === "hashtag"
-            ? <NumberImg />
-            : <SlashImg />
+            ? <NumberImg width={'60px'} height={'70px'}/>
+            : <SlashImg width={'60px'} height={'70px'}/>
           }
         </Box>
       </Button>
