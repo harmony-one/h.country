@@ -43,6 +43,12 @@ const predefinedLinks = [
 interface LinkItem {
   id: string;
   text: JSX.Element;
+  predefined?: boolean;
+}
+
+interface TagItem {
+  id: string;
+  text: JSX.Element;
 }
 
 interface Message {
@@ -112,7 +118,7 @@ export const UserPage = (props: { id: string }) => {
   const [urls, setUrls] = useState<LinkItem[]>([]);
   const [isLoading, setLoading] = useState(false);
   const [isUserPage, setIsUserPage] = useState(false);
-  const [tagItems, setTagItems] = useState<Array<{ content: ReactNode }>>([]);
+  const [tagItems, setTagItems] = useState<TagItem[]>([]);
   const [filters, setFilters] = useState<ActionFilter[]>([])
 
   useEffect(() => {
@@ -173,12 +179,14 @@ export const UserPage = (props: { id: string }) => {
                   {`${key}/${data[key].username}`}
                 </a>
               ),
+              predefined: false
             };
           } else {
             // Return a default link item with the display text if the key does not exist
             return {
               id: docSnap.id + key,
               text: <Text>{displayText}</Text>,
+              predefined: true
             };
           }
         });
@@ -186,10 +194,11 @@ export const UserPage = (props: { id: string }) => {
         setUrls(linkItems);
       } else {
         console.log("No such document!");
-        // Here you can handle the case where there are no user links at all
+        // for other users (isUserPage == false)
         setUrls(predefinedLinks.map(({ key, displayText }) => ({
           id: 'default' + key,
           text: <Text>{displayText}</Text>,
+          predefined: true
         })));
       }
     });
@@ -224,29 +233,29 @@ export const UserPage = (props: { id: string }) => {
       );
 
       const sortedHashtags = Object.entries(hashtagFrequency)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 9)
-        .map(([hashtag, count]) => ({
-          content: (
-            <Button key={hashtag} onClick={
-              async (e) => {
-                e.preventDefault();
-                if (wallet !== undefined && key !== undefined) {
-                  const addressWithoutPrefix = wallet.address.slice(2);
-                  await handleSubmit(e, addressWithoutPrefix, `#${hashtag} @${key}`);
-                } else {
-                  console.log("Invalid user wallet");
-                }
-              }}
-              plain>
-              <Box direction={"row"} key={hashtag}>
-                <HeaderText>{isHex(hashtag) ? `0/${hashtag.substring(0, 4)}` : hashtag}</HeaderText>
-                <SmallHeaderText>{count}</SmallHeaderText>
-              </Box>
-            </Button>
-          ),
-        })
-        );
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 9)
+  .map(([hashtag, count]) => ({
+    id: hashtag, // Use hashtag as a unique ID
+    text: (
+      <Button onClick={async (e) => {
+          e.preventDefault();
+          if (wallet !== undefined && key !== undefined) {
+            const addressWithoutPrefix = wallet.address.slice(2);
+            await handleSubmit(e, addressWithoutPrefix, `#${hashtag} @${key}`);
+          } else {
+            console.log("Invalid user wallet");
+          }
+        }}
+        plain>
+        <Box direction={"row"}>
+          <HeaderText>{isHex(hashtag) ? `0/${hashtag.substring(0, 4)}` : hashtag}</HeaderText>
+          <SmallHeaderText>{count}</SmallHeaderText>
+        </Box>
+      </Button>
+    )
+  }));
+
 
       setTagItems(sortedHashtags);
     });
@@ -295,13 +304,9 @@ export const UserPage = (props: { id: string }) => {
   return (
     <Box>
       <Box>
-        <HeaderList userId={key} isLoading={isLoading} isUserPage={isUserPage} type={"url"} items={extendedUrls.map(item => ({
-          content: (
-            <Box key={item.id}>
-              <HeaderText>{item.text}</HeaderText>
-            </Box>
-          ),
-        }))} wallet={wallet} />
+        <HeaderList userId={key} isLoading={isLoading} isUserPage={isUserPage} type={"url"} 
+          items={extendedUrls}
+          wallet={wallet} />
         <HeaderList userId={key} isLoading={isLoading} isUserPage={isUserPage} type={"hashtag"} items={tagItems} wallet={wallet} />
       </Box>
       <Box pad={'0 16px'}>
