@@ -1,18 +1,20 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Box, Button, Spinner, Text } from "grommet";
-import { PlainButton, PlainText } from "../../components/button";
-import { useUserContext } from "../../context/UserContext";
 import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
-import { db } from "../../configs/firebase-config";
-import { HeaderList } from "./headerList";
+import styled from "styled-components";
+import { useSearchParams } from "react-router-dom";
+import { StarOutlined } from "@ant-design/icons"; // FireOutlined, HeartOutlined, 
+
+import { addMessageWithGeolocation } from "../../api";
+import { useActionsContext } from "../../context";
 import { UserAction } from "../../components/action";
 import { isSameAddress, isValidAddress } from "../../utils/user";
 import { formatAddress, linkToMapByAddress } from "../../utils";
-import styled from "styled-components";
-import { useSearchParams } from "react-router-dom";
-import { addMessageWithGeolocation } from "../../api";
-import { useActionsContext } from "../../context";
-import { FireOutlined, HeartOutlined, StarOutlined } from "@ant-design/icons";
+import { useUserContext } from "../../context/UserContext";
+import { db } from "../../configs/firebase-config";
+
+import { HeaderList } from "./headerList";
+import { PlainButton, PlainText } from "../../components/button";
 
 const HeaderText = styled(Text)`
   font-size: min(1em, 3vw);
