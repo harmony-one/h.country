@@ -120,7 +120,7 @@ export const UserAction = (props: UserActionProps) => {
             {' '} */}
             {' '}
             <ActionLink className="link" to={`/0/${action.from}`} type={actionType}>{
-              socialUrlParser(action.payload || '')[0]?.type + '/' + socialUrlParser(action.payload || '')[0]?.username
+              socialUrlParser(action.payload || '', '')?.type + '/' + socialUrlParser(action.payload || '', '')?.username
             }
             </ActionLink>
             {' '}

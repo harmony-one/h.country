@@ -1,20 +1,41 @@
 import React from "react";
 import { Box, Button, Text } from "grommet";
-import { addMessageWithGeolocation } from "../../api";
 import { ethers } from "ethers";
 import { doc, setDoc } from "firebase/firestore";
+import styled from "styled-components";
+
 import { db } from "../../configs/firebase-config";
+import { addMessageWithGeolocation } from "../../api";
 import { socialUrlParser } from "../../utils";
 import {ReactComponent as NumberImg} from '../../assets/images/number.svg'
 import {ReactComponent as SlashImg} from '../../assets/images/slash.svg'
-
-import styled from "styled-components";
-
 
 const HeaderText = styled(Text)`
   font-size: min(1em, 3vw);
 `
 
+const HeaderListIcon = styled(Box)<{ isUserPage?: Boolean }>`
+  
+  ${(props) => !props.isUserPage ?
+    `filter: brightness(0) 
+      saturate(100%) 
+      invert(94%) 
+      sepia(54%) 
+      saturate(626%) 
+      hue-rotate(317deg) 
+      brightness(106%) 
+      contrast(104%);` : ''};
+
+  svg {
+    height: 70px
+  }
+   
+  @media only screen and (min-width: 450px) {
+    svg {
+      height: 100px
+    }
+  }
+`
 interface HeaderListProps {
   userId: string;
   isLoading?: boolean;
@@ -24,18 +45,18 @@ interface HeaderListProps {
     id: string;
     text: JSX.Element | string;
     predefined?: boolean;
-    provider?: string;
+    providerName?: string;
   }>;
   wallet: ethers.Wallet | undefined;
   onUrlSubmit?: (url: string) => void;
 }
 
 interface TitleClickEvent {
-  provider: string;
+  providerName: string;
 }
 
 export const HeaderList = (props: HeaderListProps) => {
-  const { userId: key, type, items, wallet } = props;
+  const { userId: key, type, items, wallet, isUserPage } = props;
   const onHashSubmit = async (hashtag: string) => {
     if (!wallet || !key) {
       console.log("Invalid user wallet or key");
@@ -47,10 +68,10 @@ export const HeaderList = (props: HeaderListProps) => {
     await addMessageWithGeolocation(addressWithoutPrefix, submitText);
   };
 
-  const onTitleClick = async ({ provider }: TitleClickEvent) => {
-    console.log("clicked", provider)
+  const onTitleClick = async ({ providerName }: TitleClickEvent) => {
+    console.log("clicked", providerName)
     const input = window.prompt(
-      type === "hashtag" ? "Enter Hashtag (without #):" : "/"
+      type === "hashtag" ? "Enter Hashtag (without #):" : `Enter ${providerName} username:`
     );
 
     if (input === null) {
@@ -61,22 +82,22 @@ export const HeaderList = (props: HeaderListProps) => {
     if (type === "hashtag" && !input.trim().includes(" ")) {
       await onHashSubmit(input.trim());
     } else if (type === "url") {
-      await onUrlSubmit(input);
+      await onUrlSubmit(input, providerName);
     } else {
       alert("Enter a valid input.");
     }
   };
 
-  const onUrlSubmit = async (url: string) => {
+  const onUrlSubmit = async (url: string, providerName: string) => {
     if (!key) {
       console.error("No key provided for URL submission.");
       return;
     }
 
-    const socialObj = socialUrlParser(url)[0];
+    const socialObj = socialUrlParser(url, providerName);
 
     if (!socialObj) {
-      alert("Enter a valid URL.");
+      alert("Enter a valid username.");
       return;
     }
 
@@ -158,9 +179,9 @@ export const HeaderList = (props: HeaderListProps) => {
                 }}
               >
                 <Box key={item.id}>
-                  {(item.predefined === true && item.provider !== undefined) ?
+                  {(item.predefined === true && item.providerName !== undefined) ?
                     <Button plain>
-                      <HeaderText onClick={() => {onTitleClick({provider: item.provider!})}}>{item.text}</HeaderText>
+                      <HeaderText onClick={() => {onTitleClick({providerName: item.providerName!})}}>{item.text}</HeaderText>
                     </Button> :
                     <HeaderText>{item.text}</HeaderText>}
                 </Box>
@@ -169,13 +190,13 @@ export const HeaderList = (props: HeaderListProps) => {
           </div>
         </Box>
       }
-      <Button plain onClick={() => onTitleClick({provider: "all"})}>
-        <Box width={'60px'} align={"start"} pad={'8px'}>
+      <Button plain onClick={() => onTitleClick({providerName: "all"})}>
+        <HeaderListIcon width={'60px'} align={"start"} pad={'8px'} isUserPage={isUserPage}>
           {type === "hashtag"
             ? <NumberImg />
             : <SlashImg />
           }
-        </Box>
+        </HeaderListIcon>
       </Button>
     </Box>
   );
