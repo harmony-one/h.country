@@ -27,6 +27,8 @@ interface UserProviderProps {
   children: ReactNode;
 }
 
+let forceGenerateNewWallet = false
+
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const location = useLocation();
   const [wallet, setWallet] = useState<Wallet | undefined>(undefined);

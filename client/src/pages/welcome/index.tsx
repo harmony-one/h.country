@@ -133,7 +133,7 @@ const TopicItem = (props: TopicItemProps) => {
 
 export const WelcomePage: React.FC = () => {
   // const { user } = useUser();
-  const { wallet } = useUserContext();
+  const { wallet, firstTimeVisit } = useUserContext();
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -160,7 +160,7 @@ export const WelcomePage: React.FC = () => {
       };
       if (wallet) {
         const addressWithoutPrefix = wallet.address.slice(2);
-        const tags = [...selectedTopics, addressWithoutPrefix]
+        const tags = firstTimeVisit ? [...selectedTopics, addressWithoutPrefix] : selectedTopics
         try {
           await Promise.all(tags.map((tag: string) => addMessage(locationData, addressWithoutPrefix, `#${tag} @${addressWithoutPrefix}`)));
         } catch (e) {
@@ -173,7 +173,7 @@ export const WelcomePage: React.FC = () => {
       setTopicsUpdating(true);
       tagsTopic()
       .then(() => {
-        postUserTopics(wallet.address, selectedTopics) //[...selectedTopics, wallet.address]
+        postUserTopics(wallet.address, selectedTopics)
           .then(() => {
             // toast.success(`Added ${selectedTopics.length} topics!`, { autoClose: 10000 });
             navigate(`/0/${wallet.address.substring(2)}`);
@@ -186,7 +186,7 @@ export const WelcomePage: React.FC = () => {
           });
       })
     }
-  }, [selectedTopics, wallet, wallet?.address, navigate]);
+  }, [selectedTopics, wallet, wallet?.address, navigate, firstTimeVisit]);
 
   useEffect(() => {
     if(topicsQueryParam && wallet && wallet.address) {
