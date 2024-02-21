@@ -4,7 +4,7 @@ import {Outlet} from "react-router-dom";
 import {AppMenu} from "../menu";
 
 export const AppLayout = () => {
-  return <Box background={'background'} >
+  return <Box background={'background'} pad={'8px'} >
     <Box
       pad={'8px 16px'}
       background={'background'}
@@ -18,7 +18,6 @@ export const AppLayout = () => {
     <Box
       width={'700px'}
       margin={'0px auto'}
-      pad={'8px 0'}
     >
       <Outlet />
     </Box>

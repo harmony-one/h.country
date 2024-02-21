@@ -188,6 +188,7 @@ export const UserPage = (props: { id: string }) => {
       })) as Message[];
 
       const allHashtags = messages.flatMap((msg) => msg.payload || []);
+
       const hashtagFrequency = allHashtags.reduce<Record<string, number>>(
         (acc, hashtag) => {
           acc[hashtag] = (acc[hashtag] || 0) + 1;
@@ -196,12 +197,11 @@ export const UserPage = (props: { id: string }) => {
         {}
       );
 
-      const tagsFromUrl = parseTagsFromUrl(topicsQueryParam || '')
-      console.log('Tags from Url: ', tagsFromUrl)
+      const tagsFromUrl = topicsQueryParam ? parseTagsFromUrl(topicsQueryParam || '') : []
 
       const tagsList = tagsFromUrl.length ? tagsFromUrl : Object.entries(hashtagFrequency)
 
-      const sortedHashtags = tagsList
+      const sortedHashtags = tagsList.filter(item => item[0] !== '')
         .sort((a, b) => b[1] - a[1])
         .slice(0, 9)
         .map(([hashtag, count]) => ({

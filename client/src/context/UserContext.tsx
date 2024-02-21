@@ -29,22 +29,25 @@ interface UserProviderProps {
   children: ReactNode;
 }
 
-const privateKeyLS = window.localStorage.getItem(LSAccountKey);
-const firstTimeVisit = !window.localStorage.getItem(LSIsPageVisited);
 let forceGenerateNewWallet = false
-
-if (firstTimeVisit) {
-  setTimeout(() => {
-    window.localStorage.setItem(LSIsPageVisited, 'true');
-  }, 3000);
-}
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const location = useLocation();
   const [wallet, setWallet] = useState<Wallet | undefined>(undefined);
   const [pageOwnerAddress, setPageOwnerAddress] = useState<string | undefined>(undefined);
 
+  const privateKeyLS = window.localStorage.getItem(LSAccountKey);
+  const firstTimeVisit = !window.localStorage.getItem(LSIsPageVisited);
+
+  useEffect(()=> {
+    if (firstTimeVisit) {
+      setTimeout(() => {
+        window.localStorage.setItem(LSIsPageVisited, 'true');
+      }, 3000);
+    } 
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   useEffect(() => {
     if (location.pathname === "/auth" || location.pathname === "/") {
       console.log("[user context] /auth route, special handling");
@@ -56,6 +59,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       forceGenerateNewWallet = true
     }
 
+    if (wallet && !forceGenerateNewWallet) return
+    
     if (privateKeyLS && !forceGenerateNewWallet) {
       try {
         if (privateKeyLS) {
@@ -98,12 +103,13 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         "[user context] Generated new blockchain address: ",
         newWallet.address
       );
-      // navigate('/welcome')
 
       if (forceGenerateNewWallet) {
         window.location.replace('/')
       }
+
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   const value = useMemo(() => {
@@ -114,7 +120,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       pageOwnerAddress,
       setPageOwnerAddress
     } as any;
-  }, [wallet, pageOwnerAddress]);
+  }, [wallet, pageOwnerAddress, firstTimeVisit]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
