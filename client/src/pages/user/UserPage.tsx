@@ -168,7 +168,7 @@ export const UserPage = (props: { id: string }) => {
           e.preventDefault();
           if (wallet !== undefined && key !== undefined) {
             const addressWithoutPrefix = wallet.address.slice(2);
-            await handleSubmit(e, addressWithoutPrefix, `#${hashtag} @${key}`);
+            await addMessageWithGeolocation(addressWithoutPrefix, `#${hashtag} @${key}`);
           } else {
             console.log("Invalid user wallet");
           }
