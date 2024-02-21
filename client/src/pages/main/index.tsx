@@ -30,6 +30,9 @@ export const MainPage = () => {
         setLoading(true)
         const items = await getMessages()
         setActions(items)
+        if (items.length <= 1) {
+          navigate('/hash');
+        }
       } catch (e) {
         console.error('Failed to load messages:', e)
       } finally {
@@ -37,6 +40,7 @@ export const MainPage = () => {
       }
     };
     loadData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
   return (

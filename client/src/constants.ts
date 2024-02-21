@@ -3,58 +3,68 @@ import oneOutline from './assets/logos/one-grey.svg'
 import {type UserTopic, UserTopicType} from "./types";
 
 export const baseTopicList = [
-  { name: 'chainlink', group: 1, type: 'blockchain'},
-  { name: 'base', group: 1, type: 'blockchain'},
-  { name: 'trustwallet', group: 1, type: 'blockchain'},
-  { name: 'optimism', group: 1, type: 'blockchain'},
-  { name: 'sandbox', group: 1, type: 'blockchain'},
-  { name: 'opensea', group: 1, type: 'blockchain'},
-  { name: 'arbitrum', group: 1, type: 'blockchain'},
-  { name: 'ethfoundation', group: 1, type: 'blockchain'},
-  { name: 'ethdenver', group: 1, type: 'blockchain'},
-  { name: 'matic', group: 1, type: 'blockchain'},
-  { name: 'kraken', group: 1, type: 'blockchain'},
-  { name: 'eth', group: 1, type: 'blockchain'},
+  { name: 'uni', group: 1, type: 'blockchain'},
+  { name: 'aave', group: 1, type: 'blockchain'},
+  { name: 'comp', group: 1, type: 'blockchain'},
+  { name: 'mkr', group: 1, type: 'blockchain'},
+  { name: 'dai', group: 1, type: 'blockchain'},
+  { name: 'crv', group: 1, type: 'blockchain'},
+  { name: 'zrx', group: 1, type: 'blockchain'},
+  { name: '1inch', group: 1, type: 'blockchain'},
+  { name: 'fxs', group: 1, type: 'blockchain'},
+  { name: 'dydx', group: 1, type: 'blockchain'},
+  { name: 'snx', group: 1, type: 'blockchain'},
+  { name: 'ftm', group: 1, type: 'blockchain'},
+  { name: 'ens', group: 1, type: 'blockchain'},
+  { name: 'blur', group: 1, type: 'blockchain'},
+  { name: 'ape', group: 1, type: 'blockchain'},
+  { name: 'imx', group: 1, type: 'blockchain'},
+
   // group 2
-  { name: 'sol', group: 2, type: 'blockchain'},
-  { name: 'one', group: 2, type: 'blockchain'},
-  { name: 'kucoin', group: 2, type: 'blockchain'},
-  { name: 'compound', group: 2, type: 'blockchain'},
-  { name: 'metamask', group: 2, type: 'blockchain'},
   { name: 'btc', group: 2, type: 'blockchain'},
-  { name: 'binance', group: 2, type: 'blockchain'},
-  { name: 'pancakeswap', group: 2, type: 'blockchain'},
+  { name: 'one', group: 2, type: 'blockchain'},
+  { name: 'sol', group: 2, type: 'blockchain'},
+  { name: 'near', group: 2, type: 'blockchain'},
+  { name: 'strk', group: 2, type: 'blockchain'},
+  { name: 'base', group: 2, type: 'blockchain'},
+  { name: 'arb', group: 2, type: 'blockchain'},
+  { name: 'op', group: 2, type: 'blockchain'},
+
   // group 3
-  { name: '1inch', group: 3, type: 'blockchain'},
-  { name: 'spork', group: 3, type: 'blockchain'},
-  { name: 'cryptopunks', group: 3, type: 'blockchain'},
-  { name: 'sushiswap', group: 3, type: 'blockchain'},
-  { name: 'uniswap', group: 3, type: 'blockchain'},
-  { name: 'timeless', group: 3, type: 'blockchain'},
-  { name: 'zksync', group: 3, type: 'blockchain'},
-  { name: 'boredapes', group: 3, type: 'blockchain'},
-  { name: 'ledger', group: 3, type: 'blockchain'},
-  { name: 'consensys', group: 3, type: 'blockchain'},
-  { name: 'okx', group: 3, type: 'blockchain'},
-  { name: 'gnosis', group: 3, type: 'blockchain'},
+  { name: 'rune', group: 3, type: 'blockchain'},
+  { name: 'stx', group: 3, type: 'blockchain'},
+  { name: 'ordi', group: 3, type: 'blockchain'},
+  { name: 'stats', group: 3, type: 'blockchain'},
+  { name: 'tia', group: 3, type: 'blockchain'},
+  { name: 'atom', group: 3, type: 'blockchain'},
+  { name: 'ar', group: 3, type: 'blockchain'},
+  { name: 'axl', group: 3, type: 'blockchain'},
+  { name: 'ton', group: 3, type: 'blockchain'},
+  { name: 'mina', group: 3, type: 'blockchain'},
+  { name: 'gno', group: 3, type: 'blockchain'},
+  { name: 'celo', group: 3, type: 'blockchain'},
+  { name: 'lrc', group: 3, type: 'blockchain'},
+  { name: 'gmx', group: 3, type: 'blockchain'},
+  { name: 'cake', group: 3, type: 'blockchain'},
+  { name: 'sushi', group: 3, type: 'blockchain'},
 ]
 
 export const getTopicLits = async (): Promise<UserTopic[]> => {
-  const colorPath = './assets/logos'
+  // const colorPath = './assets/logos'
 
   const logoPromises = baseTopicList.map(async (logo) => {
     try {
-      const logoName = logo.name
-      const [logoColor, logoLight] = await Promise.all([
-          import(`${colorPath}/${logoName}-color.svg`),
-          import(`${colorPath}/${logoName}-grey.svg`),
-          // import(`${colorPath}/${logoName}-white.svg`)
+      // const logoName = logo.name
+      // const [logoColor, logoLight] = await Promise.all([
+      //     import(`${colorPath}/${logoName}-color.svg`),
+      //     import(`${colorPath}/${logoName}-grey.svg`),
+      //     // import(`${colorPath}/${logoName}-white.svg`)
 
-      ]);
+      // ]);
       return {
         name: logo.name,
-        light: logoLight.default,
-        color: logoColor.default,
+        light: null, // logoLight.default,
+        color: null, // logoColor.default,
         type: logo.type as UserTopicType,
         group: logo.group
     };
