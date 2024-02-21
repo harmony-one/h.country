@@ -235,6 +235,16 @@ export const UserPage = (props: { id: string }) => {
     }
   }
 
+  const onLocationClicked = (location: string) => {
+    if (!filters.find(item => item.value === location)) {
+      setFilters([...filters, {
+        type: 'location',
+        value: location
+      }])
+      setFilterMode('location')
+    }
+  }
+
   return (
     <Box>
       <Box>
@@ -298,6 +308,7 @@ export const UserPage = (props: { id: string }) => {
             key={index + action.timestamp}
             action={action}
             onTagClicked={onTagClicked}
+            onLocationClicked={onLocationClicked}
           />
         ))}
       </Box>

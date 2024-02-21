@@ -47,7 +47,7 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
   const { firstTimeVisit, pageOwnerAddress } = useUserContext();
 
   const [actions, setActions] = useState<Action[]>([]);
-  const [filterMode, setFilterMode] = useState<"all" | "address" | "hashtag">(
+  const [filterMode, setFilterMode] = useState<ActionFilterType>(
     firstTimeVisit ? 'all' : DefaultFilterMode
   );
   const [isLoading, setLoading] = useState(false);

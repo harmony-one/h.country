@@ -50,6 +50,7 @@ export interface UserActionProps {
   userId?: any
   action: Action
   onTagClicked?: (hashtag: string) => void
+  onLocationClicked?: (location: string) => void
 }
 
 export const UserAction = (props: UserActionProps) => {
@@ -63,6 +64,12 @@ export const UserAction = (props: UserActionProps) => {
   const onTagClicked = () => {
     if (props.onTagClicked && action.payload) {
       props.onTagClicked(action.payload)
+    }
+  }
+
+  const onLocationClicked = () => {
+    if (props.onLocationClicked && action.payload) {
+      props.onLocationClicked(action.payload)
     }
   }
 
@@ -132,7 +139,7 @@ export const UserAction = (props: UserActionProps) => {
           <Text size={"small"} style={{ wordBreak: 'break-all' }}>
             <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
             {" "}
-            <ActionText size={"small"} onClick={onTagClicked} type={actionType}>{action.payload}</ActionText>
+            <ActionText size={"small"} onClick={onLocationClicked} type={actionType}>{action.payload}</ActionText>
             {" "}
             <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
           </Text>
