@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { Box, Button, Text } from "grommet";
 import { addMessageWithGeolocation } from "../../api";
 import { ethers } from "ethers";

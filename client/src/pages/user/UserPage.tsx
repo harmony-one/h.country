@@ -1,4 +1,4 @@
-import React, {ReactNode, useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {Box, Button, Spinner, Text} from "grommet";
 import {PlainButton} from "../../components/button";
 import {useUserContext} from "../../context/UserContext";
@@ -225,13 +225,6 @@ export const UserPage = (props: { id: string }) => {
       }])
       setFilterMode('hashtag')
     }
-  }
-
-  const headersListProps = {
-    userId: key,
-    isLoading,
-    isUserPage,
-    wallet
   }
 
   return (
