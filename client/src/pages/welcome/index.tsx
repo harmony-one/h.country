@@ -225,7 +225,10 @@ export const WelcomePage: React.FC = () => {
       if (isAlreadySelected) {
         return prevSelectedTopics.filter((t) => t !== name);
       }
-      return [...prevSelectedTopics, name];
+      if (prevSelectedTopics.length < TOPIC_SELECTED_TRIGGER) {
+        return [...prevSelectedTopics, name];
+      }
+      return  prevSelectedTopics;
     });
 
     // if(!selectedTopics.includes(name)) {
