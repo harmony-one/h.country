@@ -24,14 +24,14 @@ interface HeaderListProps {
     id: string;
     text: JSX.Element | string;
     predefined?: boolean;
-    provider?: string;
+    providerName?: string;
   }>;
   wallet: ethers.Wallet | undefined;
   onUrlSubmit?: (url: string) => void;
 }
 
 interface TitleClickEvent {
-  provider: string;
+  providerName: string;
 }
 
 export const HeaderList = (props: HeaderListProps) => {
@@ -47,8 +47,8 @@ export const HeaderList = (props: HeaderListProps) => {
     await addMessageWithGeolocation(addressWithoutPrefix, submitText);
   };
 
-  const onTitleClick = async ({ provider }: TitleClickEvent) => {
-    console.log("clicked", provider)
+  const onTitleClick = async ({ providerName }: TitleClickEvent) => {
+    console.log("clicked", providerName)
     const input = window.prompt(
       type === "hashtag" ? "Enter Hashtag (without #):" : "Enter URL:"
     );
@@ -158,9 +158,9 @@ export const HeaderList = (props: HeaderListProps) => {
                 }}
               >
                 <Box key={item.id}>
-                  {(item.predefined === true && item.provider !== undefined) ?
+                  {(item.predefined === true && item.providerName !== undefined) ?
                     <Button plain>
-                      <HeaderText onClick={() => {onTitleClick({provider: item.provider!})}}>{item.text}</HeaderText>
+                      <HeaderText onClick={() => {onTitleClick({providerName: item.providerName!})}}>{item.text}</HeaderText>
                     </Button> :
                     <HeaderText>{item.text}</HeaderText>}
                 </Box>
@@ -169,7 +169,7 @@ export const HeaderList = (props: HeaderListProps) => {
           </div>
         </Box>
       }
-      <Button plain onClick={() => onTitleClick({provider: "all"})}>
+      <Button plain onClick={() => onTitleClick({providerName: "all"})}>
         <Box width={'60px'} align={"start"} pad={'8px'}>
           {type === "hashtag"
             ? <NumberImg />
