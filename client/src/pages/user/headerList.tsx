@@ -50,7 +50,7 @@ export const HeaderList = (props: HeaderListProps) => {
   const onTitleClick = async ({ providerName }: TitleClickEvent) => {
     console.log("clicked", providerName)
     const input = window.prompt(
-      type === "hashtag" ? "Enter Hashtag (without #):" : "Enter URL:"
+      type === "hashtag" ? "Enter Hashtag (without #):" : `Enter ${providerName} username:`
     );
 
     if (input === null) {
@@ -61,22 +61,22 @@ export const HeaderList = (props: HeaderListProps) => {
     if (type === "hashtag" && !input.trim().includes(" ")) {
       await onHashSubmit(input.trim());
     } else if (type === "url") {
-      await onUrlSubmit(input);
+      await onUrlSubmit(input, providerName);
     } else {
       alert("Enter a valid input.");
     }
   };
 
-  const onUrlSubmit = async (url: string) => {
+  const onUrlSubmit = async (url: string, providerName: string) => {
     if (!key) {
       console.error("No key provided for URL submission.");
       return;
     }
 
-    const socialObj = socialUrlParser(url)[0];
+    const socialObj = socialUrlParser(url, providerName);
 
     if (!socialObj) {
-      alert("Enter a valid URL.");
+      alert("Enter a valid username.");
       return;
     }
 
