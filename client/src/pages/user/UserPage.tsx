@@ -78,14 +78,14 @@ export const UserPage = (props: { id: string }) => {
   const [tagItems, setTagItems] = useState<TagItem[]>([]);
   const [searchParams] = useSearchParams();
   const topicsQueryParam = searchParams.get('topics')
-  const { 
-    actions, 
-    filters, 
+  const {
+    actions,
+    filters,
     setFilters,
-    filterMode, 
-    setFilterMode, 
+    filterMode,
+    setFilterMode,
     DefaultFilterMode,
-    isLoading 
+    isLoading
   } = useActionsContext();
 
   useEffect(() => {
@@ -94,7 +94,7 @@ export const UserPage = (props: { id: string }) => {
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-  
+
         let linkItems: LinkItem[] = predefinedLinks.map(({ key, displayText }) => {
           // Check if the key exists in the fetched data
           if (data[key] && data[key].username && data[key].url) {
@@ -118,7 +118,7 @@ export const UserPage = (props: { id: string }) => {
             };
           }
         });
-  
+
         setUrls(linkItems);
       } else {
         console.log("No such document!");
@@ -131,9 +131,9 @@ export const UserPage = (props: { id: string }) => {
         })));
       }
     });
-  
+
     return () => unsubscribe();
-  }, [key]);  
+  }, [key]);
 
   useEffect(() => {
     if (wallet) {
@@ -235,13 +235,26 @@ export const UserPage = (props: { id: string }) => {
     }
   }
 
+  const headerListProps = {
+    userId: key,
+    isLoading,
+    isUserPage,
+    wallet
+  }
+
   return (
     <Box>
-      <Box>
-        <HeaderList userId={key} isLoading={isLoading} isUserPage={isUserPage} type={"url"} 
+      <Box gap={'16px'}>
+        <HeaderList
+          {...headerListProps}
+          type={"url"}
           items={extendedUrls}
-          wallet={wallet} />
-        <HeaderList userId={key} isLoading={isLoading} isUserPage={isUserPage} type={"hashtag"} items={tagItems} wallet={wallet} />
+        />
+        <HeaderList
+          {...headerListProps}
+          type={"hashtag"}
+          items={tagItems}
+        />
       </Box>
       <Box pad={'0 16px'}>
         <Box direction={"row"} gap={"16px"}>
