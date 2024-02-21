@@ -94,7 +94,7 @@ export const UserAction = (props: UserActionProps) => {
           </Text>
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
-          <Text size={"small"}>
+          <Text size={"xsmall"}>
             {moment(action.timestamp).fromNow()}
           </Text>
         </Box>
@@ -121,7 +121,7 @@ export const UserAction = (props: UserActionProps) => {
           </Text>
         </Box>
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
-          <Text size={"small"}>
+          <Text size={"xsmall"}>
             {moment(action.timestamp).fromNow()}
           </Text>
         </Box>
