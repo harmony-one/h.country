@@ -120,7 +120,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       pageOwnerAddress,
       setPageOwnerAddress
     } as any;
-  }, [wallet, pageOwnerAddress]);
+  }, [wallet, pageOwnerAddress, firstTimeVisit]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
