@@ -30,20 +30,20 @@ const SmallHeaderText = styled(Text)`
 `
 
 const predefinedLinks = [
-  { key: 'x', displayText: 'Twitter' },
-  { key: 'ig', displayText: 'Instagram' },
-  { key: 'g', displayText: 'Github' },
-  { key: 'f', displayText: 'Facebook' },
-  { key: 'l', displayText: 'LinkedIn' },
-  { key: 't', displayText: 'Telegram' },
-  { key: 's', displayText: 'Substack' },
+  { key: 'x', displayText: 'Twitter', providerName: 'twitter' },
+  // { key: 'ig', displayText: 'Instagram',  },
+  { key: 'g', displayText: 'Github', providerName: 'github' },
+  // { key: 'f', displayText: 'Facebook', providerName: },
+  { key: 'l', displayText: 'LinkedIn', providerName: 'linkedin' },
+  // { key: 't', displayText: 'Telegram' },
+  // { key: 's', displayText: 'Substack' },
 ];
 
 interface LinkItem {
   id: string;
   text: JSX.Element;
   predefined?: boolean;
-  provider?: string;
+  providerName?: string;
 }
 
 interface TagItem {
@@ -95,7 +95,7 @@ export const UserPage = (props: { id: string }) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
   
-        let linkItems: LinkItem[] = predefinedLinks.map(({ key, displayText }) => {
+        let linkItems: LinkItem[] = predefinedLinks.map(({ key, displayText, providerName }) => {
           // Check if the key exists in the fetched data
           if (data[key] && data[key].username && data[key].url) {
             return {
@@ -106,7 +106,6 @@ export const UserPage = (props: { id: string }) => {
                 </a>
               ),
               predefined: false,
-              provider: displayText
             };
           } else {
             // Return a default link item with the display text if the key does not exist
@@ -114,7 +113,7 @@ export const UserPage = (props: { id: string }) => {
               id: docSnap.id + key,
               text: <Text>{displayText}</Text>,
               predefined: true,
-              provider: displayText
+              providerName: providerName
             };
           }
         });
@@ -123,11 +122,11 @@ export const UserPage = (props: { id: string }) => {
       } else {
         console.log("No such document!");
         // for other users (isUserPage == false)
-        setUrls(predefinedLinks.map(({ key, displayText }) => ({
+        setUrls(predefinedLinks.map(({ key, displayText, providerName }) => ({
           id: 'default' + key,
           text: <Text>{displayText}</Text>,
           predefined: true,
-          provider: displayText
+          providerName: providerName
         })));
       }
     });

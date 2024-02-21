@@ -5,8 +5,8 @@ import { ethers } from "ethers";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../configs/firebase-config";
 import { socialUrlParser } from "../../utils";
-
 import styled from "styled-components";
+import { handleOpenIdLogin } from "../../oAuth/openIdLogin";
 
 
 const HeaderText = styled(Text)`
@@ -22,14 +22,14 @@ interface HeaderListProps {
     id: string;
     text: JSX.Element | string;
     predefined?: boolean;
-    provider?: string;
+    providerName?: string;
   }>;
   wallet: ethers.Wallet | undefined;
   onUrlSubmit?: (url: string) => void;
 }
 
 interface TitleClickEvent {
-  provider: string;
+  providerName: string;
 }
 
 export const HeaderList = (props: HeaderListProps) => {
@@ -45,14 +45,15 @@ export const HeaderList = (props: HeaderListProps) => {
     await addMessageWithGeolocation(addressWithoutPrefix, submitText);
   };
 
-  const onTitleClick = async ({ provider }: TitleClickEvent) => {
-    console.log("clicked", provider)
+  const onTitleClick = async ({ providerName }: TitleClickEvent) => {
+    console.log("clicked", providerName)
     const input = window.prompt(
       type === "hashtag" ? "Enter Hashtag (without #):" : "Enter URL:"
     );
 
     if (input === null) {
       console.log("Prompt was cancelled.");
+      handleOpenIdLogin({providerName})
       return;
     }
 
@@ -109,7 +110,7 @@ export const HeaderList = (props: HeaderListProps) => {
   return (
     <Box>
       <Box direction={"row"} gap={"24px"} align={"center"}>
-        <Button plain onClick={() => onTitleClick({provider: "all"})}>
+        <Button plain onClick={() => onTitleClick({providerName: "all"})}>
           <Box width={"116px"} align={"center"}>
             <Text
               size={"164px"}
@@ -164,9 +165,9 @@ export const HeaderList = (props: HeaderListProps) => {
                   }}
                 >
                   <Box key={item.id}>
-                  {(item.predefined === true && item.provider !== undefined) ? 
+                  {(item.predefined === true && item.providerName !== undefined) ? 
                     <Button plain>
-                      <HeaderText onClick={() => {onTitleClick({provider: item.provider!})}}>{item.text}</HeaderText>
+                      <HeaderText onClick={() => {onTitleClick({providerName: item.providerName!})}}>{item.text}</HeaderText>
                     </Button> : 
                     <HeaderText>{item.text}</HeaderText>}
                   </Box>
