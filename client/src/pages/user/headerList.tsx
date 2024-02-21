@@ -5,13 +5,15 @@ import { ethers } from "ethers";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../configs/firebase-config";
 import { socialUrlParser } from "../../utils";
+import {ReactComponent as NumberImg} from '../../assets/images/number.svg'
+import {ReactComponent as SlashImg} from '../../assets/images/slash.svg'
 
 import styled from "styled-components";
 
 
 const HeaderText = styled(Text)`
   font-size: min(1em, 3vw);
-` 
+`
 
 interface HeaderListProps {
   userId: string;
@@ -22,13 +24,18 @@ interface HeaderListProps {
     id: string;
     text: JSX.Element | string;
     predefined?: boolean;
+    provider?: string;
   }>;
   wallet: ethers.Wallet | undefined;
   onUrlSubmit?: (url: string) => void;
 }
 
+interface TitleClickEvent {
+  provider: string;
+}
+
 export const HeaderList = (props: HeaderListProps) => {
-  const { userId: key, isUserPage, type, items, wallet } = props;
+  const { userId: key, type, items, wallet } = props;
   const onHashSubmit = async (hashtag: string) => {
     if (!wallet || !key) {
       console.log("Invalid user wallet or key");
@@ -40,8 +47,8 @@ export const HeaderList = (props: HeaderListProps) => {
     await addMessageWithGeolocation(addressWithoutPrefix, submitText);
   };
 
-  const onTitleClick = async () => {
-    console.log("clicked")
+  const onTitleClick = async ({ provider }: TitleClickEvent) => {
+    console.log("clicked", provider)
     const input = window.prompt(
       type === "hashtag" ? "Enter Hashtag (without #):" : "Enter URL:"
     );
@@ -102,75 +109,74 @@ export const HeaderList = (props: HeaderListProps) => {
   };
 
   return (
-    <Box>
-      <Box direction={"row"} gap={"24px"} align={"center"}>
-        <Button plain onClick={() => onTitleClick()}>
-          <Box width={"116px"} align={"center"}>
-            <Text
-              size={"164px"}
-              weight={800}
-              color={isUserPage ? "blue1" : "yellow1"}
-            >
-              {type === "hashtag" ? "#" : "/"}
-            </Text>
-          </Box>
-        </Button>
-        { type === "hashtag" ? <Box style={{ flex: '5'}}>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateRows: "repeat(3, 1fr)",
-                gridAutoColumns: "1fr",
-              }}
-            >
-              {items.map((item, index) => (
-                <div
-                  key={index}
-                  style={{
-                    gridRowStart: (index % 3) + 1,
-                    gridColumnStart: Math.floor(index / 3) + 1,
-                    width: "100%",
-                    textAlign: "left"
-                  }}
-                >
-                  <Box key={item.id}>
-                    <HeaderText>{item.text}</HeaderText>
-                  </Box>
-                </div>
-              ))}
-            </div>
-          </Box> :
-          <Box style={{ flex: '5'}}>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateRows: "repeat(3, 1fr)",
-                gridAutoColumns: "1fr",
-              }}
-            >
-              {items.map((item, index) => (
-                <div
-                  key={index}
-                  style={{
-                    gridRowStart: (index % 3) + 1,
-                    gridColumnStart: Math.floor(index / 3) + 1,
-                    width: "100%",
-                    textAlign: "left"
-                  }}
-                >
-                  <Box key={item.id}>
-                  {item.predefined === true ? 
+    <Box
+      direction={"row"}
+      align={"center"}
+    >
+      {type === "hashtag"
+        ? <Box style={{ flex: '5'}}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateRows: "repeat(3, 1fr)",
+              gridAutoColumns: "1fr",
+            }}
+          >
+            {items.map((item, index) => (
+              <div
+                key={index}
+                style={{
+                  gridRowStart: (index % 3) + 1,
+                  gridColumnStart: Math.floor(index / 3) + 1,
+                  width: "100%",
+                  textAlign: "left"
+                }}
+              >
+                <Box key={item.id}>
+                  <HeaderText>{item.text}</HeaderText>
+                </Box>
+              </div>
+            ))}
+          </div>
+        </Box>
+        : <Box style={{ flex: '5'}}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateRows: "repeat(3, 1fr)",
+              gridAutoColumns: "1fr",
+            }}
+          >
+            {items.map((item, index) => (
+              <div
+                key={index}
+                style={{
+                  gridRowStart: (index % 3) + 1,
+                  gridColumnStart: Math.floor(index / 3) + 1,
+                  width: "100%",
+                  textAlign: "left"
+                }}
+              >
+                <Box key={item.id}>
+                  {(item.predefined === true && item.provider !== undefined) ?
                     <Button plain>
-                      <HeaderText onClick={() => onTitleClick()}>{item.text}</HeaderText>
-                    </Button> : 
+                      <HeaderText onClick={() => {onTitleClick({provider: item.provider!})}}>{item.text}</HeaderText>
+                    </Button> :
                     <HeaderText>{item.text}</HeaderText>}
-                  </Box>
-                </div>
-              ))}
-            </div>
-          </Box>
-        }
-      </Box>
+                </Box>
+              </div>
+            ))}
+          </div>
+        </Box>
+      }
+      <Button plain onClick={() => onTitleClick({provider: "all"})}>
+        <Box width={'60px'} align={"start"} pad={'8px'}>
+          {type === "hashtag"
+            ? <NumberImg />
+            : <SlashImg />
+          }
+        </Box>
+      </Button>
     </Box>
   );
 };

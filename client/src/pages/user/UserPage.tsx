@@ -1,15 +1,15 @@
-import React, {useEffect, useMemo, useState} from "react";
-import {Box, Button, Spinner, Text} from "grommet";
-import {PlainButton} from "../../components/button";
-import {useUserContext} from "../../context/UserContext";
-import {collection, doc, onSnapshot, query, where} from "firebase/firestore";
-import {db} from "../../configs/firebase-config";
-import {HeaderList} from "./headerList";
-import {UserAction} from "../../components/action";
-import {isSameAddress, isValidAddress} from "../../utils/user";
-import {formatAddress, linkToMapByAddress} from "../../utils";
+import React, { useEffect, useMemo, useState } from "react";
+import { Box, Button, Spinner, Text } from "grommet";
+import { PlainButton } from "../../components/button";
+import { useUserContext } from "../../context/UserContext";
+import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
+import { db } from "../../configs/firebase-config";
+import { HeaderList } from "./headerList";
+import { UserAction } from "../../components/action";
+import { isSameAddress, isValidAddress } from "../../utils/user";
+import { formatAddress, linkToMapByAddress } from "../../utils";
 import styled from "styled-components";
-import {useSearchParams} from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { addMessageWithGeolocation } from "../../api";
 import { useActionsContext } from "../../context";
 
@@ -33,12 +33,17 @@ const predefinedLinks = [
   { key: 'x', displayText: 'Twitter' },
   { key: 'ig', displayText: 'Instagram' },
   { key: 'g', displayText: 'Github' },
+  { key: 'f', displayText: 'Facebook' },
+  { key: 'l', displayText: 'LinkedIn' },
+  { key: 't', displayText: 'Telegram' },
+  { key: 's', displayText: 'Substack' },
 ];
 
 interface LinkItem {
   id: string;
   text: JSX.Element;
   predefined?: boolean;
+  provider?: string;
 }
 
 interface TagItem {
@@ -73,14 +78,14 @@ export const UserPage = (props: { id: string }) => {
   const [tagItems, setTagItems] = useState<TagItem[]>([]);
   const [searchParams] = useSearchParams();
   const topicsQueryParam = searchParams.get('topics')
-  const { 
-    actions, 
-    filters, 
+  const {
+    actions,
+    filters,
     setFilters,
-    filterMode, 
-    setFilterMode, 
+    filterMode,
+    setFilterMode,
     DefaultFilterMode,
-    isLoading 
+    isLoading
   } = useActionsContext();
 
   useEffect(() => {
@@ -89,7 +94,7 @@ export const UserPage = (props: { id: string }) => {
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-  
+
         let linkItems: LinkItem[] = predefinedLinks.map(({ key, displayText }) => {
           // Check if the key exists in the fetched data
           if (data[key] && data[key].username && data[key].url) {
@@ -100,18 +105,20 @@ export const UserPage = (props: { id: string }) => {
                   {`${key}/${data[key].username}`}
                 </a>
               ),
-              predefined: false
+              predefined: false,
+              provider: displayText
             };
           } else {
             // Return a default link item with the display text if the key does not exist
             return {
               id: docSnap.id + key,
               text: <Text>{displayText}</Text>,
-              predefined: true
+              predefined: true,
+              provider: displayText
             };
           }
         });
-  
+
         setUrls(linkItems);
       } else {
         console.log("No such document!");
@@ -119,13 +126,14 @@ export const UserPage = (props: { id: string }) => {
         setUrls(predefinedLinks.map(({ key, displayText }) => ({
           id: 'default' + key,
           text: <Text>{displayText}</Text>,
-          predefined: true
+          predefined: true,
+          provider: displayText
         })));
       }
     });
-  
+
     return () => unsubscribe();
-  }, [key]);  
+  }, [key]);
 
   useEffect(() => {
     if (wallet) {
@@ -163,24 +171,24 @@ export const UserPage = (props: { id: string }) => {
         .slice(0, 9)
         .map(([hashtag, count]) => ({
           id: hashtag, // Use hashtag as a unique ID
-    text: (
-      <Button onClick={async (e) => {
-          e.preventDefault();
-          if (wallet !== undefined && key !== undefined) {
-            const addressWithoutPrefix = wallet.address.slice(2);
-            await addMessageWithGeolocation(addressWithoutPrefix, `#${hashtag} @${key}`);
-          } else {
-            console.log("Invalid user wallet");
-          }
-        }}
-        plain>
-        <Box direction={"row"}>
-          <HeaderText>{isHex(hashtag) ? `0/${hashtag.substring(0, 4)}` : hashtag}</HeaderText>
-          <SmallHeaderText>{count}</SmallHeaderText>
-        </Box>
-      </Button>
-    )
-  })
+          text: (
+            <Button onClick={async (e) => {
+              e.preventDefault();
+              if (wallet !== undefined && key !== undefined) {
+                const addressWithoutPrefix = wallet.address.slice(2);
+                await addMessageWithGeolocation(addressWithoutPrefix, `#${hashtag} @${key}`);
+              } else {
+                console.log("Invalid user wallet");
+              }
+            }}
+              plain>
+              <Box direction={"row"}>
+                <HeaderText>{isHex(hashtag) ? `0/${hashtag.substring(0, 4)}` : hashtag}</HeaderText>
+                <SmallHeaderText>{count}</SmallHeaderText>
+              </Box>
+            </Button>
+          )
+        })
         );
 
       setTagItems(sortedHashtags);
@@ -227,13 +235,36 @@ export const UserPage = (props: { id: string }) => {
     }
   }
 
+  const onLocationClicked = (location: string) => {
+    if (!filters.find(item => item.value === location)) {
+      setFilters([...filters, {
+        type: 'location',
+        value: location
+      }])
+      setFilterMode('location')
+    }
+  }
+
+  const headerListProps = {
+    userId: key,
+    isLoading,
+    isUserPage,
+    wallet
+  }
+
   return (
     <Box>
-      <Box>
-        <HeaderList userId={key} isLoading={isLoading} isUserPage={isUserPage} type={"url"} 
+      <Box gap={'16px'} pad={'0 16px'}>
+        <HeaderList
+          {...headerListProps}
+          type={"url"}
           items={extendedUrls}
-          wallet={wallet} />
-        <HeaderList userId={key} isLoading={isLoading} isUserPage={isUserPage} type={"hashtag"} items={tagItems} wallet={wallet} />
+        />
+        <HeaderList
+          {...headerListProps}
+          type={"hashtag"}
+          items={tagItems}
+        />
       </Box>
       <Box pad={'0 16px'}>
         <Box direction={"row"} gap={"16px"}>
@@ -290,6 +321,7 @@ export const UserPage = (props: { id: string }) => {
             key={index + action.timestamp}
             action={action}
             onTagClicked={onTagClicked}
+            onLocationClicked={onLocationClicked}
           />
         ))}
       </Box>

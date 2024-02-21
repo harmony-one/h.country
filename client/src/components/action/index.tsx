@@ -50,6 +50,7 @@ export interface UserActionProps {
   userId?: any
   action: Action
   onTagClicked?: (hashtag: string) => void
+  onLocationClicked?: (location: string) => void
 }
 
 export const UserAction = (props: UserActionProps) => {
@@ -66,31 +67,41 @@ export const UserAction = (props: UserActionProps) => {
     }
   }
 
+  const onLocationClicked = (value?: string) => {
+    if (props.onLocationClicked && value) {
+      props.onLocationClicked(value)
+    }
+  }
+
   const address = action.address.short ||
     formatAddress(action.address.road)
 
   return <Box border={{ side: "bottom", color: '#565654' }} pad={"4px 0"}>
-    {action.type === "new_user" &&
-      <Box pad={'0 16px'}>
-        <Text size={"small"}>
-          <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
-          {" joins"}
-        </Text>
-      </Box>}
-    {action.type === 'tag' &&
+    {(action.type === 'tag' || action.type === 'new_user') &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
         <Box basis={address ? "50%" : "90%"}>
-          <Text size={"small"} style={{ wordBreak: 'break-all' }}>
-            <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
-            {" "}
-            <ActionText size={"small"} onClick={onTagClicked} type={actionType}>#{action.payload}</ActionText>
-            {" "}
-            <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
-          </Text>
+          {action.type === 'tag' &&
+            <Text size={"small"} style={{ wordBreak: 'break-all' }}>
+              <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
+              {" "}
+              <ActionText size={"small"} onClick={onTagClicked} type={actionType}>#{action.payload}</ActionText>
+              {" "}
+              <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
+            </Text>
+          }
+          {action.type === 'new_user' &&
+            <Text size={"small"}>
+              <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
+              {" joins"}
+            </Text>
+          }
         </Box>
         {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
-          <Text style={{ textAlign: "right" }} size={"small"}>
-            {action.address.short || formatAddress(action.address.road)}
+          <Text
+            onClick={() => onLocationClicked(address)}
+            style={{ textAlign: "right", cursor: 'pointer' }}
+            size={"small"}>
+            {address}
           </Text>
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
@@ -98,7 +109,8 @@ export const UserAction = (props: UserActionProps) => {
             {moment(action.timestamp).fromNow()}
           </Text>
         </Box>
-      </Box>}
+      </Box>
+    }
     {action.type === 'link' &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
         <Box basis="50%">
@@ -115,11 +127,14 @@ export const UserAction = (props: UserActionProps) => {
             <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
           </Text>
         </Box>
-        <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
-          <Text style={{ textAlign: "right" }} size={"small"}>
-            {action.address.short || formatAddress(action.address.road)}
+        {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
+          <Text
+            onClick={() => onLocationClicked(address)}
+            style={{ textAlign: "right", cursor: 'pointer' }}
+            size={"small"}>
+            {address}
           </Text>
-        </Box>
+        </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
           <Text size={"xsmall"}>
             {moment(action.timestamp).fromNow()}
@@ -132,11 +147,19 @@ export const UserAction = (props: UserActionProps) => {
           <Text size={"small"} style={{ wordBreak: 'break-all' }}>
             <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
             {" "}
-            <ActionText size={"small"} onClick={onTagClicked} type={actionType}>{action.payload}</ActionText>
+            <ActionText size={"small"} onClick={() => onLocationClicked(action.payload)} type={actionType}>{action.payload}</ActionText>
             {" "}
             <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
           </Text>
         </Box>
+        {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
+          <Text
+            onClick={() => onLocationClicked(address)}
+            style={{ textAlign: "right", cursor: 'pointer' }}
+            size={"small"}>
+            {address}
+          </Text>
+        </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
           <Text size={"small"}>
             {moment(action.timestamp).fromNow()}
