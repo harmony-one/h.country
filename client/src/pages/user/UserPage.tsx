@@ -6,12 +6,13 @@ import {collection, doc, onSnapshot, query, where} from "firebase/firestore";
 import {db} from "../../configs/firebase-config";
 import {HeaderList} from "./headerList";
 import {UserAction} from "../../components/action";
-import {addMessage, getMessages} from "../../api/firebase";
+import {getMessages} from "../../api/firebase";
 import {isSameAddress, isValidAddress} from "../../utils/user";
 import {ActionFilter, ActionFilterType, AddressComponents} from "../../types";
 import {formatAddress, linkToMapByAddress} from "../../utils";
 import styled from "styled-components";
 import {useSearchParams} from "react-router-dom";
+import { addMessageWithGeolocation } from "../../api";
 
 const HeaderText = styled(Text)`
   font-size: min(1em, 3vw);
@@ -55,42 +56,6 @@ interface Action {
   toShort?: string;
   fromShort: string;
 }
-
-export const handleSubmit = async (
-  event: React.FormEvent | undefined,
-  wallet: string,
-  text: string
-) => {
-  if (event) {
-    event.preventDefault();
-  }
-  let locationData = {
-    latitude: null as number | null,
-    longitude: null as number | null,
-    address: "No Address",
-  };
-
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          locationData.latitude = position.coords.latitude;
-          locationData.longitude = position.coords.longitude;
-        } catch (error) {
-          console.error("Error fetching address: ", error);
-        } finally {
-          await addMessage(locationData, wallet, text);
-        }
-      },
-      async () => {
-        await addMessage(locationData, wallet, text);
-      }
-    );
-  } else {
-    console.error("Geolocation is not supported by your browser");
-    await addMessage(locationData, wallet, text);
-  }
-};
 
 const DefaultFilterMode: ActionFilterType = 'address'
 
@@ -244,9 +209,10 @@ export const UserPage = (props: { id: string }) => {
             <Button key={hashtag} onClick={
               async (e) => {
                 e.preventDefault();
+
                 if (wallet !== undefined && key !== undefined) {
                   const addressWithoutPrefix = wallet.address.slice(2);
-                  await handleSubmit(e, addressWithoutPrefix, `#${hashtag} @${key}`);
+                  await addMessageWithGeolocation(addressWithoutPrefix, `#${hashtag} @${key}`);
                 } else {
                   console.log("Invalid user wallet");
                 }
@@ -285,7 +251,7 @@ export const UserPage = (props: { id: string }) => {
           rel="noopener noreferrer"
           style={{ color: 'white', textDecoration: 'none' }}
         >
-          {`l/${latestLocation?.short || formatAddress(latestLocation?.road)}`}
+          {`m/${latestLocation?.short || formatAddress(latestLocation?.road)}`}
         </a>
       )
     }, ...urls]

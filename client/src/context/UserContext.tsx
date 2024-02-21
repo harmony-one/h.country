@@ -9,7 +9,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import {useLocation} from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { addMessage } from "../api/firebase";
 
 export const LSAccountKey = "h_country_client_account";
@@ -19,6 +19,8 @@ interface UserContextType {
   wallet: Wallet | undefined;
   setWallet: Dispatch<SetStateAction<Wallet | undefined>>;
   firstTimeVisit: boolean;
+  pageOwnerAddress: string;
+  setPageOwnerAddress: (address: string) => void
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -32,6 +34,7 @@ let forceGenerateNewWallet = false
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const location = useLocation();
   const [wallet, setWallet] = useState<Wallet | undefined>(undefined);
+  const [pageOwnerAddress, setPageOwnerAddress] = useState<string | undefined>(undefined);
 
   const privateKeyLS = window.localStorage.getItem(LSAccountKey);
   const firstTimeVisit = !window.localStorage.getItem(LSIsPageVisited);
@@ -60,7 +63,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     
     if (privateKeyLS && !forceGenerateNewWallet) {
       try {
-        if(privateKeyLS) {
+        if (privateKeyLS) {
           const data = getWalletFromPrivateKey(privateKeyLS);
           setWallet(data);
           console.log(
@@ -87,7 +90,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       };
       const addressWithoutPrefix = newWallet.address.slice(2);
       try {
-        addMessage(locationData, addressWithoutPrefix, "new_user");
+        addMessage({
+          locationData,
+          from: addressWithoutPrefix,
+          text: "new_user"
+        });
       } catch (error) {
         console.error("Failed to add message: ", error);
       }
@@ -97,7 +104,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         newWallet.address
       );
 
-      if(forceGenerateNewWallet) {
+      if (forceGenerateNewWallet) {
         window.location.replace('/')
       }
 
@@ -110,9 +117,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       wallet,
       setWallet,
       firstTimeVisit,
+      pageOwnerAddress,
+      setPageOwnerAddress
     } as any;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wallet]);
+  }, [wallet, pageOwnerAddress]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
