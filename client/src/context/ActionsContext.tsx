@@ -55,7 +55,7 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
 
   useEffect(() => {
     // Drop sub-filters if user select All of <Address> filter
-    if (filterMode !== 'hashtag') {
+    if (!['hashtag', 'location'].includes(filterMode)) {
       setFilters([])
     }
   }, [filterMode]);
