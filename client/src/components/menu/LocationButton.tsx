@@ -5,9 +5,11 @@ import { getLatestLocation } from '../../api/firebase';
 import { AddressComponents } from '../../types';
 import { formatAddress } from '../../utils';
 import { addMessageWithGeolocation } from '../../api';
+import { useActionsContext } from '../../context';
 
 export const LocationButton = () => {
     const { wallet, pageOwnerAddress } = useUserContext();
+    const { loadActions } = useActionsContext();
     const [latestLocation, setLatestLocation] = useState<AddressComponents>();
 
     const syncUserLocation = useCallback(async () => {
@@ -40,8 +42,10 @@ export const LocationButton = () => {
                 `location @${pageOwnerAddress.substring(2)}`,
                 locationShort
             );
+
+            await loadActions();
         }
-    }, [wallet?.address, latestLocation, pageOwnerAddress]);
+    }, [wallet?.address, latestLocation, pageOwnerAddress, loadActions]);
 
     if (!latestLocation) {
         return null;
