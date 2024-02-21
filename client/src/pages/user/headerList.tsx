@@ -1,15 +1,14 @@
 import React from "react";
 import { Box, Button, Text } from "grommet";
-import { addMessageWithGeolocation } from "../../api";
 import { ethers } from "ethers";
 import { doc, setDoc } from "firebase/firestore";
+import styled from "styled-components";
+
 import { db } from "../../configs/firebase-config";
+import { addMessageWithGeolocation } from "../../api";
 import { socialUrlParser } from "../../utils";
 import {ReactComponent as NumberImg} from '../../assets/images/number.svg'
 import {ReactComponent as SlashImg} from '../../assets/images/slash.svg'
-
-import styled from "styled-components";
-
 
 const HeaderText = styled(Text)`
   font-size: min(1em, 3vw);
