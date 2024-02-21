@@ -33,12 +33,17 @@ const predefinedLinks = [
   { key: 'x', displayText: 'Twitter' },
   { key: 'ig', displayText: 'Instagram' },
   { key: 'g', displayText: 'Github' },
+  { key: 'f', displayText: 'Facebook' },
+  { key: 'l', displayText: 'LinkedIn' },
+  { key: 't', displayText: 'Telegram' },
+  { key: 's', displayText: 'Substack' },
 ];
 
 interface LinkItem {
   id: string;
   text: JSX.Element;
   predefined?: boolean;
+  provider?: string;
 }
 
 interface TagItem {
@@ -100,14 +105,16 @@ export const UserPage = (props: { id: string }) => {
                   {`${key}/${data[key].username}`}
                 </a>
               ),
-              predefined: false
+              predefined: false,
+              provider: displayText
             };
           } else {
             // Return a default link item with the display text if the key does not exist
             return {
               id: docSnap.id + key,
               text: <Text>{displayText}</Text>,
-              predefined: true
+              predefined: true,
+              provider: displayText
             };
           }
         });
@@ -119,7 +126,8 @@ export const UserPage = (props: { id: string }) => {
         setUrls(predefinedLinks.map(({ key, displayText }) => ({
           id: 'default' + key,
           text: <Text>{displayText}</Text>,
-          predefined: true
+          predefined: true,
+          provider: displayText
         })));
       }
     });
