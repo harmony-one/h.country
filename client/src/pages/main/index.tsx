@@ -55,7 +55,9 @@ export const MainPage = () => {
             <Text>No messages found</Text>
         </Box>
       }
-      {!isLoading && actions.map((action, index) => (
+      {!isLoading && actions
+        .slice(0,30)
+        .map((action, index) => (
         <UserAction key={index + action.timestamp} action={action} />
       ))}
     </Box>
