@@ -44,7 +44,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       setTimeout(() => {
         window.localStorage.setItem(LSIsPageVisited, 'true');
       }, 3000);
-    } 
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -60,16 +60,13 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
 
     if (wallet && !forceGenerateNewWallet) return
-    
+
     if (privateKeyLS && !forceGenerateNewWallet) {
       try {
         if (privateKeyLS) {
           const data = getWalletFromPrivateKey(privateKeyLS);
           setWallet(data);
-          console.log(
-            "[user context] Restored blockchain wallet from private key: ",
-            data.address
-          );
+          console.log("[user context] Restored blockchain address");
         }
         // navigate('/messages')
       } catch (error) {
