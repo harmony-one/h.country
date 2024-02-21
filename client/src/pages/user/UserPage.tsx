@@ -1,15 +1,15 @@
-import React, {useEffect, useMemo, useState} from "react";
-import {Box, Button, Spinner, Text} from "grommet";
-import {PlainButton} from "../../components/button";
-import {useUserContext} from "../../context/UserContext";
-import {collection, doc, onSnapshot, query, where} from "firebase/firestore";
-import {db} from "../../configs/firebase-config";
-import {HeaderList} from "./headerList";
-import {UserAction} from "../../components/action";
-import {isSameAddress, isValidAddress} from "../../utils/user";
-import {formatAddress, linkToMapByAddress} from "../../utils";
+import React, { useEffect, useMemo, useState } from "react";
+import { Box, Button, Spinner, Text } from "grommet";
+import { PlainButton } from "../../components/button";
+import { useUserContext } from "../../context/UserContext";
+import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
+import { db } from "../../configs/firebase-config";
+import { HeaderList } from "./headerList";
+import { UserAction } from "../../components/action";
+import { isSameAddress, isValidAddress } from "../../utils/user";
+import { formatAddress, linkToMapByAddress } from "../../utils";
 import styled from "styled-components";
-import {useSearchParams} from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { addMessageWithGeolocation } from "../../api";
 import { useActionsContext } from "../../context";
 
@@ -171,24 +171,24 @@ export const UserPage = (props: { id: string }) => {
         .slice(0, 9)
         .map(([hashtag, count]) => ({
           id: hashtag, // Use hashtag as a unique ID
-    text: (
-      <Button onClick={async (e) => {
-          e.preventDefault();
-          if (wallet !== undefined && key !== undefined) {
-            const addressWithoutPrefix = wallet.address.slice(2);
-            await addMessageWithGeolocation(addressWithoutPrefix, `#${hashtag} @${key}`);
-          } else {
-            console.log("Invalid user wallet");
-          }
-        }}
-        plain>
-        <Box direction={"row"}>
-          <HeaderText>{isHex(hashtag) ? `0/${hashtag.substring(0, 4)}` : hashtag}</HeaderText>
-          <SmallHeaderText>{count}</SmallHeaderText>
-        </Box>
-      </Button>
-    )
-  })
+          text: (
+            <Button onClick={async (e) => {
+              e.preventDefault();
+              if (wallet !== undefined && key !== undefined) {
+                const addressWithoutPrefix = wallet.address.slice(2);
+                await addMessageWithGeolocation(addressWithoutPrefix, `#${hashtag} @${key}`);
+              } else {
+                console.log("Invalid user wallet");
+              }
+            }}
+              plain>
+              <Box direction={"row"}>
+                <HeaderText>{isHex(hashtag) ? `0/${hashtag.substring(0, 4)}` : hashtag}</HeaderText>
+                <SmallHeaderText>{count}</SmallHeaderText>
+              </Box>
+            </Button>
+          )
+        })
         );
 
       setTagItems(sortedHashtags);
@@ -232,6 +232,16 @@ export const UserPage = (props: { id: string }) => {
         value: hashtag
       }])
       setFilterMode('hashtag')
+    }
+  }
+
+  const onLocationClicked = (location: string) => {
+    if (!filters.find(item => item.value === location)) {
+      setFilters([...filters, {
+        type: 'location',
+        value: location
+      }])
+      setFilterMode('location')
     }
   }
 
@@ -311,6 +321,7 @@ export const UserPage = (props: { id: string }) => {
             key={index + action.timestamp}
             action={action}
             onTagClicked={onTagClicked}
+            onLocationClicked={onLocationClicked}
           />
         ))}
       </Box>

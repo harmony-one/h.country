@@ -10,7 +10,7 @@ import {
   useState,
 } from "react";
 import { ActionFilter, ActionFilterType, AddressComponents } from "../types";
-import { getMessages } from "../api";
+import { getMessages, genFilter, IFilter } from "../api";
 import { useUserContext } from "./UserContext";
 
 interface Action {
@@ -47,7 +47,7 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
   const { firstTimeVisit, pageOwnerAddress } = useUserContext();
 
   const [actions, setActions] = useState<Action[]>([]);
-  const [filterMode, setFilterMode] = useState<"all" | "address" | "hashtag">(
+  const [filterMode, setFilterMode] = useState<ActionFilterType>(
     firstTimeVisit ? 'all' : DefaultFilterMode
   );
   const [isLoading, setLoading] = useState(false);
@@ -55,7 +55,7 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
 
   useEffect(() => {
     // Drop sub-filters if user select All of <Address> filter
-    if (filterMode !== 'hashtag') {
+    if (!['hashtag', 'location'].includes(filterMode)) {
       setFilters([])
     }
   }, [filterMode]);
@@ -66,18 +66,23 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
 
     try {
       let items: Action[]
-      let actionFilters: ActionFilter[] = []
+      let actionFilters: IFilter[] = []
       if (filterMode === "address" && pageOwnerAddress) {
-        actionFilters.push({
-          type: 'address',
-          value: pageOwnerAddress
-        })
+        actionFilters = [
+          genFilter('from', '==', pageOwnerAddress),
+          genFilter('to', '==', pageOwnerAddress)
+        ]
+      } else if (filterMode === 'location' && filters.length > 0) {
+        const [{ value }] = filters
+        actionFilters = [
+          genFilter('payload', '==', value),
+          genFilter('address.short', '==', value)
+        ]
       } else if (filterMode === 'hashtag' && filters.length > 0) {
         const [{ value }] = filters
-        actionFilters.push({
-          type: 'hashtag',
-          value: value
-        })
+        actionFilters = [
+          genFilter('payload', '==', value),
+        ]
       }
       console.log('Fetching actions...', actionFilters)
       items = await getMessages(actionFilters);
