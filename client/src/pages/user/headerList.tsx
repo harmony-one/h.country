@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { Box, Button, Text } from "grommet";
 import { addMessageWithGeolocation } from "../../api";
 import { ethers } from "ethers";
@@ -6,12 +6,23 @@ import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../configs/firebase-config";
 import { socialUrlParser } from "../../utils";
 
+import styled from "styled-components";
+
+
+const HeaderText = styled(Text)`
+  font-size: min(1em, 3vw);
+` 
+
 interface HeaderListProps {
   userId: string;
   isLoading?: boolean;
   isUserPage: boolean;
   type: "url" | "hashtag";
-  items: Array<{ content: ReactNode }>;
+  items: Array<{
+    id: string;
+    text: JSX.Element | string;
+    predefined?: boolean;
+  }>;
   wallet: ethers.Wallet | undefined;
   onUrlSubmit?: (url: string) => void;
 }
@@ -30,6 +41,7 @@ export const HeaderList = (props: HeaderListProps) => {
   };
 
   const onTitleClick = async () => {
+    console.log("clicked")
     const input = window.prompt(
       type === "hashtag" ? "Enter Hashtag (without #):" : "Enter URL:"
     );
@@ -92,7 +104,7 @@ export const HeaderList = (props: HeaderListProps) => {
   return (
     <Box>
       <Box direction={"row"} gap={"24px"} align={"center"}>
-        <Button plain onClick={onTitleClick}>
+        <Button plain onClick={() => onTitleClick()}>
           <Box width={"116px"} align={"center"}>
             <Text
               size={"164px"}
@@ -103,7 +115,31 @@ export const HeaderList = (props: HeaderListProps) => {
             </Text>
           </Box>
         </Button>
-        {
+        { type === "hashtag" ? <Box style={{ flex: '5'}}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateRows: "repeat(3, 1fr)",
+                gridAutoColumns: "1fr",
+              }}
+            >
+              {items.map((item, index) => (
+                <div
+                  key={index}
+                  style={{
+                    gridRowStart: (index % 3) + 1,
+                    gridColumnStart: Math.floor(index / 3) + 1,
+                    width: "100%",
+                    textAlign: "left"
+                  }}
+                >
+                  <Box key={item.id}>
+                    <HeaderText>{item.text}</HeaderText>
+                  </Box>
+                </div>
+              ))}
+            </div>
+          </Box> :
           <Box style={{ flex: '5'}}>
             <div
               style={{
@@ -122,7 +158,13 @@ export const HeaderList = (props: HeaderListProps) => {
                     textAlign: "left"
                   }}
                 >
-                  {item.content}
+                  <Box key={item.id}>
+                  {item.predefined === true ? 
+                    <Button plain>
+                      <HeaderText onClick={() => onTitleClick()}>{item.text}</HeaderText>
+                    </Button> : 
+                    <HeaderText>{item.text}</HeaderText>}
+                  </Box>
                 </div>
               ))}
             </div>
