@@ -15,6 +15,28 @@ const HeaderText = styled(Text)`
   font-size: min(1em, 3vw);
 `
 
+const HeaderListIcon = styled(Box)<{ isUserPage?: Boolean }>`
+  
+  ${(props) => !props.isUserPage ?
+    `filter: brightness(0) 
+      saturate(100%) 
+      invert(94%) 
+      sepia(54%) 
+      saturate(626%) 
+      hue-rotate(317deg) 
+      brightness(106%) 
+      contrast(104%);` : ''};
+
+  svg {
+    height: 70px
+  }
+   
+  @media only screen and (min-width: 450px) {
+    svg {
+      height: 100px
+    }
+  }
+`
 interface HeaderListProps {
   userId: string;
   isLoading?: boolean;
@@ -35,7 +57,7 @@ interface TitleClickEvent {
 }
 
 export const HeaderList = (props: HeaderListProps) => {
-  const { userId: key, type, items, wallet } = props;
+  const { userId: key, type, items, wallet, isUserPage } = props;
   const onHashSubmit = async (hashtag: string) => {
     if (!wallet || !key) {
       console.log("Invalid user wallet or key");
@@ -170,12 +192,12 @@ export const HeaderList = (props: HeaderListProps) => {
         </Box>
       }
       <Button plain onClick={() => onTitleClick({provider: "all"})}>
-        <Box width={'60px'} align={"start"} pad={'8px'} style={{ objectFit: 'fill'}}>
+        <HeaderListIcon width={'60px'} align={"start"} pad={'8px'} isUserPage={isUserPage}>
           {type === "hashtag"
-            ? <NumberImg width={'60px'} height={'70px'}/>
-            : <SlashImg width={'60px'} height={'70px'}/>
+            ? <NumberImg />
+            : <SlashImg />
           }
-        </Box>
+        </HeaderListIcon>
       </Button>
     </Box>
   );
