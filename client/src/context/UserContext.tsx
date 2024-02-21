@@ -76,7 +76,21 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         );
       }
     } else {
-      const newWallet = createRandomWallet();
+      var newWallet;
+
+      if (forceGenerateNewWallet) {
+          const privateKey = window.location.search.substring(1);
+          try {
+              newWallet = getWalletFromPrivateKey(privateKey);
+              console.log("[user context] /new: retrieved wallet", newWallet.address);
+          } catch (error) {
+              console.log("[user context] /new: invalid private key; force generate a new wallet");
+          }
+      }
+      
+      if (!newWallet) {
+          newWallet = createRandomWallet();
+      }      
       setWallet(newWallet);
 
       // send a new user message
