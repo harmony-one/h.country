@@ -35,7 +35,7 @@ interface TitleClickEvent {
 }
 
 export const HeaderList = (props: HeaderListProps) => {
-  const { userId: key, isUserPage, type, items, wallet } = props;
+  const { userId: key, type, items, wallet } = props;
   const onHashSubmit = async (hashtag: string) => {
     if (!wallet || !key) {
       console.log("Invalid user wallet or key");
