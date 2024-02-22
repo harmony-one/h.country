@@ -11,7 +11,8 @@ import {
   QueryDocumentSnapshot,
   limit,
   WhereFilterOp,
-  onSnapshot
+  onSnapshot,
+  Unsubscribe
 } from 'firebase/firestore';
 import { db } from "../configs/firebase-config";
 import { Action, AddressComponents, LocationData } from "../types";
@@ -55,7 +56,7 @@ export interface GetMessagesParams {
 
 export const getMessages = async (params: GetMessagesParams = {}): Promise<{
   actions: Action[],
-  unsubscribeList: Array<() => void>
+  unsubscribeList: Unsubscribe[]
 }> => {
   const { filters = [], updateCallback } = params
   let data: QueryDocumentSnapshot<DocumentData, DocumentData>[] = []

@@ -12,6 +12,7 @@ import {
 import { ActionFilter, ActionFilterType, AddressComponents } from "../types";
 import { getMessages, genFilter, IFilter } from "../api";
 import { useUserContext } from "./UserContext";
+import {  Unsubscribe } from 'firebase/firestore';
 
 interface Action {
   timestamp: string;
@@ -64,6 +65,8 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
     setLoading(true)
     setActions([])
 
+    let unsubscribeList: Unsubscribe[] = []
+
     try {
       let actionFilters: IFilter[] = []
       if (filterMode === "address" && pageOwnerAddress) {
@@ -84,22 +87,29 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
         ]
       }
       console.log('Fetching actions...', actionFilters)
-      const { actions: items, unsubscribeList } = await getMessages({
+      const data = await getMessages({
         filters: actionFilters,
         updateCallback: (newActions: Action[]) => {
-          setActions(newActions)
-          console.log('Actions updated', newActions)
+          if(!isLoading) {
+            setActions(newActions)
+            console.log('Actions updated', newActions)
+          }
         }
       });
 
-      console.log('unsubscribeList', unsubscribeList)
-
-      setActions(items)
-      console.log('Actions loaded:', items)
+      setActions(data.actions)
+      console.log('Actions loaded:', data.actions)
+      unsubscribeList = data.unsubscribeList
     } catch (e) {
       console.error('Failed to load messages:', e)
     } finally {
       setLoading(false)
+    }
+
+    return () => {
+      unsubscribeList.forEach(unsubscribe => {
+        unsubscribe()
+      })
     }
   }, [filterMode, pageOwnerAddress, filters]);
 
