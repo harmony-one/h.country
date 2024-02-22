@@ -292,7 +292,7 @@ export const UserPage = (props: { id: string }) => {
     isUserPage,
     wallet,
   };
-
+  console.log('FRANK 2', actions)
   return (
     <UserPageBox>
       <Box gap={"16px"} pad={"0 16px"}>
@@ -305,17 +305,14 @@ export const UserPage = (props: { id: string }) => {
             isActive={filterMode === "all"}
             onClick={() => setFilterMode("all")}
           >
-            <PlainText fontSize="min(1em, 4vw)" color='#B3B3B3'>all</PlainText>
+            <PlainText fontSize="min(1em, 4vw)">all</PlainText>
           </PlainButton>
           <PlainButton
             isActive={filterMode === "address"}
             onClick={() => setFilterMode("address")}
-            fontColor={isUserPage ? "blue1" : "yellow1"}
           >
             <PlainText
               fontSize="min(1em, 4vw)"
-              color='#B3B3B3'
-            // color={isUserPage ? "blue1" : "yellow1"}
             >
               {key?.substring(0, 4)}
             </PlainText>
@@ -365,7 +362,7 @@ export const UserPage = (props: { id: string }) => {
               }
             }}
           >
-            <PlainText fontSize="min(1em, 4vw)" color='#B3B3B3'>#one</PlainText>
+            <PlainText fontSize="min(1em, 4vw)">#one</PlainText>
           </PlainButton>
           <PlainButton
             isActive={filterMode === "hashtag"}
@@ -387,10 +384,10 @@ export const UserPage = (props: { id: string }) => {
               }
             }}
           >
-            <PlainText fontSize="min(1em, 4vw)" color='#B3B3B3'>#ai</PlainText>
+            <PlainText fontSize="min(1em, 4vw)">#ai</PlainText>
           </PlainButton>
           <PlainButton style={{ padding: '2px' }}>
-            <PlainText fontSize="min(1em, 4vw)" color='#B3B3B3'>
+            <PlainText fontSize="min(1em, 4vw)">
               <StarOutlined />
             </PlainText>
           </PlainButton>

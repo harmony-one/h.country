@@ -6,7 +6,6 @@ import { Action } from "../../types";
 import { socialUrlParser, formatAddress } from "../../utils";
 import styled from "styled-components";
 
-
 export enum ActionType {
   self = 'self',
   other = 'other',
@@ -82,7 +81,7 @@ export const UserAction = (props: UserActionProps) => {
   const address = action.address.short ||
     formatAddress(action.address.road)
 
-  return <Box border={{ side: "bottom", color: '#565654' }} pad={"4px 0"}>
+  return <Box border={{ side: "bottom", color: 'border' }} pad={"4px 0"}> 
     {(action.type === 'tag' || action.type === 'new_user' || action.type === 'multi_tag') &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
         <Box basis={address ? "50%" : "90%"}>
@@ -107,7 +106,7 @@ export const UserAction = (props: UserActionProps) => {
             </Text>
           }
           {action.type === 'new_user' &&
-            <ActionText color='#B3B3B3'>
+            <ActionText type={ActionType.none}>
               <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
               {" joins"}
             </ActionText>
