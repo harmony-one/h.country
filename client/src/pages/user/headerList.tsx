@@ -13,6 +13,10 @@ import {ReactComponent as SlashImg} from '../../assets/images/slash.svg'
 export const HeaderText = styled(Text)`
   font-size: min(1em, 4vw);
   color: #B3B3B3;
+
+  a {
+    color: #B3B3B3;
+  }
 `;
 
 export const SmallHeaderText = styled(Text)`

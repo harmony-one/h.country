@@ -97,7 +97,7 @@ export const UserPage = (props: { id: string }) => {
                     href={data[key].url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ color: "white", textDecoration: "none" }}
+                    style={{ textDecoration: "none" }}
                   >
                     {`${key}/${data[key].username}`}
                   </a></HeaderText>
@@ -220,18 +220,18 @@ export const UserPage = (props: { id: string }) => {
     return [
       {
         id: "latest_location" + latestLocation?.postcode,
-        text: (
+        text: (<HeaderText>
           <a
             href={linkToMapByAddress(latestLocation)}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: "white", textDecoration: "none" }}
+            style={{ textDecoration: "none" }}
           >
             {`m/${
               latestLocation?.short || formatAddress(latestLocation?.road)
             }`}
           </a>
-        ),
+          </HeaderText>),
       },
       ...urls,
     ];
