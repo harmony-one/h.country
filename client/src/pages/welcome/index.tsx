@@ -187,7 +187,6 @@ export const WelcomePage: React.FC = () => {
       if (wallet) {
         const addressWithoutPrefix = wallet.address.slice(2);
         const tags = firstTimeVisit ? [...selectedTopics, addressWithoutPrefix] : selectedTopics
-        console.log('FRANK 3', tags)
         try {
           await Promise.all(tags.map((tag: string) => addMessage({
             locationData,

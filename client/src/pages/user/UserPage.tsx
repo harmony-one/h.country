@@ -291,7 +291,6 @@ export const UserPage = (props: { id: string }) => {
     isUserPage,
     wallet,
   };
-  console.log('FRANK 2', actions)
   return (
     <UserPageBox>
       <Box gap={"16px"} pad={"0 16px"}>
