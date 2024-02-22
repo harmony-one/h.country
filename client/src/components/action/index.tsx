@@ -103,7 +103,7 @@ export const UserAction = (props: UserActionProps) => {
             <Text size={"small"} style={{ wordBreak: 'break-all' }}>
               <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
               {" "}
-              <ActionText onClick={onTagClicked} type={actionType}>#{action.payload}</ActionText>
+              <ActionText onClick={onTagClicked} type={actionType}>#{String(action.payload)}</ActionText>
               {" "}
               <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
             </Text>
@@ -112,11 +112,11 @@ export const UserAction = (props: UserActionProps) => {
             <Text size={"small"} style={{ wordBreak: 'break-all' }}>
               <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
               {" "}
-              <ActionText size={"small"} onClick={onTagClicked} type={actionType}>#{action.payload.tag}</ActionText>
+              <ActionText size={"small"} onClick={onTagClicked} type={actionType}>#{String(action.payload.tag)}</ActionText>
               {" "}
               <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
               {" "}
-              ({action.payload.count})
+              ({String(action.payload.count)})
             </Text>
           }
           {action.type === 'new_user' &&
@@ -194,7 +194,7 @@ export const UserAction = (props: UserActionProps) => {
           <Text size={"small"} style={{ wordBreak: 'break-all' }}>
             <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
             {" "}
-            <ActionText size={"small"} onClick={() => onLocationClicked(action.payload)} type={actionType}>{action.payload}</ActionText>
+            <ActionText size={"small"} onClick={() => onLocationClicked(action.payload)} type={actionType}>{String(action.payload)}</ActionText>
             {" "}
             <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
           </Text>
