@@ -5,7 +5,6 @@ import moment from 'moment'
 import { Action } from "../../types";
 import { socialUrlParser, formatAddress } from "../../utils";
 import styled from "styled-components";
-import { PlainText } from "../button";
 
 export enum ActionType {
   self = 'self',
