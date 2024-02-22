@@ -1,20 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Box, Button, Spinner, Text } from "grommet";
-import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
+import React from "react";
+import { Box, Spinner, Text } from "grommet";
 import styled from "styled-components";
 import { StarOutlined } from "@ant-design/icons"; // FireOutlined, HeartOutlined,
 
-import { addMessageWithGeolocation } from "../../api";
 import { useActionsContext } from "../../context";
 import { UserAction } from "../../components/action";
-import { isSameAddress, isValidAddress } from "../../utils/user";
-import { formatAddress, linkToMapByAddress } from "../../utils";
+import { isValidAddress } from "../../utils/user";
 import { useUserContext } from "../../context";
-import { db } from "../../configs/firebase-config";
 
-import { HeaderList, HeaderText, SmallHeaderText } from "./headerList";
+import { HeaderList } from "./headerList";
 import { PlainButton, PlainText } from "../../components/button";
-import { predefinedLinks } from "../../components/links";
+import { useIsUserPage, useTopTags, useUrls } from "./hooks";
 
 const UserPageBox = styled(Box)`
   .filter-panel {
@@ -28,39 +24,13 @@ const UserPageBox = styled(Box)`
   }
 `;
 
-interface LinkItem {
-  id: string;
-  text: JSX.Element;
-  predefined?: boolean;
-  providerName?: string;
-}
-
-interface TagItem {
-  id: string;
-  text: JSX.Element;
-}
-
-type TagPayload = string;
-type MultiTagPayload = { count: number; tag: string };
-
-interface Message {
-  id: string;
-  payload?: TagPayload | MultiTagPayload;
-  type: string;
-}
-
-function isHex(num: string): Boolean {
-  return (
-    Boolean(num.match(/^0x[0-9a-f]+$/i)) ||
-    Boolean(`0x${num}`.match(/^0x[0-9a-f]+$/i))
-  );
-}
 export const UserPage = (props: { id: string }) => {
   const { wallet } = useUserContext();
   const { id: key } = props;
-  const [urls, setUrls] = useState<LinkItem[]>([]);
-  const [isUserPage, setIsUserPage] = useState(false);
-  const [tagItems, setTagItems] = useState<TagItem[]>([]);
+
+  const tagItems = useTopTags();
+  const extendedUrls = useUrls();
+  const isUserPage = useIsUserPage();
 
   const {
     actions,
@@ -71,199 +41,6 @@ export const UserPage = (props: { id: string }) => {
     DefaultFilterMode,
     isLoading,
   } = useActionsContext();
-
-  useEffect(() => {
-    if (!key) return;
-    const docRef = doc(db, "userLinks", key);
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-
-        let linkItems: LinkItem[] = predefinedLinks.map(
-          ({ key, providerName, displayName }) => {
-            // Check if the key exists in the fetched data
-            if (data[key] && data[key].username && data[key].url) {
-              return {
-                id: docSnap.id + key,
-                text: (
-                  <HeaderText>
-                    <a
-                      href={data[key].url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ textDecoration: "none" }}
-                    >
-                      {`${key}/${data[key].username}`}
-                    </a>
-                  </HeaderText>
-                ),
-                predefined: false,
-                providerName: providerName,
-              };
-            } else {
-              // Return a default link item with the display text if the key does not exist
-              return {
-                id: docSnap.id + key,
-                text: <HeaderText>{displayName}</HeaderText>,
-                predefined: true,
-                providerName: providerName,
-              };
-            }
-          }
-        );
-
-        const keyToExclude = predefinedLinks.map((l) => l.key);
-
-        const customLinkItems = Object.keys(data)
-          .filter((key) => !keyToExclude.includes(key))
-          .map((key) => ({
-            id: docSnap.id + key,
-            text: (
-              <HeaderText>
-                <a
-                  href={data[key].url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ textDecoration: "none" }}
-                >
-                  {data[key].username.length > 12
-                    ? `${data[key].username.slice(0, 12)}...`
-                    : data[key].username}
-                </a>
-              </HeaderText>
-            ),
-            predefined: false,
-            // providerName: providerName,
-          }));
-
-        setUrls(linkItems.concat(customLinkItems));
-      } else {
-        console.log("No such document!");
-        // for other users (isUserPage == false)
-        setUrls(
-          predefinedLinks.map(({ key, providerName, displayName }) => ({
-            id: "default" + key,
-            text: <HeaderText>{displayName}</HeaderText>,
-            predefined: true,
-            providerName: providerName,
-          }))
-        );
-      }
-    });
-
-    return () => unsubscribe();
-  }, [key]);
-
-  useEffect(() => {
-    if (wallet) {
-      setIsUserPage(isSameAddress(wallet.address.substring(2), key));
-    }
-
-    const messagesQuery = query(
-      collection(db, "actions"),
-      where("to", "==", key),
-      where("type", "in", ["tag", "multi_tag"])
-    );
-
-    const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
-      const messages: Message[] = querySnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      })) as Message[];
-
-      const hashtagFrequency = messages.reduce<Record<string, number>>(
-        (acc, message) => {
-          const payload = message.payload;
-          if (message.type === "tag") {
-            if (typeof payload === "string") {
-              acc[payload] = (acc[payload] || 0) + 1;
-            }
-          } else if (message.type === "multi_tag") {
-            if (
-              typeof payload === "object" &&
-              "tag" in payload &&
-              "count" in payload
-            ) {
-              const tag = payload.tag as string;
-              const count = payload.count as number;
-              acc[tag] = (acc[tag] || 0) + count;
-            }
-          }
-          return acc;
-        },
-        {}
-      );
-
-      const tagsList = Object.entries(hashtagFrequency);
-
-      const sortedHashtags = tagsList
-        .filter((item) => item[0] !== "")
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 9)
-        .map(([hashtag, count]) => ({
-          id: hashtag, // Use hashtag as a unique ID
-          text: (
-            <Button
-              onClick={async (e) => {
-                e.preventDefault();
-                if (wallet !== undefined && key !== undefined) {
-                  const addressWithoutPrefix = wallet.address.slice(2);
-                  await addMessageWithGeolocation(
-                    addressWithoutPrefix,
-                    `#${hashtag} @${key}`
-                  );
-                } else {
-                  console.log("Invalid user wallet");
-                }
-              }}
-              plain
-            >
-              <Box direction={"row"}>
-                <HeaderText>
-                  {isHex(hashtag) ? `0/${hashtag.substring(0, 4)}` : hashtag}
-                </HeaderText>
-                <SmallHeaderText>{count}</SmallHeaderText>
-              </Box>
-            </Button>
-          ),
-        }));
-
-      setTagItems(sortedHashtags);
-    });
-
-    return () => unsubscribe();
-  }, [wallet, key, filters.length]);
-
-  const extendedUrls = useMemo<LinkItem[]>(() => {
-    const latestLocation = actions.find(
-      (a) => a.from === wallet?.address.slice(2) && !!a.address.road
-    )?.address;
-
-    if (!latestLocation?.road) {
-      return urls;
-    }
-
-    return [
-      {
-        id: "latest_location" + latestLocation?.postcode,
-        text: (
-          <HeaderText>
-            <a
-              href={linkToMapByAddress(latestLocation)}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ textDecoration: "none" }}
-            >
-              {`m/${
-                latestLocation?.short || formatAddress(latestLocation?.road)
-              }`}
-            </a>
-          </HeaderText>
-        ),
-      },
-      ...urls,
-    ];
-  }, [actions, urls, wallet?.address]);
 
   if (!key || !isValidAddress(key)) {
     return <Box>Not a valid user ID</Box>;
