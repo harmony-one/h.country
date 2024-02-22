@@ -70,7 +70,7 @@ export const getMessages = async (params: GetMessagesParams = {}): Promise<{
         where(filter.fieldPath, filter.opStr, filter.value)
       );
 
-      if(updateCallback) {
+      if (updateCallback) {
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
           updateCallback(formatMessages(querySnapshot.docs))
         })
@@ -87,7 +87,7 @@ export const getMessages = async (params: GetMessagesParams = {}): Promise<{
       orderBy("timestamp", "desc")
     );
 
-    if(updateCallback) {
+    if (updateCallback) {
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         updateCallback(formatMessages(querySnapshot.docs))
       })
@@ -137,7 +137,6 @@ export const addMessage = async (params: {
 }) => {
   const { locationData, from, text, customPayload = {} } = params;
   const timestamp = new Date().toISOString();
-
   // TODO: Conditional check based on determined type
   // const duplicateCheckQuery = query(
   //   collection(db, "actions"),
@@ -185,11 +184,11 @@ export const addMessage = async (params: {
     type = "new_user";
     payload = customPayload
   } else if (mentions.length > 0 && hashtags.length > 0) {
-    if (customPayload) { // number of the tags
+    if (customPayload.type && customPayload.type === "multi_tag") {
       type = "multi_tag";
       payload = {
         "tag": hashtags[0],
-        "count": customPayload,
+        "count": customPayload.count,
       };
     } else {
       type = "tag";

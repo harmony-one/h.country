@@ -14,9 +14,12 @@ export const theme: ThemeValue = {
         "dark": '#323232',
         "light": "#ffffff"
       },
+      border: '#565654', // dark grey
       blue1: '#2aaee9',
       spinner: '#2aaee9',
       yellow1: '#FFF7AD',
+      grey1: "#B3B3B3",
+      green1: '#a0ffa0'
     },
     focus: {
       border: {
