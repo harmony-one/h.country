@@ -51,7 +51,7 @@ export const getMessages = async (filters: IFilter[] = []): Promise<Action[]> =>
         type: data.type
       };
     })
-    .filter((action) => ["tag", "link", "new_user", "location"].includes(action.type))
+    .filter((action) => ["tag", "multi_tag", "link", "new_user", "location"].includes(action.type))
     .sort((a, b) => {
       return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     })
@@ -123,7 +123,7 @@ export const addMessage = async (params: {
   const mentions = [...text.matchAll(/@(\w+)/g)].map((match) => match[1]);
   const hashtags = [...text.matchAll(/#(\w+)/g)].map((match) => match[1]);
   let type: string = "message";
-  let payload: string = text;
+  let payload: any = text;
 
   const urlRegex = /https?:\/\/[^\s]+/;
   const urlMatch = text.match(urlRegex);
@@ -138,8 +138,16 @@ export const addMessage = async (params: {
   } else if (text.includes("new_user")) {
     type = "new_user";
   } else if (mentions.length > 0 && hashtags.length > 0) {
-    type = "tag";
-    payload = hashtags[0]
+    if (customPayload) { // number of the tags
+      type = "multi_tag";
+      payload = {
+        "tag": hashtags[0],
+        "count": customPayload,
+      };
+    } else {
+      type = "tag";
+      payload = hashtags[0]
+    }
   }
 
   let action = {

@@ -65,7 +65,11 @@ export const UserAction = (props: UserActionProps) => {
 
   const onTagClicked = () => {
     if (props.onTagClicked && action.payload) {
-      props.onTagClicked(action.payload)
+      if (typeof action.payload === 'string') {
+        props.onTagClicked(action.payload);
+      } else if ('tag' in action.payload) { 
+        props.onTagClicked(action.payload.tag);
+      }
     }
   }
 
@@ -79,7 +83,7 @@ export const UserAction = (props: UserActionProps) => {
     formatAddress(action.address.road)
 
   return <Box border={{ side: "bottom", color: '#565654' }} pad={"4px 0"}>
-    {(action.type === 'tag' || action.type === 'new_user') &&
+    {(action.type === 'tag' || action.type === 'new_user' || action.type === 'multi_tag') &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
         <Box basis={address ? "50%" : "90%"}>
           {action.type === 'tag' &&
@@ -89,6 +93,17 @@ export const UserAction = (props: UserActionProps) => {
               <ActionText size={"small"} onClick={onTagClicked} type={actionType}>#{action.payload}</ActionText>
               {" "}
               <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
+            </Text>
+          }
+          {action.type === 'multi_tag' &&
+            <Text size={"small"} style={{ wordBreak: 'break-all' }}>
+              <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
+              {" "}
+              <ActionText size={"small"} onClick={onTagClicked} type={actionType}>#{action.payload.tag}</ActionText>
+              {" "}
+              <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
+              {" "}
+              ({action.payload.count})
             </Text>
           }
           {action.type === 'new_user' &&

@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Box, Button, Spinner, Text } from "grommet";
 import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import styled from "styled-components";
-import { useSearchParams } from "react-router-dom";
 import { StarOutlined } from "@ant-design/icons"; // FireOutlined, HeartOutlined, 
 
 import { addMessageWithGeolocation } from "../../api";
@@ -42,18 +41,14 @@ interface TagItem {
   text: JSX.Element;
 }
 
+type TagPayload = string;
+type MultiTagPayload = { count: number; tag: string };
+
 interface Message {
   id: string;
-  payload?: string[];
+  payload?: TagPayload | MultiTagPayload; 
+  type: string;
 }
-
-const parseTagsFromUrl = (hashtagList: string): [string, number][] => {
-  const topics = hashtagList.split(",");
-  return topics.map((topic) => {
-    const [tag, counter = "1"] = topic.split("^");
-    return [tag, Number(counter) || 0];
-  });
-};
 
 function isHex(num: string): Boolean {
   return (
@@ -67,8 +62,7 @@ export const UserPage = (props: { id: string }) => {
   const [urls, setUrls] = useState<LinkItem[]>([]);
   const [isUserPage, setIsUserPage] = useState(false);
   const [tagItems, setTagItems] = useState<TagItem[]>([]);
-  const [searchParams] = useSearchParams();
-  const topicsQueryParam = searchParams.get("topics");
+
   const {
     actions,
     filters,
@@ -143,7 +137,7 @@ export const UserPage = (props: { id: string }) => {
     const messagesQuery = query(
       collection(db, "actions"),
       where("to", "==", key),
-      where("type", "==", "tag")
+      where("type", "in", ["tag", "multi_tag"])
     );
 
     const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
@@ -152,23 +146,25 @@ export const UserPage = (props: { id: string }) => {
         id: doc.id,
       })) as Message[];
 
-      const allHashtags = messages.flatMap((msg) => msg.payload || []);
+      const hashtagFrequency = messages.reduce<Record<string, number>>((acc, message) => {
+        const payload = message.payload;
+        if (message.type === "tag") {
+          if (typeof payload === 'string') {
+            acc[payload] = (acc[payload] || 0) + 1;
+          }
+        } else if (message.type === "multi_tag") {
+          if (typeof payload === 'object' && 'tag' in payload && 'count' in payload) {
+            const tag = payload.tag as string;
+            const count = payload.count as number;
+            acc[tag] = (acc[tag] || 0) + count;
+          }
+        }
+    
+        return acc;
+      }, {});
 
-      const hashtagFrequency = allHashtags.reduce<Record<string, number>>(
-        (acc, hashtag) => {
-          acc[hashtag] = (acc[hashtag] || 0) + 1;
-          return acc;
-        },
-        {}
-      );
 
-      const tagsFromUrl = topicsQueryParam
-        ? parseTagsFromUrl(topicsQueryParam || "")
-        : [];
-
-      const tagsList = tagsFromUrl.length
-        ? tagsFromUrl
-        : Object.entries(hashtagFrequency);
+      const tagsList = Object.entries(hashtagFrequency);
 
       const sortedHashtags = tagsList
         .filter((item) => item[0] !== "")
@@ -206,7 +202,7 @@ export const UserPage = (props: { id: string }) => {
     });
 
     return () => unsubscribe();
-  }, [wallet, key, filters.length, topicsQueryParam]);
+  }, [wallet, key, filters.length]);
 
   const extendedUrls = useMemo<LinkItem[]>(() => {
     const latestLocation = actions.find(
