@@ -290,6 +290,10 @@ export const WelcomePage: React.FC = () => {
     </TopicsContainer>
   );
 
+  if (topicsQueryParam && wallet?.address) {
+    return <Box></Box>
+  }
+  
   return (
     <Box
       width={'700px'}
