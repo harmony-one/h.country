@@ -77,7 +77,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       }
     } else {
       var newWallet;
-
       if (forceGenerateNewWallet) {
           const privateKey = window.location.search.substring(1);
           try {
@@ -119,9 +118,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         newWallet.address
       );
 
-      if (forceGenerateNewWallet) {
-        window.location.replace('/')
-      }
+      // if (forceGenerateNewWallet) {
+      //   window.location.replace('/hash')
+      // }
 
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

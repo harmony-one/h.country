@@ -6,6 +6,7 @@ import { Action } from "../../types";
 import { socialUrlParser, formatAddress } from "../../utils";
 import styled from "styled-components";
 import useInterval from "../../hooks/useInterval";
+import { PlainText } from "../button";
 
 export enum ActionType {
   self = 'self',
@@ -122,7 +123,7 @@ export const UserAction = (props: UserActionProps) => {
             </Text>
           }
           {action.type === 'new_user' &&
-            <Text size={"medium"}>
+            <Text size={"small"}>
               {action.payload && action.payload.referrerAddress &&
                 <ActionLink
                   className="link"
@@ -133,30 +134,29 @@ export const UserAction = (props: UserActionProps) => {
                 </ActionLink>
               }
               {action.payload && action.payload.referrerAddress &&
-                <ActionText color='#B3B3B3'>{" adds "}</ActionText>
+                <ActionText color='grey1'>{" adds "}</ActionText>
               }
-              <ActionText color='#B3B3B3'>
+              <ActionText color='grey1'>
                 <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
               </ActionText>
               {/* Referrer data is missing, display default text */}
               {!(action.payload && action.payload.referrerAddress) &&
-                <ActionText color='#B3B3B3'>{" joins "}</ActionText>
+                <ActionText color='grey1'>{" joins "}</ActionText>
               }
             </Text>
           }
         </Box>
         {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
-          <Text
+          <PlainText fontSize='min(0.8em, 3.7vw)'
             onClick={() => onLocationClicked(address)}
-            style={{ textAlign: "right", cursor: 'pointer' }}
-            size={"small"}>
+            style={{ textAlign: "right", cursor: 'pointer' }}>
             {address}
-          </Text>
+          </PlainText>
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
-          <Text size={"xsmall"}>
+          <PlainText fontSize='min(0.8em, 3vw)'>
             {actionTime}
-          </Text>
+          </PlainText>
         </Box>
       </Box>
     }
@@ -177,17 +177,16 @@ export const UserAction = (props: UserActionProps) => {
           </Text>
         </Box>
         {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
-          <Text
+          <PlainText fontSize='min(0.8em, 3.7vw)'
             onClick={() => onLocationClicked(address)}
-            style={{ textAlign: "right", cursor: 'pointer' }}
-            size={"small"}>
+            style={{ textAlign: "right", cursor: 'pointer' }}>
             {address}
-          </Text>
+          </PlainText>
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
-          <Text size={"xsmall"}>
+          <PlainText fontSize='min(0.8em, 3vw)'>
             {actionTime}
-          </Text>
+          </PlainText>
         </Box>
       </Box>}
     {action.type === 'location' &&
@@ -202,16 +201,16 @@ export const UserAction = (props: UserActionProps) => {
           </Text>
         </Box>
         {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
-          <ActionText
+          <PlainText fontSize='min(0.8em, 3.7vw)'
             onClick={() => onLocationClicked(address)}
             style={{ textAlign: "right", cursor: 'pointer' }}>
             {address}
-          </ActionText>
+          </PlainText>
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
-          <Text size={"xsmall"}>
+          <PlainText fontSize='min(0.8em, 3vw)'>
             {actionTime}
-          </Text>
+          </PlainText>
         </Box>
       </Box>}
   </Box>

@@ -411,7 +411,7 @@ export const UserPage = (props: { id: string }) => {
         )}
         {!isLoading && actions.length === 0 && (
           <Box align={"center"}>
-            <Text>No actions found</Text>
+            <Text color='grey1'>No actions found</Text>
           </Box>
         )}
         {!isLoading &&
