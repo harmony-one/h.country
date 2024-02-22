@@ -69,9 +69,9 @@ export const UserAction = (props: UserActionProps) => {
   // Dynamically update date
   useInterval(() => {
     const delta = Date.now() - new Date(action.timestamp).valueOf()
-    if(delta < 60_000) {
+    if(Math.ceil(delta) < 60_000) {
       setActionTime(`${Math.round(delta / 1000)}s`)
-    } else if (delta < 24 * 60 * 60_000) {
+    } else if (delta < 24 * 60_000) {
       setActionTime(moment(action.timestamp).fromNow())
     }
   }, 1000)
@@ -136,7 +136,7 @@ export const UserAction = (props: UserActionProps) => {
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
           <Text size={"xsmall"}>
-            {moment(action.timestamp).fromNow()}
+            {actionTime}
           </Text>
         </Box>
       </Box>
@@ -167,7 +167,7 @@ export const UserAction = (props: UserActionProps) => {
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
           <Text size={"xsmall"}>
-            {moment(action.timestamp).fromNow()}
+            {actionTime}
           </Text>
         </Box>
       </Box>}
