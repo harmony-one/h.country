@@ -35,6 +35,11 @@ function normalizeInput(input: string) {
     return input;
 }
 
+function generateUUID() {
+    return crypto.randomUUID();
+}
+
+
 function extractUsernameFromURL(input: string) {
     const url = new URL(normalizeInput(input));
     const hostnameParts = url.hostname.split('.').filter(part => part !== 'www');
@@ -52,12 +57,13 @@ function extractUsernameFromURL(input: string) {
 
 export function socialUrlParser(input: string, providerName: string): ParseResult | null {
     const isUrl = isLikelyURL(input);
+    const uuid = generateUUID()
 
     if (providerName === "any") {
         if (!isUrl) {
             return {
-                type: 'any',
-                providerName: 'any',
+                type: uuid,
+                providerName: uuid,
                 url: `https://www.google.com/search?q=${encodeURIComponent(input)}`,
                 username: input,
             };
@@ -65,8 +71,8 @@ export function socialUrlParser(input: string, providerName: string): ParseResul
 
         const username = extractUsernameFromURL(input);
         return {
-            type: 'any',
-            providerName: 'any',
+            type: uuid,
+            providerName: uuid,
             url: normalizeInput(input),
             username: username,
         };
