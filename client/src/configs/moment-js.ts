@@ -6,7 +6,7 @@ export const updateMomentJSConfig = () => {
     relativeTime : {
       future: "in %s",
       past:   "%s", // "%s ago"
-      s  : 'few s',
+      s  : '%ds',
       ss : '%ds',
       m:  "1m",
       mm: "%dm",

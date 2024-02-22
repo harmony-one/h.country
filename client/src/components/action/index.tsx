@@ -5,6 +5,7 @@ import moment from 'moment'
 import { Action } from "../../types";
 import { socialUrlParser, formatAddress } from "../../utils";
 import styled from "styled-components";
+import useInterval from "../../hooks/useInterval";
 
 export enum ActionType {
   self = 'self',
@@ -56,17 +57,27 @@ export interface UserActionProps {
 
 export const UserAction = (props: UserActionProps) => {
   const { action, userId } = props
+
+  const [actionTime, setActionTime] = useState(moment(action.timestamp).fromNow())
   const [actionType, setActionType] = useState<ActionType>(ActionType.none)
+
   useEffect(() => {
     setActionType(handleActionType(action, userId || ''))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Dynamically update date
+  useInterval(() => {
+    if(Date.now() - new Date(action.timestamp).valueOf() < 60_000) {
+      setActionTime(moment(action.timestamp).fromNow())
+    }
+  }, 1000)
+
   const onTagClicked = () => {
     if (props.onTagClicked && action.payload) {
       if (typeof action.payload === 'string') {
         props.onTagClicked(action.payload);
-      } else if ('tag' in action.payload) { 
+      } else if ('tag' in action.payload) {
         props.onTagClicked(action.payload.tag);
       }
     }
@@ -177,7 +188,7 @@ export const UserAction = (props: UserActionProps) => {
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
           <ActionText>
-            {moment(action.timestamp).fromNow()}
+            {actionTime}
           </ActionText>
         </Box>
       </Box>}
