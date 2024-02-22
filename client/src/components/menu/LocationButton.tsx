@@ -20,7 +20,13 @@ export const LocationButton = () => {
     }, [wallet?.address]);
 
     useEffect(() => {
-        syncUserLocation();
+        syncUserLocation()
+
+        if (wallet?.address) {
+            addMessageWithGeolocation(wallet.address.slice(2), 'check-in').then(
+                () => syncUserLocation()
+            )
+        }
 
         const intervalId = setInterval(syncUserLocation, 5000);
 
@@ -30,10 +36,6 @@ export const LocationButton = () => {
     const onCLickLocation = useCallback(async () => {
         if (wallet?.address && latestLocation && pageOwnerAddress) {
             const locationShort = latestLocation.short || formatAddress(latestLocation.road);
-
-            const shortUserName = `0/${pageOwnerAddress.substring(2, 6)}`;
-
-            window.alert(`You will locate ${shortUserName} at ${locationShort}`);
 
             const addressWithoutPrefix = wallet.address.slice(2);
 
