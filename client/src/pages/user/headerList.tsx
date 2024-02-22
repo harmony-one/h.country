@@ -90,7 +90,7 @@ export const HeaderList = (props: HeaderListProps) => {
   const onTitleClick = async ({ providerName }: TitleClickEvent) => {
     console.log("clicked", providerName)
     const input = window.prompt(
-      type === "hashtag" ? "Enter Hashtag (without #):" : `Enter ${providerName} username:`
+      type === "hashtag" ? "Enter Hashtag (without #):" : `Enter ${providerName} account:`
     );
 
     if (input === null) {
@@ -209,7 +209,7 @@ export const HeaderList = (props: HeaderListProps) => {
           </div>
         </Box>
       }
-      <Button plain onClick={() => onTitleClick({providerName: "all"})}>
+      <Button plain onClick={() => onTitleClick({providerName: "any"})}>
         <HeaderListIcon width={'60px'} align={"start"} pad={'8px'} isUserPage={isUserPage}>
           {type === "hashtag"
             ? <NumberImg />
