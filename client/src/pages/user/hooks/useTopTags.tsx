@@ -4,9 +4,22 @@ import { db } from "../../../configs/firebase-config";
 import { useUserContext } from "../../../context";
 import { Box, Button } from "grommet";
 import { HeaderText, SmallHeaderText } from "../headerList";
-import { Message, TagItem } from "../UserPage";
 import { isHex } from "../../../utils/getAddress/validators";
 import { addMessageWithGeolocation } from "../../../api";
+
+export interface TagItem {
+    id: string;
+    text: JSX.Element;
+}
+
+type TagPayload = string;
+type MultiTagPayload = { count: number; tag: string };
+
+export interface Message {
+    id: string;
+    payload?: TagPayload | MultiTagPayload;
+    type: string;
+}
 
 export const useTopTags = () => {
     const { pageOwnerAddress, wallet } = useUserContext();

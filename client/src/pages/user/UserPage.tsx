@@ -24,33 +24,6 @@ const UserPageBox = styled(Box)`
   }
 `;
 
-interface LinkItem {
-  id: string;
-  text: JSX.Element;
-  predefined?: boolean;
-  providerName?: string;
-}
-
-export interface TagItem {
-  id: string;
-  text: JSX.Element;
-}
-
-type TagPayload = string;
-type MultiTagPayload = { count: number; tag: string };
-
-export interface Message {
-  id: string;
-  payload?: TagPayload | MultiTagPayload;
-  type: string;
-}
-
-function isHex(num: string): Boolean {
-  return (
-    Boolean(num.match(/^0x[0-9a-f]+$/i)) ||
-    Boolean(`0x${num}`.match(/^0x[0-9a-f]+$/i))
-  );
-}
 export const UserPage = (props: { id: string }) => {
   const { wallet } = useUserContext();
   const { id: key } = props;

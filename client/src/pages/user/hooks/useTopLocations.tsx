@@ -5,7 +5,7 @@ import { useUserContext } from "../../../context";
 import { Action } from "../../../types";
 import { Box, Button } from "grommet";
 import { HeaderText, SmallHeaderText } from "../headerList";
-import { TagItem } from "../UserPage";
+import { TagItem } from "./useTopTags";
 
 export const useTopLocations = () => {
     const { pageOwnerAddress } = useUserContext();
