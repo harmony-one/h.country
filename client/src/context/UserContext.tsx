@@ -38,7 +38,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   const privateKeyLS = window.localStorage.getItem(LSAccountKey);
   const firstTimeVisit = !window.localStorage.getItem(LSIsPageVisited);
-
   useEffect(()=> {
     if (firstTimeVisit) {
       setTimeout(() => {
@@ -121,7 +120,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       // if (forceGenerateNewWallet) {
       //   window.location.replace('/hash')
       // }
-
+      forceGenerateNewWallet = false  
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
