@@ -185,7 +185,7 @@ export const addMessage = async (params: {
     type = "new_user";
     payload = customPayload
   } else if (mentions.length > 0 && hashtags.length > 0) {
-    if (customPayload) { // number of the tags
+    if (Object.keys(customPayload).length > 0) {
       type = "multi_tag";
       payload = {
         "tag": hashtags[0],

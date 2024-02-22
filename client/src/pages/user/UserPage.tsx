@@ -85,15 +85,17 @@ export const UserPage = (props: { id: string }) => {
             if (data[key] && data[key].username && data[key].url) {
               return {
                 id: docSnap.id + key,
-                text: (<HeaderText>
-                  <a
-                    href={data[key].url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ textDecoration: "none" }}
-                  >
-                    {`${key}/${data[key].username}`}
-                  </a></HeaderText>
+                text: (
+                  <HeaderText>
+                    <a
+                      href={data[key].url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ textDecoration: "none" }}
+                    >
+                      {`${key}/${data[key].username}`}
+                    </a>
+                  </HeaderText>
                 ),
                 predefined: false,
                 providerName: providerName,
@@ -110,29 +112,29 @@ export const UserPage = (props: { id: string }) => {
           }
         );
 
-        const keyToExclude = predefinedLinks.map(l => l.key);
+        const keyToExclude = predefinedLinks.map((l) => l.key);
 
         const customLinkItems = Object.keys(data)
-          .filter(key => !keyToExclude.includes(key))
-          .map(key => ({
+          .filter((key) => !keyToExclude.includes(key))
+          .map((key) => ({
             id: docSnap.id + key,
-            text: (<HeaderText>
-              <a
-                href={data[key].url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ textDecoration: "none" }}
-              >
-                {
-                  data[key].username.length > 12 ?
-                    `${data[key].username.slice(0, 12)}...` :
-                    data[key].username
-                }
-              </a></HeaderText>
+            text: (
+              <HeaderText>
+                <a
+                  href={data[key].url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ textDecoration: "none" }}
+                >
+                  {data[key].username.length > 12
+                    ? `${data[key].username.slice(0, 12)}...`
+                    : data[key].username}
+                </a>
+              </HeaderText>
             ),
             predefined: false,
             // providerName: providerName,
-          }))
+          }));
 
         setUrls(linkItems.concat(customLinkItems));
       } else {
@@ -169,23 +171,28 @@ export const UserPage = (props: { id: string }) => {
         id: doc.id,
       })) as Message[];
 
-      const hashtagFrequency = messages.reduce<Record<string, number>>((acc, message) => {
-        const payload = message.payload;
-        if (message.type === "tag") {
-          if (typeof payload === 'string') {
-            acc[payload] = (acc[payload] || 0) + 1;
+      const hashtagFrequency = messages.reduce<Record<string, number>>(
+        (acc, message) => {
+          const payload = message.payload;
+          if (message.type === "tag") {
+            if (typeof payload === "string") {
+              acc[payload] = (acc[payload] || 0) + 1;
+            }
+          } else if (message.type === "multi_tag") {
+            if (
+              typeof payload === "object" &&
+              "tag" in payload &&
+              "count" in payload
+            ) {
+              const tag = payload.tag as string;
+              const count = payload.count as number;
+              acc[tag] = (acc[tag] || 0) + count;
+            }
           }
-        } else if (message.type === "multi_tag") {
-          if (typeof payload === 'object' && 'tag' in payload && 'count' in payload) {
-            const tag = payload.tag as string;
-            const count = payload.count as number;
-            acc[tag] = (acc[tag] || 0) + count;
-          }
-        }
-
-        return acc;
-      }, {});
-
+          return acc;
+        },
+        {}
+      );
 
       const tagsList = Object.entries(hashtagFrequency);
 
@@ -239,17 +246,20 @@ export const UserPage = (props: { id: string }) => {
     return [
       {
         id: "latest_location" + latestLocation?.postcode,
-        text: (<HeaderText>
-          <a
-            href={linkToMapByAddress(latestLocation)}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ textDecoration: "none" }}
-          >
-            {`m/${latestLocation?.short || formatAddress(latestLocation?.road)
+        text: (
+          <HeaderText>
+            <a
+              href={linkToMapByAddress(latestLocation)}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: "none" }}
+            >
+              {`m/${
+                latestLocation?.short || formatAddress(latestLocation?.road)
               }`}
-          </a>
-        </HeaderText>),
+            </a>
+          </HeaderText>
+        ),
       },
       ...urls,
     ];
@@ -334,7 +344,9 @@ export const UserPage = (props: { id: string }) => {
                   isActive={filters.length > 0}
                   onClick={onClick}
                 >
-                  <PlainText color={isUserPage ? "blue1" : "yellow1"}>#{value}</PlainText>
+                  <PlainText color={isUserPage ? "blue1" : "yellow1"}>
+                    #{value}
+                  </PlainText>
                 </PlainButton>
               );
             })}
@@ -402,8 +414,8 @@ export const UserPage = (props: { id: string }) => {
             <Text>No actions found</Text>
           </Box>
         )}
-        {!isLoading && actions
-          .map((action, index) => (
+        {!isLoading &&
+          actions.map((action, index) => (
             <UserAction
               userId={key}
               key={index + action.timestamp}
