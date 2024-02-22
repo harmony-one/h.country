@@ -46,7 +46,7 @@ type MultiTagPayload = { count: number; tag: string };
 
 interface Message {
   id: string;
-  payload?: TagPayload | MultiTagPayload; 
+  payload?: TagPayload | MultiTagPayload;
   type: string;
 }
 
@@ -159,7 +159,7 @@ export const UserPage = (props: { id: string }) => {
             acc[tag] = (acc[tag] || 0) + count;
           }
         }
-    
+
         return acc;
       }, {});
 
@@ -223,11 +223,10 @@ export const UserPage = (props: { id: string }) => {
             rel="noopener noreferrer"
             style={{ textDecoration: "none" }}
           >
-            {`m/${
-              latestLocation?.short || formatAddress(latestLocation?.road)
-            }`}
+            {`m/${latestLocation?.short || formatAddress(latestLocation?.road)
+              }`}
           </a>
-          </HeaderText>),
+        </HeaderText>),
       },
       ...urls,
     ];
@@ -365,7 +364,7 @@ export const UserPage = (props: { id: string }) => {
           >
             <PlainText fontSize="min(1em, 4vw)">#ai</PlainText>
           </PlainButton>
-          <PlainButton style={{ padding: '2px'}}>
+          <PlainButton style={{ padding: '2px' }}>
             <PlainText fontSize="min(1em, 4vw)">
               <StarOutlined />
             </PlainText>
@@ -384,16 +383,15 @@ export const UserPage = (props: { id: string }) => {
           </Box>
         )}
         {!isLoading && actions
-            .slice(0, 30)
-            .map((action, index) => (
-              <UserAction
-                userId={key}
-                key={index + action.timestamp}
-                action={action}
-                onTagClicked={onTagClicked}
-                onLocationClicked={onLocationClicked}
-              />
-        ))}
+          .map((action, index) => (
+            <UserAction
+              userId={key}
+              key={index + action.timestamp}
+              action={action}
+              onTagClicked={onTagClicked}
+              onLocationClicked={onLocationClicked}
+            />
+          ))}
       </Box>
     </UserPageBox>
   );
