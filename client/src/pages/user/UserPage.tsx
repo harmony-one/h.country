@@ -110,7 +110,31 @@ export const UserPage = (props: { id: string }) => {
           }
         );
 
-        setUrls(linkItems);
+        const keyToExclude = predefinedLinks.map(l => l.key);
+
+        const customLinkItems = Object.keys(data)
+          .filter(key => !keyToExclude.includes(key))
+          .map(key => ({
+            id: docSnap.id + key,
+            text: (<HeaderText>
+              <a
+                href={data[key].url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: "none" }}
+              >
+                {
+                  data[key].username.length > 12 ?
+                    `${data[key].username.slice(0, 12)}...` :
+                    data[key].username
+                }
+              </a></HeaderText>
+            ),
+            predefined: false,
+            // providerName: providerName,
+          }))
+
+        setUrls(linkItems.concat(customLinkItems));
       } else {
         console.log("No such document!");
         // for other users (isUserPage == false)
@@ -290,7 +314,7 @@ export const UserPage = (props: { id: string }) => {
             <PlainText
               fontSize="min(1em, 4vw)"
               color='#B3B3B3'
-              // color={isUserPage ? "blue1" : "yellow1"}
+            // color={isUserPage ? "blue1" : "yellow1"}
             >
               {key?.substring(0, 4)}
             </PlainText>
@@ -364,7 +388,7 @@ export const UserPage = (props: { id: string }) => {
           >
             <PlainText fontSize="min(1em, 4vw)" color='#B3B3B3'>#ai</PlainText>
           </PlainButton>
-          <PlainButton style={{ padding: '2px'}}>
+          <PlainButton style={{ padding: '2px' }}>
             <PlainText fontSize="min(1em, 4vw)" color='#B3B3B3'>
               <StarOutlined />
             </PlainText>

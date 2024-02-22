@@ -160,14 +160,14 @@ export const UserAction = (props: UserActionProps) => {
     }
     {action.type === 'link' &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
-        <Box basis="50%">
+        <Box basis={address ? "50%" : "90%"}>
           <Text size={"small"} style={{ wordBreak: 'break-all' }}>
             <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
             {/* <ActionText size={"small"} type={ActionType.none}>{socialUrlParser(action.payload || '')[0]?.name}</ActionText>
             {' '} */}
             {' '}
             <ActionLink className="link" to={`/0/${action.from}`} type={actionType}>{
-              socialUrlParser(action.payload || '', '')?.type + '/' + socialUrlParser(action.payload || '', '')?.username
+              socialUrlParser(action.payload || '', 'any')?.username
             }
             </ActionLink>
             {' '}
@@ -207,9 +207,9 @@ export const UserAction = (props: UserActionProps) => {
           </ActionText>
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
-          <ActionText>
+          <Text size={"xsmall"}>
             {actionTime}
-          </ActionText>
+          </Text>
         </Box>
       </Box>}
   </Box>
