@@ -22,43 +22,74 @@ export interface ParseResult {
     deprecated?: boolean;
 }
 
+function isLikelyURL(input: string) {
+    return /^https?:\/\//.test(input) ||
+           /^www\./.test(input) ||
+           /\.[a-z]{2,15}($|\/)/i.test(input);
+}
+
+function normalizeInput(input: string) {
+    if (!/^https?:\/\//i.test(input)) {
+        return `http://${input}`;
+    }
+    return input;
+}
+
+function generateUUID() {
+    return crypto.randomUUID();
+}
+
+
+function extractUsernameFromURL(input: string) {
+    const url = new URL(normalizeInput(input));
+    const hostnameParts = url.hostname.split('.').filter(part => part !== 'www');
+    const pathAndQuery = url.pathname !== '/' ? url.pathname : '' + url.search;
+    let username;
+
+    if (!pathAndQuery) {
+        username = hostnameParts.join('.');
+    } else {
+        username = `${hostnameParts.slice(0, -1).join('.')}${pathAndQuery}`;
+    }
+
+    return username;
+}
+
 export function socialUrlParser(input: string, providerName: string): ParseResult | null {
-    const regexObject = regexes.find(regex => regex.providerName === providerName);
-    if (!regexObject) {
-        return null;
-    }
+    const isUrl = isLikelyURL(input);
+    const uuid = generateUUID()
 
-    const isUrl = /^https?:\/\//.test(input);
-    if (isUrl) {
-        const inputDomain = new URL(input).hostname;
-        const baseDomain = new URL(regexObject.baseUrl).hostname;
-        if (inputDomain !== baseDomain) {
-            return null;
+    if (providerName === "any") {
+        if (!isUrl) {
+            return {
+                type: uuid,
+                providerName: uuid,
+                url: `https://www.google.com/search?q=${encodeURIComponent(input)}`,
+                username: input,
+            };
         }
-    }
-    let url = input;
-    if (!isUrl) {
-        if (providerName === 'substack') {
-            url = `https://${input}.substack.com`;
-        } else if (regexObject.baseUrl) {
-            url = regexObject.baseUrl + input;
-        }
-    }
 
-    const result = regexObject.regex.exec(url);
-    if (!result) {
-        return null;
-    }
-    const username = result[result.length - 1];
-    if (!username) {
-        return null;
-    }
-    const parseResult: ParseResult = {
-        type: regexObject.type,
-        providerName: providerName,
-        url: isUrl ? result[0] : url, // Use the constructed URL for usernames
-        username: username,
-    };
+        const username = extractUsernameFromURL(input);
+        return {
+            type: uuid,
+            providerName: uuid,
+            url: normalizeInput(input),
+            username: username,
+        };
+    } else {
+        const regexObject = regexes.find(regex => regex.providerName === providerName);
+        if (!regexObject) return null;
 
-    return parseResult;
+        const normalizedInput = normalizeInput(input);
+        regexObject.regex.lastIndex = 0;
+        const result = regexObject.regex.exec(normalizedInput);
+        if (!result) return null;
+
+        return {
+            type: regexObject.type,
+            providerName: regexObject.providerName,
+            url: normalizedInput,
+            username: result[result.length - 1],
+        };
+    }
 }

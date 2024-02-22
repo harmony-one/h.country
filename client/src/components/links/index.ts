@@ -9,7 +9,7 @@ export const predefinedLinks = [
     { key: "s", displayName: "substack", providerName: "substack" },
   ];
 
-  interface RegexObject {
+  export interface RegexObject {
     type: string; // a all lowercase no space name of the social media site
     providerName: string; // the formatted official name of the social media site
     regex: RegExp; // the regex that will be used to find the username
