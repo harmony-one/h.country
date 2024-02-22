@@ -29,6 +29,13 @@ export function socialUrlParser(input: string, providerName: string): ParseResul
     }
 
     const isUrl = /^https?:\/\//.test(input);
+    if (isUrl) {
+        const inputDomain = new URL(input).hostname;
+        const baseDomain = new URL(regexObject.baseUrl).hostname;
+        if (inputDomain !== baseDomain) {
+            return null;
+        }
+    }
     let url = input;
     if (!isUrl) {
         if (providerName === 'substack') {

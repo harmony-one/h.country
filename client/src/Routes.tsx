@@ -17,6 +17,7 @@ export const AppRoutes = () => {
         <Route path="/0/:key" element={<UserPageByKey />} />
         <Route path="/:socialType/:username" element={<UserPageBySocial />} />
         <Route path={'/auth'} element={<AuthPage />} />
+        <Route path="/home" element={<MainPage />} />
       </Route>
       <Route path={'*'} element={<PageNotFound />} />
     </Routes>
