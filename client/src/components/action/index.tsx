@@ -13,16 +13,16 @@ export enum ActionType {
   verified = 'verified',
   none = 'none'
 }
-const handleActionTypeColor = (type: ActionType) => {
+const handleActionTypeColor = (type: ActionType, theme: any) => {
   switch (type) {
     case 'verified':
-      return "#a0ffa0 !important"
+      return `${theme.global.colors.green1}`;
     case 'other':
-      return "#FFF7AD !important";
+      return `${theme.global.colors.yellow1}`;
     case 'self':
-      return "#64ebfd !important"; // self
+      return `${theme.global.colors.blue1}`;
     default:
-      return "#B3B3B3 !important";
+      return `${theme.global.colors.grey1}`;
   }
 };
 
@@ -37,12 +37,12 @@ export const handleActionType = (action: Action, walletAddress: string) => {
 
 export const ActionText = styled(Text) <{ type?: ActionType }>`
   font-size: min(1em, 4vw);
-  color: ${(props) => props.type && handleActionTypeColor(props.type)};
+  color: ${(props) => props.type && handleActionTypeColor(props.type, props.theme)};
   cursor: ${(props) => props.type && props.type !== 'none' ? 'pointer' : 'auto'};
 `
 export const ActionLink = styled(Link) <{ type?: ActionType }>`
   :visited, :link, :hover, :active {
-    color: ${(props) => props.type && handleActionTypeColor(props.type)};
+    color: ${(props) => props.type && handleActionTypeColor(props.type, props.theme)};
   }
   font-size: min(1em, 4vw);
   text-decoration: ${(props) => props.type && props.type !== 'none' ? 'underline' : 'none'};
@@ -95,7 +95,7 @@ export const UserAction = (props: UserActionProps) => {
   const address = action.address.short ||
     formatAddress(action.address.road)
 
-  return <Box border={{ side: "bottom", color: '#565654' }} pad={"4px 0"}>
+  return <Box border={{ side: "bottom", color: 'border' }} pad={"4px 0"}> 
     {(action.type === 'tag' || action.type === 'new_user' || action.type === 'multi_tag') &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
         <Box basis={address ? "50%" : "90%"}>

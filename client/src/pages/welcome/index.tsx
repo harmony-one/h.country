@@ -21,7 +21,6 @@ const WelcomeContainer = styled(Box)`
   gap: 2em;
   width: 100%;
   height: 100svh;
-  /* background-color: #fff; */
 `;
 
 const TopicsContainer = styled(Box)`
@@ -293,7 +292,7 @@ export const WelcomePage: React.FC = () => {
   if (topicsQueryParam && wallet?.address) {
     return <Box></Box>
   }
-  
+
   return (
     <Box
       width={'700px'}

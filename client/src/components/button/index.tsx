@@ -17,5 +17,5 @@ export const PlainButton = styled(Box)<{ isActive?: boolean, fontColor?: string 
 
 export const PlainText = styled(Text)<{ fontSize?: string, color?: string}>`
     font-size: ${props => props.fontSize || 'min(1em, 4vw)' };
-    color: ${props => props.color ?? '#B3B3B3'};
+    color: ${props => props.color ?? props.theme.global.colors.grey1};
 `
