@@ -120,10 +120,27 @@ export const UserAction = (props: UserActionProps) => {
             </Text>
           }
           {action.type === 'new_user' &&
-            <ActionText color='#B3B3B3'>
-              <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
-              {" joins"}
-            </ActionText>
+              <Text size={"medium"}>
+                {action.payload && action.payload.referrerAddress &&
+                    <ActionLink
+                        className="link"
+                        to={`/0/${action.payload.referrerAddress}`}
+                        type={ActionType.other}
+                    >
+                        0/{action.payload.referrerAddress.slice(0, 4)}
+                    </ActionLink>
+                }
+                {action.payload && action.payload.referrerAddress &&
+                    <ActionText color='#B3B3B3'>{" adds "}</ActionText>
+                }
+                <ActionText color='#B3B3B3'>
+                    <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
+                </ActionText>
+                {/* Referrer data is missing, display default text */}
+                {! (action.payload && action.payload.referrerAddress) &&
+                    <ActionText color='#B3B3B3'>{" joins "}</ActionText>
+                }
+              </Text>
           }
         </Box>
         {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>

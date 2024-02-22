@@ -2,20 +2,19 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Box, Button, Spinner, Text } from "grommet";
 import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import styled from "styled-components";
-import { StarOutlined } from "@ant-design/icons"; // FireOutlined, HeartOutlined, 
+import { StarOutlined } from "@ant-design/icons"; // FireOutlined, HeartOutlined,
 
 import { addMessageWithGeolocation } from "../../api";
 import { useActionsContext } from "../../context";
 import { UserAction } from "../../components/action";
 import { isSameAddress, isValidAddress } from "../../utils/user";
 import { formatAddress, linkToMapByAddress } from "../../utils";
-import { useUserContext } from "../../context/UserContext";
+import { useUserContext } from "../../context";
 import { db } from "../../configs/firebase-config";
 
 import { HeaderList, HeaderText, SmallHeaderText } from "./headerList";
 import { PlainButton, PlainText } from "../../components/button";
 import { predefinedLinks } from "../../components/links";
-
 
 const UserPageBox = styled(Box)`
   .filter-panel {

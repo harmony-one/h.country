@@ -89,7 +89,7 @@ export const addMessage = async (params: {
   text: string,
   customPayload?: any,
 }) => {
-  const { locationData, from, text, customPayload } = params;
+  const { locationData, from, text, customPayload = {} } = params;
   const timestamp = new Date().toISOString();
 
   // TODO: Conditional check based on determined type
@@ -137,6 +137,7 @@ export const addMessage = async (params: {
     type = "check-in";
   } else if (text.includes("new_user")) {
     type = "new_user";
+    payload = customPayload
   } else if (mentions.length > 0 && hashtags.length > 0) {
     if (customPayload) { // number of the tags
       type = "multi_tag";
