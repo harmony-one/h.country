@@ -235,13 +235,25 @@ export const WelcomePage: React.FC = () => {
       };
 
       try {
-        await Promise.all(parsedTags.map((tag: [string, number]) =>
-          addMessage({
-            locationData,
-            from: addressWithoutPrefix,
-            text: `#${tag[0]} @${addressWithoutPrefix}`,
-            customPayload: tag[1] > 1 ? Math.min(tag[1], 99) : undefined, // cap to 99 for each multi tag
-          })
+        await Promise.all(parsedTags.map((tag: [string, number]) => {
+          if (tag[1] > 1) {
+            return addMessage({
+              locationData,
+              from: addressWithoutPrefix,
+              text: `#${tag[0]} @${addressWithoutPrefix}`,
+              customPayload: {
+                "count": Math.min(tag[1], 99), // cap to 99 for each multi tag,
+                "type": "multi_tag",
+              }
+            });
+          } else {
+            return addMessage({
+              locationData,
+              from: addressWithoutPrefix,
+              text: `#${tag[0]} @${addressWithoutPrefix}`,
+            });
+          }
+        }
         ));
       } catch (error) {
         console.error(error);
