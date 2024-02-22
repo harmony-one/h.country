@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Box, Button, Spinner, Text } from "grommet";
 import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import styled from "styled-components";
-import { useSearchParams } from "react-router-dom";
 import { StarOutlined } from "@ant-design/icons"; // FireOutlined, HeartOutlined, 
 
 import { addMessageWithGeolocation } from "../../api";
@@ -67,14 +66,6 @@ interface Message {
   type: string;
 }
 
-const parseTagsFromUrl = (hashtagList: string): [string, number][] => {
-  const topics = hashtagList.split(",");
-  return topics.map((topic) => {
-    const [tag, counter = "1"] = topic.split("^");
-    return [tag, Number(counter) || 0];
-  });
-};
-
 function isHex(num: string): Boolean {
   return (
     Boolean(num.match(/^0x[0-9a-f]+$/i)) ||
@@ -87,8 +78,7 @@ export const UserPage = (props: { id: string }) => {
   const [urls, setUrls] = useState<LinkItem[]>([]);
   const [isUserPage, setIsUserPage] = useState(false);
   const [tagItems, setTagItems] = useState<TagItem[]>([]);
-  const [searchParams] = useSearchParams();
-  const topicsQueryParam = searchParams.get("topics");
+
   const {
     actions,
     filters,
@@ -189,13 +179,8 @@ export const UserPage = (props: { id: string }) => {
         return acc;
       }, {});
 
-      const tagsFromUrl = topicsQueryParam
-        ? parseTagsFromUrl(topicsQueryParam || "")
-        : [];
 
-      const tagsList = tagsFromUrl.length
-        ? tagsFromUrl
-        : Object.entries(hashtagFrequency);
+      const tagsList = Object.entries(hashtagFrequency);
 
       const sortedHashtags = tagsList
         .filter((item) => item[0] !== "")
@@ -233,7 +218,7 @@ export const UserPage = (props: { id: string }) => {
     });
 
     return () => unsubscribe();
-  }, [wallet, key, filters.length, topicsQueryParam]);
+  }, [wallet, key, filters.length]);
 
   const extendedUrls = useMemo<LinkItem[]>(() => {
     const latestLocation = actions.find(

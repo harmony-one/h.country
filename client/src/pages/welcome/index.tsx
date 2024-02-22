@@ -162,7 +162,8 @@ export const WelcomePage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  // const [isTopicsUpdating, setTopicsUpdating] = useState(false);
+  // const [isTopicsUpdating, setTopicsUpdating] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [topicList, setTopicList] = useState<UserTopic[]>();
 
   const topicsQueryParam = searchParams.get('topics');
@@ -218,7 +219,10 @@ export const WelcomePage: React.FC = () => {
 
   useEffect(() => {
     const processTopics = async () => {
-      if (!topicsQueryParam || !wallet || !wallet.address) return;
+      if (!topicsQueryParam || !wallet || !wallet.address) {
+        setIsLoading(false);
+        return;
+      }
 
       console.log('Set topics from query: ', topicsQueryParam);
 
@@ -241,8 +245,9 @@ export const WelcomePage: React.FC = () => {
         ));
       } catch (error) {
         console.error(error);
+      } finally {
+        setIsLoading(false); // data processing is complete, stop loading
       }
-
       navigate(`/0/${addressWithoutPrefix}`);
     };
 
@@ -292,11 +297,13 @@ export const WelcomePage: React.FC = () => {
       margin={'0 auto'}
     >
       {/* <Spin spinning={isTopicsUpdating} size={"large"}> */}
-      <WelcomeContainer>
-        {[1, 2, 3].map((group) => (
-          <Box key={group}>{renderTopicsContainer(group)}</Box>
-        ))}
-      </WelcomeContainer>
+      {!isLoading ? <div /> : (
+        <WelcomeContainer>
+          {[1, 2, 3].map((group) => (
+            <Box key={group}>{renderTopicsContainer(group)}</Box>
+          ))}
+        </WelcomeContainer>
+      )}
       {/* </Spin> */}
     </Box>
   );
