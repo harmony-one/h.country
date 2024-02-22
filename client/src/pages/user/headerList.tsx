@@ -7,8 +7,8 @@ import styled from "styled-components";
 import { db } from "../../configs/firebase-config";
 import { addMessageWithGeolocation } from "../../api";
 import { socialUrlParser } from "../../utils";
-import {ReactComponent as NumberImg} from '../../assets/images/number.svg'
-import {ReactComponent as SlashImg} from '../../assets/images/slash.svg'
+import { ReactComponent as NumberImg } from '../../assets/images/number.svg'
+import { ReactComponent as SlashImg } from '../../assets/images/slash.svg'
 
 export const HeaderText = styled(Text)`
   font-size: min(1em, 4vw);
@@ -33,7 +33,7 @@ export const SmallHeaderText = styled(Text)`
   }
 `;
 
-const HeaderListIcon = styled(Box)<{ isUserPage?: Boolean }>`
+const HeaderListIcon = styled(Box) <{ isUserPage?: Boolean }>`
   
   ${(props) => !props.isUserPage ?
     `filter: brightness(0) 
@@ -62,6 +62,7 @@ interface HeaderListProps {
   type: "url" | "hashtag";
   items: Array<{
     id: string;
+    index: number;
     text: JSX.Element | string;
     predefined?: boolean;
     providerName?: string;
@@ -154,7 +155,7 @@ export const HeaderList = (props: HeaderListProps) => {
       align={"center"}
     >
       {type === "hashtag"
-        ? <Box style={{ flex: '5'}}>
+        ? <Box style={{ flex: '5' }}>
           <div
             style={{
               display: "grid",
@@ -179,7 +180,7 @@ export const HeaderList = (props: HeaderListProps) => {
             ))}
           </div>
         </Box>
-        : <Box style={{ flex: '5'}}>
+        : <Box style={{ flex: '5' }}>
           <div
             style={{
               display: "grid",
@@ -187,12 +188,12 @@ export const HeaderList = (props: HeaderListProps) => {
               gridAutoColumns: "1fr",
             }}
           >
-            {items.map((item, index) => (
+            {items.map((item) => (
               <div
-                key={index}
+                key={item.index}
                 style={{
-                  gridRowStart: (index % 3) + 1,
-                  gridColumnStart: Math.floor(index / 3) + 1,
+                  gridRowStart: (item.index % 3) + 1,
+                  gridColumnStart: Math.floor(item.index / 3) + 1,
                   width: "100%",
                   textAlign: "left"
                 }}
@@ -200,7 +201,7 @@ export const HeaderList = (props: HeaderListProps) => {
                 <Box key={item.id}>
                   {(item.predefined === true && item.providerName !== undefined) ?
                     <Button plain>
-                      <HeaderText onClick={() => {onTitleClick({providerName: item.providerName!})}}>{item.text}</HeaderText>
+                      <HeaderText onClick={() => { onTitleClick({ providerName: item.providerName! }) }}>{item.text}</HeaderText>
                     </Button> :
                     <HeaderText>{item.text}</HeaderText>}
                 </Box>
@@ -209,7 +210,7 @@ export const HeaderList = (props: HeaderListProps) => {
           </div>
         </Box>
       }
-      <Button plain onClick={() => onTitleClick({providerName: "any"})}>
+      <Button plain onClick={() => onTitleClick({ providerName: "any" })}>
         <HeaderListIcon width={'60px'} align={"start"} pad={'8px'} isUserPage={isUserPage}>
           {type === "hashtag"
             ? <NumberImg />

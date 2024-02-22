@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, Spinner, Text } from "grommet";
 import styled from "styled-components";
 import { StarOutlined } from "@ant-design/icons"; // FireOutlined, HeartOutlined,
@@ -10,7 +10,7 @@ import { useUserContext } from "../../context";
 
 import { HeaderList } from "./headerList";
 import { PlainButton, PlainText } from "../../components/button";
-import { useIsUserPage, useTopTags, useUrls } from "./hooks";
+import { useIsUserPage, useTopLocations, useTopTags, useUrls } from "./hooks";
 
 const UserPageBox = styled(Box)`
   .filter-panel {
@@ -29,8 +29,24 @@ export const UserPage = (props: { id: string }) => {
   const { id: key } = props;
 
   const tagItems = useTopTags();
-  const extendedUrls = useUrls();
+  const locationItems = useTopLocations();
+  const urls = useUrls();
   const isUserPage = useIsUserPage();
+
+  const indexedUrls = useMemo(
+    () => urls.map((u, i) => ({ ...u, index: i })),
+    [urls]
+  );
+
+  const indexedItems = useMemo(
+    () => [
+      // to be displayed in column 1,2
+      ...tagItems.slice(0, 6).map((item, idx) => ({ ...item, index: idx })),
+      // to be displayed in column 3
+      ...locationItems.map((item, idx) => ({ ...item, index: 6 + idx }))
+    ],
+    [tagItems, locationItems]
+  );
 
   const {
     actions,
@@ -81,8 +97,8 @@ export const UserPage = (props: { id: string }) => {
   return (
     <UserPageBox>
       <Box gap={"16px"} pad={"0 16px"}>
-        <HeaderList {...headerListProps} type={"url"} items={extendedUrls} />
-        <HeaderList {...headerListProps} type={"hashtag"} items={tagItems} />
+        <HeaderList {...headerListProps} type={"url"} items={indexedUrls} />
+        <HeaderList {...headerListProps} type={"hashtag"} items={indexedItems} />
       </Box>
       <div className="filter-panel">
         <Box direction={"row"}>
