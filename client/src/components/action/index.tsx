@@ -5,6 +5,7 @@ import moment from 'moment'
 import { Action } from "../../types";
 import { socialUrlParser, formatAddress } from "../../utils";
 import styled from "styled-components";
+import useInterval from "../../hooks/useInterval";
 
 export enum ActionType {
   self = 'self',
@@ -56,11 +57,24 @@ export interface UserActionProps {
 
 export const UserAction = (props: UserActionProps) => {
   const { action, userId } = props
+
+  const [actionTime, setActionTime] = useState(moment(action.timestamp).fromNow())
   const [actionType, setActionType] = useState<ActionType>(ActionType.none)
+
   useEffect(() => {
     setActionType(handleActionType(action, userId || ''))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Dynamically update date
+  useInterval(() => {
+    const delta = Date.now() - new Date(action.timestamp).valueOf()
+    if(Math.ceil(delta) < 60_000) {
+      setActionTime(`${Math.round(delta / 1000)}s`)
+    } else if (delta < 24 * 60_000) {
+      setActionTime(moment(action.timestamp).fromNow())
+    }
+  }, 1000)
 
   const onTagClicked = () => {
     if (props.onTagClicked && action.payload) {
@@ -106,10 +120,27 @@ export const UserAction = (props: UserActionProps) => {
             </Text>
           }
           {action.type === 'new_user' &&
-            <Text color='#B3B3B3' size={"small"}>
-              <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
-              {" joins"}
-            </Text>
+              <Text size={"medium"}>
+                {action.payload && action.payload.referrerAddress &&
+                    <ActionLink
+                        className="link"
+                        to={`/0/${action.payload.referrerAddress}`}
+                        type={ActionType.other}
+                    >
+                        0/{action.payload.referrerAddress.slice(0, 4)}
+                    </ActionLink>
+                }
+                {action.payload && action.payload.referrerAddress &&
+                    <ActionText color='#B3B3B3'>{" adds "}</ActionText>
+                }
+                <ActionText color='#B3B3B3'>
+                    <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
+                </ActionText>
+                {/* Referrer data is missing, display default text */}
+                {! (action.payload && action.payload.referrerAddress) &&
+                    <ActionText color='#B3B3B3'>{" joins "}</ActionText>
+                }
+              </Text>
           }
         </Box>
         {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
@@ -122,7 +153,7 @@ export const UserAction = (props: UserActionProps) => {
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
           <Text size={"xsmall"}>
-            {moment(action.timestamp).fromNow()}
+            {actionTime}
           </Text>
         </Box>
       </Box>
@@ -153,10 +184,10 @@ export const UserAction = (props: UserActionProps) => {
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
           <Text size={"xsmall"}>
-            {moment(action.timestamp).fromNow()}
+            {actionTime}
           </Text>
         </Box>
-      </Box>}  
+      </Box>}
     {action.type === 'location' &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
         <Box basis={address ? "50%" : "90%"}>
@@ -177,7 +208,7 @@ export const UserAction = (props: UserActionProps) => {
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
           <Text size={"xsmall"}>
-            {moment(action.timestamp).fromNow()}
+            {actionTime}
           </Text>
         </Box>
       </Box>}
