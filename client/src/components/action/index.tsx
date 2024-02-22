@@ -6,22 +6,23 @@ import { Action } from "../../types";
 import { socialUrlParser, formatAddress } from "../../utils";
 import styled from "styled-components";
 
+
 export enum ActionType {
   self = 'self',
   other = 'other',
   verified = 'verified',
   none = 'none'
 }
-const handleActionTypeColor = (type: ActionType) => {
+const handleActionTypeColor = (type: ActionType, theme: any) => {
   switch (type) {
     case 'verified':
-      return "#a0ffa0 !important"
+      return `${theme.global.colors.green1}`;
     case 'other':
-      return "#FFF7AD !important";
+      return `${theme.global.colors.yellow1}`;
     case 'self':
-      return "#64ebfd !important"; // self
+      return `${theme.global.colors.blue1}`;
     default:
-      return "#B3B3B3 !important";
+      return `${theme.global.colors.grey1}`;
   }
 };
 
@@ -36,12 +37,12 @@ export const handleActionType = (action: Action, walletAddress: string) => {
 
 export const ActionText = styled(Text) <{ type?: ActionType }>`
   font-size: min(1em, 4vw);
-  color: ${(props) => props.type && handleActionTypeColor(props.type)};
+  color: ${(props) => props.type && handleActionTypeColor(props.type, props.theme)};
   cursor: ${(props) => props.type && props.type !== 'none' ? 'pointer' : 'auto'};
 `
 export const ActionLink = styled(Link) <{ type?: ActionType }>`
   :visited, :link, :hover, :active {
-    color: ${(props) => props.type && handleActionTypeColor(props.type)};
+    color: ${(props) => props.type && handleActionTypeColor(props.type, props.theme)};
   }
   font-size: min(1em, 4vw);
   text-decoration: ${(props) => props.type && props.type !== 'none' ? 'underline' : 'none'};
