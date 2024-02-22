@@ -281,7 +281,7 @@ export const UserPage = (props: { id: string }) => {
             isActive={filterMode === "all"}
             onClick={() => setFilterMode("all")}
           >
-            <PlainText fontSize="min(1em, 4vw)">all</PlainText>
+            <PlainText fontSize="min(1em, 4vw)" color='#B3B3B3'>all</PlainText>
           </PlainButton>
           <PlainButton
             isActive={filterMode === "address"}
@@ -290,7 +290,8 @@ export const UserPage = (props: { id: string }) => {
           >
             <PlainText
               fontSize="min(1em, 4vw)"
-              color={isUserPage ? "blue1" : "yellow1"}
+              color='#B3B3B3'
+              // color={isUserPage ? "blue1" : "yellow1"}
             >
               {key?.substring(0, 4)}
             </PlainText>
@@ -314,7 +315,7 @@ export const UserPage = (props: { id: string }) => {
                   isActive={filters.length > 0}
                   onClick={onClick}
                 >
-                  <Text color={isUserPage ? "blue1" : "yellow1"}>#{value}</Text>
+                  <PlainText color={isUserPage ? "blue1" : "yellow1"}>#{value}</PlainText>
                 </PlainButton>
               );
             })}
@@ -340,7 +341,7 @@ export const UserPage = (props: { id: string }) => {
               }
             }}
           >
-            <PlainText fontSize="min(1em, 4vw)">#one</PlainText>
+            <PlainText fontSize="min(1em, 4vw)" color='#B3B3B3'>#one</PlainText>
           </PlainButton>
           <PlainButton
             isActive={filterMode === "hashtag"}
@@ -362,10 +363,10 @@ export const UserPage = (props: { id: string }) => {
               }
             }}
           >
-            <PlainText fontSize="min(1em, 4vw)">#ai</PlainText>
+            <PlainText fontSize="min(1em, 4vw)" color='#B3B3B3'>#ai</PlainText>
           </PlainButton>
-          <PlainButton style={{ padding: '2px' }}>
-            <PlainText fontSize="min(1em, 4vw)">
+          <PlainButton style={{ padding: '2px'}}>
+            <PlainText fontSize="min(1em, 4vw)" color='#B3B3B3'>
               <StarOutlined />
             </PlainText>
           </PlainButton>

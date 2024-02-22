@@ -5,7 +5,6 @@ import moment from 'moment'
 import { Action } from "../../types";
 import { socialUrlParser, formatAddress } from "../../utils";
 import styled from "styled-components";
-import { PlainText } from "../button";
 
 export enum ActionType {
   self = 'self',
@@ -22,7 +21,7 @@ const handleActionTypeColor = (type: ActionType) => {
     case 'self':
       return "#64ebfd !important"; // self
     default:
-      return "#fff !important";
+      return "#B3B3B3 !important";
   }
 };
 
@@ -90,7 +89,7 @@ export const UserAction = (props: UserActionProps) => {
             <Text size={"small"} style={{ wordBreak: 'break-all' }}>
               <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
               {" "}
-              <ActionText size={"small"} onClick={onTagClicked} type={actionType}>#{action.payload}</ActionText>
+              <ActionText onClick={onTagClicked} type={actionType}>#{action.payload}</ActionText>
               {" "}
               <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
             </Text>
@@ -107,10 +106,10 @@ export const UserAction = (props: UserActionProps) => {
             </Text>
           }
           {action.type === 'new_user' &&
-            <Text size={"small"}>
+            <ActionText color='#B3B3B3'>
               <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
               {" joins"}
-            </Text>
+            </ActionText>
           }
         </Box>
         {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
@@ -170,17 +169,16 @@ export const UserAction = (props: UserActionProps) => {
           </Text>
         </Box>
         {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
-          <Text
+          <ActionText
             onClick={() => onLocationClicked(address)}
-            style={{ textAlign: "right", cursor: 'pointer' }}
-            size={"small"}>
+            style={{ textAlign: "right", cursor: 'pointer' }}>
             {address}
-          </Text>
+          </ActionText>
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
-          <PlainText>
+          <ActionText>
             {moment(action.timestamp).fromNow()}
-          </PlainText>
+          </ActionText>
         </Box>
       </Box>}
   </Box>
