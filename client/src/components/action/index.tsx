@@ -71,7 +71,7 @@ export const UserAction = (props: UserActionProps) => {
     const delta = Date.now() - new Date(action.timestamp).valueOf()
     if(delta < 60_000) {
       setActionTime(`${Math.round(delta / 1000)}s`)
-    } else {
+    } else if (delta < 24 * 60 * 60_000) {
       setActionTime(moment(action.timestamp).fromNow())
     }
   }, 1000)
