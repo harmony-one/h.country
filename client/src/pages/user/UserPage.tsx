@@ -13,26 +13,10 @@ import { formatAddress, linkToMapByAddress } from "../../utils";
 import { useUserContext } from "../../context/UserContext";
 import { db } from "../../configs/firebase-config";
 
-import { HeaderList } from "./headerList";
+import { HeaderList, HeaderText, SmallHeaderText } from "./headerList";
 import { PlainButton, PlainText } from "../../components/button";
 import { predefinedLinks } from "../../components/links";
 
-const HeaderText = styled(Text)`
-  font-size: min(1em, 3vw);
-`;
-
-const SmallHeaderText = styled(Text)`
-  font-size: min(0.8em, 2.5vw);
-  line-height: 2.3em;
-
-  @media only screen and (min-width: 380px) {
-    line-height: 2em;
-  }
-
-  @media only screen and (min-width: 450px) {
-    line-height: 1em;
-  }
-`;
 
 const UserPageBox = styled(Box)`
   .filter-panel {
@@ -108,7 +92,7 @@ export const UserPage = (props: { id: string }) => {
             if (data[key] && data[key].username && data[key].url) {
               return {
                 id: docSnap.id + key,
-                text: (
+                text: (<HeaderText>
                   <a
                     href={data[key].url}
                     target="_blank"
@@ -116,7 +100,7 @@ export const UserPage = (props: { id: string }) => {
                     style={{ color: "white", textDecoration: "none" }}
                   >
                     {`${key}/${data[key].username}`}
-                  </a>
+                  </a></HeaderText>
                 ),
                 predefined: false,
                 providerName: providerName,
@@ -125,7 +109,7 @@ export const UserPage = (props: { id: string }) => {
               // Return a default link item with the display text if the key does not exist
               return {
                 id: docSnap.id + key,
-                text: <Text>{displayName}</Text>,
+                text: <HeaderText>{displayName}</HeaderText>,
                 predefined: true,
                 providerName: providerName,
               };

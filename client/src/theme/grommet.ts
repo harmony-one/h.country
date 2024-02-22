@@ -5,7 +5,7 @@ export const theme: ThemeValue = {
     font: {
       family: 'Nunito',
       color: {
-        "dark": "#ffffff",
+        "dark": "#B3B3B3",
         "light": '#323232'
       },
     },

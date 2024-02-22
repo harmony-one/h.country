@@ -5,6 +5,7 @@ import moment from 'moment'
 import { Action } from "../../types";
 import { socialUrlParser, formatAddress } from "../../utils";
 import styled from "styled-components";
+import { PlainText } from "../button";
 
 export enum ActionType {
   self = 'self',
@@ -35,6 +36,7 @@ export const handleActionType = (action: Action, walletAddress: string) => {
 }
 
 export const ActionText = styled(Text) <{ type?: ActionType }>`
+  font-size: min(1em, 4vw);
   color: ${(props) => props.type && handleActionTypeColor(props.type)};
   cursor: ${(props) => props.type && props.type !== 'none' ? 'pointer' : 'auto'};
 `
@@ -42,7 +44,7 @@ export const ActionLink = styled(Link) <{ type?: ActionType }>`
   :visited, :link, :hover, :active {
     color: ${(props) => props.type && handleActionTypeColor(props.type)};
   }
-  
+  font-size: min(1em, 4vw);
   text-decoration: ${(props) => props.type && props.type !== 'none' ? 'underline' : 'none'};
 `;
 
@@ -161,9 +163,9 @@ export const UserAction = (props: UserActionProps) => {
           </Text>
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
-          <Text size={"small"}>
+          <PlainText>
             {moment(action.timestamp).fromNow()}
-          </Text>
+          </PlainText>
         </Box>
       </Box>}
   </Box>
