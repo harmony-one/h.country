@@ -11,6 +11,7 @@ export const AppRoutes = () => {
   return (
     <Routes>
       <Route path={'/hash'} element={<WelcomePage />} />
+      <Route path={'/new'} element={<WelcomePage />} />
       <Route element={<AppLayout />}>
         <Route path={'/'} element={<MainPage />} />
         <Route path="/h/:tagName" element={<TagPageByName />} />
