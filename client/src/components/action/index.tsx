@@ -69,7 +69,7 @@ export const UserAction = (props: UserActionProps) => {
   // Dynamically update date
   useInterval(() => {
     const delta = Date.now() - new Date(action.timestamp).valueOf()
-    if(Math.ceil(delta) < 60_000) {
+    if (Math.ceil(delta) < 60_000) {
       setActionTime(`${Math.round(delta / 1000)}s`)
     } else if (delta < 24 * 60_000) {
       setActionTime(moment(action.timestamp).fromNow())
@@ -116,31 +116,33 @@ export const UserAction = (props: UserActionProps) => {
               {" "}
               <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
               {" "}
-              ({String(action.payload.count)})
+              ({typeof action.payload.count === 'object' ?
+                '' :
+                String(action.payload.count)})
             </Text>
           }
           {action.type === 'new_user' &&
-              <Text size={"medium"}>
-                {action.payload && action.payload.referrerAddress &&
-                    <ActionLink
-                        className="link"
-                        to={`/0/${action.payload.referrerAddress}`}
-                        type={ActionType.other}
-                    >
-                        0/{action.payload.referrerAddress.slice(0, 4)}
-                    </ActionLink>
-                }
-                {action.payload && action.payload.referrerAddress &&
-                    <ActionText color='#B3B3B3'>{" adds "}</ActionText>
-                }
-                <ActionText color='#B3B3B3'>
-                    <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
-                </ActionText>
-                {/* Referrer data is missing, display default text */}
-                {! (action.payload && action.payload.referrerAddress) &&
-                    <ActionText color='#B3B3B3'>{" joins "}</ActionText>
-                }
-              </Text>
+            <Text size={"medium"}>
+              {action.payload && action.payload.referrerAddress &&
+                <ActionLink
+                  className="link"
+                  to={`/0/${action.payload.referrerAddress}`}
+                  type={ActionType.other}
+                >
+                  0/{action.payload.referrerAddress.slice(0, 4)}
+                </ActionLink>
+              }
+              {action.payload && action.payload.referrerAddress &&
+                <ActionText color='#B3B3B3'>{" adds "}</ActionText>
+              }
+              <ActionText color='#B3B3B3'>
+                <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
+              </ActionText>
+              {/* Referrer data is missing, display default text */}
+              {!(action.payload && action.payload.referrerAddress) &&
+                <ActionText color='#B3B3B3'>{" joins "}</ActionText>
+              }
+            </Text>
           }
         </Box>
         {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
