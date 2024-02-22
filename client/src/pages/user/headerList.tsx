@@ -10,9 +10,28 @@ import { socialUrlParser } from "../../utils";
 import {ReactComponent as NumberImg} from '../../assets/images/number.svg'
 import {ReactComponent as SlashImg} from '../../assets/images/slash.svg'
 
-const HeaderText = styled(Text)`
-  font-size: min(1em, 3vw);
-`
+export const HeaderText = styled(Text)`
+  font-size: min(1em, 4vw);
+  color: #B3B3B3;
+
+  a {
+    color: #B3B3B3;
+  }
+`;
+
+export const SmallHeaderText = styled(Text)`
+  font-size: min(0.8em, 2.5vw);
+  line-height: 2.3em;
+  color: #B3B3B3;
+  
+  @media only screen and (min-width: 380px) {
+    line-height: 2em;
+  }
+
+  @media only screen and (min-width: 450px) {
+    line-height: 1em;
+  }
+`;
 
 const HeaderListIcon = styled(Box)<{ isUserPage?: Boolean }>`
   
