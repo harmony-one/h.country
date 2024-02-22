@@ -5,7 +5,7 @@ export const updateMomentJSConfig = () => {
   moment.updateLocale('en', {
     relativeTime : {
       future: "in %s",
-      past:   "%s", // "%s ago"
+      past: "%s", // "%s ago"
       s  : '%ds',
       ss : '%ds',
       m:  "1m",

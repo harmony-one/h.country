@@ -68,7 +68,10 @@ export const UserAction = (props: UserActionProps) => {
 
   // Dynamically update date
   useInterval(() => {
-    if(Date.now() - new Date(action.timestamp).valueOf() < 60_000) {
+    const delta = Date.now() - new Date(action.timestamp).valueOf()
+    if(delta < 60_000) {
+      setActionTime(`${Math.round(delta / 1000)}s`)
+    } else {
       setActionTime(moment(action.timestamp).fromNow())
     }
   }, 1000)
