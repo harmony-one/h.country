@@ -4,7 +4,7 @@ import { Box } from "grommet";
 import { toast } from "react-toastify";
 import { getTopicLits } from "../../constants";
 import styled from "styled-components";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useUserContext } from "../../context/UserContext";
 import { UserTopic } from "../../types";
 import { Typography } from "antd"; // Spin
@@ -160,12 +160,15 @@ export const WelcomePage: React.FC = () => {
   const { wallet, firstTimeVisit } = useUserContext();
 
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  // const [searchParams] = useSearchParams();
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   // const [isTopicsUpdating, setTopicsUpdating] = useState(true);
   const [topicList, setTopicList] = useState<UserTopic[]>();
 
-  const topicsQueryParam = searchParams.get('topics');
+  // const topicsQueryParam = searchParams.get('topics');
+
+  const location = useLocation();
+  const topicsQueryParam = location.search.substring(1);
 
   useEffect(() => {
     const getTopics = async () => {
