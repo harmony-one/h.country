@@ -117,9 +117,9 @@ export const UserAction = (props: UserActionProps) => {
               {" "}
               <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
               {" "}
-              ({typeof action.payload.count === 'object' ?
+              {typeof action.payload.count === 'object' ?
                 '' :
-                String(action.payload.count)})
+                (String(action.payload.count))}
             </Text>
           }
           {action.type === 'new_user' &&

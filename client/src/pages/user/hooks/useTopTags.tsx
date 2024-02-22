@@ -54,7 +54,7 @@ export const useTopTags = () => {
                             "count" in payload
                         ) {
                             const tag = payload.tag as string;
-                            const count = payload.count as number;
+                            const count = typeof payload.count === 'number' ? payload.count : 1;
                             acc[tag] = (acc[tag] || 0) + count;
                         }
                     }
