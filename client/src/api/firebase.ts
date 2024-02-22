@@ -1,4 +1,18 @@
-import { collection, getDocs, setDoc, doc, query, where, orderBy, addDoc, DocumentData, QueryDocumentSnapshot, limit, WhereFilterOp } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  setDoc,
+  doc,
+  query,
+  where,
+  orderBy,
+  addDoc,
+  DocumentData,
+  QueryDocumentSnapshot,
+  limit,
+  WhereFilterOp,
+  onSnapshot
+} from 'firebase/firestore';
 import { db } from "../configs/firebase-config";
 import { Action, AddressComponents, LocationData } from "../types";
 import axios from "axios";
@@ -8,31 +22,8 @@ export interface IFilter { fieldPath: string; opStr: WhereFilterOp; value: any; 
 
 export const genFilter = (fieldPath: string, opStr: WhereFilterOp, value: any) => ({ fieldPath, opStr, value })
 
-export const getMessages = async (filters: IFilter[] = []): Promise<Action[]> => {
-  let data: QueryDocumentSnapshot<DocumentData, DocumentData>[] = []
-
-  if (filters.length) {
-    const res = await Promise.all(filters.map(async filter => {
-      const q = query(
-        collection(db, "actions"),
-        orderBy("timestamp", "desc"),
-        where(filter.fieldPath, filter.opStr, filter.value)
-      );
-
-      return (await getDocs(q)).docs;
-    }))
-
-    data = [].concat.apply([], res as any);
-  } else {
-    const q = query(
-      collection(db, "actions"),
-      orderBy("timestamp", "desc")
-    );
-
-    data = (await getDocs(q)).docs;
-  }
-
-  return data
+const formatMessages = (messages: QueryDocumentSnapshot[]) => {
+  return messages
     .map((doc) => ({ id: doc.id, data: doc.data() }))
     .filter(
       (value, index, self) =>
@@ -55,6 +46,60 @@ export const getMessages = async (filters: IFilter[] = []): Promise<Action[]> =>
     .sort((a, b) => {
       return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     })
+}
+
+export interface GetMessagesParams {
+  filters?: IFilter[]
+  updateCallback?: (actions: Action[]) => void
+}
+
+export const getMessages = async (params: GetMessagesParams = {}): Promise<{
+  actions: Action[],
+  unsubscribeList: Array<() => void>
+}> => {
+  const { filters = [], updateCallback } = params
+  let data: QueryDocumentSnapshot<DocumentData, DocumentData>[] = []
+
+  const unsubscribeList = []
+  if (filters.length) {
+    const res = await Promise.all(filters.map(async filter => {
+      const q = query(
+        collection(db, "actions"),
+        orderBy("timestamp", "desc"),
+        where(filter.fieldPath, filter.opStr, filter.value)
+      );
+
+      if(updateCallback) {
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+          updateCallback(formatMessages(querySnapshot.docs))
+        })
+        unsubscribeList.push(unsubscribe)
+      }
+
+      return (await getDocs(q)).docs;
+    }))
+
+    data = [].concat.apply([], res as any);
+  } else {
+    const q = query(
+      collection(db, "actions"),
+      orderBy("timestamp", "desc")
+    );
+
+    if(updateCallback) {
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        updateCallback(formatMessages(querySnapshot.docs))
+      })
+      unsubscribeList.push(unsubscribe)
+    }
+
+    data = (await getDocs(q)).docs;
+  }
+
+  return {
+    actions: formatMessages(data),
+    unsubscribeList
+  }
 }
 
 export const getLatestLocation = async (address: string): Promise<Action> => {

@@ -65,7 +65,6 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
     setActions([])
 
     try {
-      let items: Action[]
       let actionFilters: IFilter[] = []
       if (filterMode === "address" && pageOwnerAddress) {
         actionFilters = [
@@ -85,7 +84,15 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
         ]
       }
       console.log('Fetching actions...', actionFilters)
-      items = await getMessages(actionFilters);
+      const { actions: items, unsubscribeList } = await getMessages({
+        filters: actionFilters,
+        updateCallback: (newActions: Action[]) => {
+          setActions(newActions)
+          console.log('Actions updated', newActions)
+        }
+      });
+
+      console.log('unsubscribeList', unsubscribeList)
 
       setActions(items)
       console.log('Actions loaded:', items)
@@ -99,8 +106,6 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
   useEffect(() => {
     loadActions()
   }, [filterMode, pageOwnerAddress, filters, loadActions]);
-
-
 
   const value = useMemo(() => {
     return {
