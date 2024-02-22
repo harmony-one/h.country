@@ -17,7 +17,7 @@ export const useTopLocations = () => {
         const messagesQuery = query(
             collection(db, "actions"),
             where("from", "==", pageOwnerAddress),
-            where("type", "in", ["tag", "multi_tag", "location"])
+            where("type", "in", ["tag", "multi_tag", "location", 'link'])
         );
 
         const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
