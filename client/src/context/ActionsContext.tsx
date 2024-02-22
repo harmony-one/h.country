@@ -90,10 +90,10 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
       const data = await getMessages({
         filters: actionFilters,
         updateCallback: (newActions: Action[]) => {
-          if(!isLoading) {
-            setActions(newActions)
-            console.log('Actions updated', newActions)
-          }
+          // if(!isLoading) {
+          //   setActions(newActions)
+          //   console.log('Actions updated', newActions)
+          // }
         }
       });
 
