@@ -123,7 +123,7 @@ export const addMessage = async (params: {
   const mentions = [...text.matchAll(/@(\w+)/g)].map((match) => match[1]);
   const hashtags = [...text.matchAll(/#(\w+)/g)].map((match) => match[1]);
   let type: string = "message";
-  let payload: string = text;
+  let payload: any = text;
 
   const urlRegex = /https?:\/\/[^\s]+/;
   const urlMatch = text.match(urlRegex);
@@ -138,8 +138,16 @@ export const addMessage = async (params: {
   } else if (text.includes("new_user")) {
     type = "new_user";
   } else if (mentions.length > 0 && hashtags.length > 0) {
-    type = "tag";
-    payload = hashtags[0]
+    if (customPayload) { // number of the tags
+      type = "multi_tag";
+      payload = {
+        "tag": hashtags[0],
+        "count": customPayload,
+      };
+    } else {
+      type = "tag";
+      payload = hashtags[0]
+    }
   }
 
   let action = {

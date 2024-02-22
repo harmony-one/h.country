@@ -147,7 +147,13 @@ const TopicItem = (props: TopicItemProps) => {
   );
 };
 
-
+const parseTagsFromUrl = (hashtagList: string): [string, number][] => {
+  const topics = hashtagList.split(",");
+  return topics.map((topic) => {
+    const [tag, counter = "1"] = topic.split("^");
+    return [tag, Number(counter) || 0];
+  });
+};
 
 export const WelcomePage: React.FC = () => {
   // const { user } = useUser();
@@ -159,7 +165,7 @@ export const WelcomePage: React.FC = () => {
   // const [isTopicsUpdating, setTopicsUpdating] = useState(false);
   const [topicList, setTopicList] = useState<UserTopic[]>();
 
-  const topicsQueryParam = searchParams.get('topics')
+  const topicsQueryParam = searchParams.get('topics');
 
   useEffect(() => {
     const getTopics = async () => {
@@ -171,7 +177,7 @@ export const WelcomePage: React.FC = () => {
 
   useEffect(() => {
     const tagsTopic = async () => {
-      let locationData = {
+      const locationData = {
         latitude: null as number | null,
         longitude: null as number | null,
         address: "No Address",
@@ -211,10 +217,36 @@ export const WelcomePage: React.FC = () => {
   }, [selectedTopics, wallet, wallet?.address, navigate, firstTimeVisit]);
 
   useEffect(() => {
-    if (topicsQueryParam && wallet && wallet.address) {
-      console.log('Set topics from query: ', topicsQueryParam)
-      navigate(`/0/${wallet.address.substring(2)}?topics=${topicsQueryParam}`);
-    }
+    const processTopics = async () => {
+      if (!topicsQueryParam || !wallet || !wallet.address) return;
+
+      console.log('Set topics from query: ', topicsQueryParam);
+
+      const parsedTags = parseTagsFromUrl(topicsQueryParam);
+      const addressWithoutPrefix = wallet.address.substring(2);
+      const locationData = {
+        latitude: null,
+        longitude: null,
+        address: "No Address",
+      };
+
+      try {
+        await Promise.all(parsedTags.map((tag: [string, number]) =>
+          addMessage({
+            locationData,
+            from: addressWithoutPrefix,
+            text: `#${tag[0]} @${addressWithoutPrefix}`,
+            customPayload: tag[1] > 1 ? Math.min(tag[1], 99) : undefined, // cap to 99 for each multi tag
+          })
+        ));
+      } catch (error) {
+        console.error(error);
+      }
+
+      navigate(`/0/${addressWithoutPrefix}`);
+    };
+
+    processTopics();
   }, [topicsQueryParam, wallet, navigate]);
 
   const handleTopicClick = (topic: UserTopic) => {

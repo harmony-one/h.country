@@ -58,9 +58,13 @@ interface TagItem {
   text: JSX.Element;
 }
 
+type TagPayload = string;
+type MultiTagPayload = { count: number; tag: string };
+
 interface Message {
   id: string;
-  payload?: string[];
+  payload?: TagPayload | MultiTagPayload; 
+  type: string;
 }
 
 const parseTagsFromUrl = (hashtagList: string): [string, number][] => {
@@ -159,7 +163,7 @@ export const UserPage = (props: { id: string }) => {
     const messagesQuery = query(
       collection(db, "actions"),
       where("to", "==", key),
-      where("type", "==", "tag")
+      where("type", "in", ["tag", "multi_tag"])
     );
 
     const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
@@ -168,15 +172,22 @@ export const UserPage = (props: { id: string }) => {
         id: doc.id,
       })) as Message[];
 
-      const allHashtags = messages.flatMap((msg) => msg.payload || []);
-
-      const hashtagFrequency = allHashtags.reduce<Record<string, number>>(
-        (acc, hashtag) => {
-          acc[hashtag] = (acc[hashtag] || 0) + 1;
-          return acc;
-        },
-        {}
-      );
+      const hashtagFrequency = messages.reduce<Record<string, number>>((acc, message) => {
+        const payload = message.payload;
+        if (message.type === "tag") {
+          if (typeof payload === 'string') {
+            acc[payload] = (acc[payload] || 0) + 1;
+          }
+        } else if (message.type === "multi_tag") {
+          if (typeof payload === 'object' && 'tag' in payload && 'count' in payload) {
+            const tag = payload.tag as string;
+            const count = payload.count as number;
+            acc[tag] = (acc[tag] || 0) + count;
+          }
+        }
+    
+        return acc;
+      }, {});
 
       const tagsFromUrl = topicsQueryParam
         ? parseTagsFromUrl(topicsQueryParam || "")
