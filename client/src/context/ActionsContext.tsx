@@ -12,6 +12,7 @@ import {
 import { ActionFilter, ActionFilterType, AddressComponents } from "../types";
 import { getMessages, genFilter, IFilter } from "../api";
 import { useUserContext } from "./UserContext";
+import {  Unsubscribe } from 'firebase/firestore';
 
 interface Action {
   timestamp: string;
@@ -64,8 +65,9 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
     setLoading(true)
     setActions([])
 
+    let unsubscribeList: Unsubscribe[] = []
+
     try {
-      let items: Action[]
       let actionFilters: IFilter[] = []
       if (filterMode === "address" && pageOwnerAddress) {
         actionFilters = [
@@ -85,22 +87,35 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
         ]
       }
       console.log('Fetching actions...', actionFilters)
-      items = await getMessages(actionFilters);
+      const data = await getMessages({
+        filters: actionFilters,
+        updateCallback: (newActions: Action[]) => {
+          // if(!isLoading) {
+          //   setActions(newActions)
+          //   console.log('Actions updated', newActions)
+          // }
+        }
+      });
 
-      setActions(items)
-      console.log('Actions loaded:', items)
+      setActions(data.actions)
+      console.log('Actions loaded:', data.actions)
+      unsubscribeList = data.unsubscribeList
     } catch (e) {
       console.error('Failed to load messages:', e)
     } finally {
       setLoading(false)
+    }
+
+    return () => {
+      unsubscribeList.forEach(unsubscribe => {
+        unsubscribe()
+      })
     }
   }, [filterMode, pageOwnerAddress, filters]);
 
   useEffect(() => {
     loadActions()
   }, [filterMode, pageOwnerAddress, filters, loadActions]);
-
-
 
   const value = useMemo(() => {
     return {

@@ -87,10 +87,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
               console.log("[user context] /new: invalid private key; force generate a new wallet");
           }
       }
-      
+
       if (!newWallet) {
           newWallet = createRandomWallet();
-      }      
+      }
       setWallet(newWallet);
 
       // send a new user message
@@ -101,10 +101,14 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       };
       const addressWithoutPrefix = newWallet.address.slice(2);
       try {
+        const [, referrerAddress] = location.pathname.split('/0/')
         addMessage({
           locationData,
           from: addressWithoutPrefix,
-          text: "new_user"
+          text: "new_user",
+          customPayload: {
+            referrerAddress
+          }
         });
       } catch (error) {
         console.error("Failed to add message: ", error);

@@ -31,7 +31,7 @@ export const MainPage = () => {
     const loadData = async () => {
       try {
         setLoading(true)
-        const items = await getMessages()
+        const { actions: items } = await getMessages()
         setActions(items)
         if (items.length <= 1) {
           navigate('/hash');
