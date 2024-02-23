@@ -121,10 +121,10 @@ export const UserAction = (props: UserActionProps) => {
               <ActionText size={"small"} onClick={onTagClicked} type={actionType}>#{String(action.payload.tag)}</ActionText>
               {" "}
               <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
-              {" "}
+              {/* {" "}
               {typeof action.payload.count === 'object' ?
                 '' :
-                (String(action.payload.count))}
+                (String(action.payload.count))} */}
             </Text>
           }
           {action.type === 'new_user' &&
@@ -161,7 +161,7 @@ export const UserAction = (props: UserActionProps) => {
           <PlainText fontSize='min(0.8em, 3.7vw)'
             onClick={() => onLocationClicked(address)}
             style={{ textAlign: "right", cursor: 'pointer' }}>
-            {address}
+            {address.substring(0, 10)}
           </PlainText>
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
@@ -191,7 +191,7 @@ export const UserAction = (props: UserActionProps) => {
           <PlainText fontSize='min(0.8em, 3.7vw)'
             onClick={() => onLocationClicked(address)}
             style={{ textAlign: "right", cursor: 'pointer' }}>
-            {address}
+            {address.substring(0, 10)}
           </PlainText>
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
@@ -215,7 +215,7 @@ export const UserAction = (props: UserActionProps) => {
           <PlainText fontSize='min(0.8em, 3.7vw)'
             onClick={() => onLocationClicked(address)}
             style={{ textAlign: "right", cursor: 'pointer' }}>
-            {address}
+            {address.substring(0, 10)}
           </PlainText>
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
