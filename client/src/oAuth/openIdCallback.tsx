@@ -11,7 +11,7 @@ export const OpenIdCallback = () => {
 
     if (code) {
       // Update the endpoint to a more general name reflecting its purpose
-      fetch('/api/openid/exchange-code', {
+      fetch('https://arcane-scrubland-65117-d47280ee383b.herokuapp.com/api/openid/exchange-code', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
