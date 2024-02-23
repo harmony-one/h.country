@@ -93,7 +93,7 @@ export const HeaderList = (props: HeaderListProps) => {
   const onTitleClick = async ({ providerName }: TitleClickEvent) => {
     console.log("clicked", providerName)
     const input = window.prompt(
-      type === "hashtag" ? "Enter Hashtag (without #):" : `Enter ${providerName} account:`
+      type === "hashtag" ? "hash?" : `${providerName}?`
     );
 
     if (input === null) {
