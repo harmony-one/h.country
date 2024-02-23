@@ -29,7 +29,7 @@ const handleActionTypeColor = (type: ActionType, theme: any) => {
 
 export const handleActionType = (action: Action, walletAddress: string) => {
   // const myAddress = walletAddress ? walletAddress.slice(2) : '';
-  if (walletAddress === action.from) {
+  if (action.to === action.from) {
     return ActionType.self
   } else {
     return ActionType.other
