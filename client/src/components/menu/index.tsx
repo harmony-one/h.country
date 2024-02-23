@@ -2,14 +2,16 @@ import React from 'react'
 import { Box, Text } from "grommet"
 import { useUserContext } from '../../context/UserContext'
 import { LocationButton } from './LocationButton';
+import { useNavigate } from 'react-router-dom';
 
 export const AppMenu = () => {
   const { wallet } = useUserContext();
+  const navigate = useNavigate();
   const handleCopyPrivateKey = () => {
     const privateKey = wallet!.privateKey!.substring(2);
   
     navigator.clipboard.writeText(privateKey).then(() => {
-      alert("copied key to clipboard");
+      navigate(`/0/${wallet!.address.substring(2)}`);
     }).catch(_ => {
       // fallback
       const textarea = document.createElement('textarea');
@@ -18,7 +20,7 @@ export const AppMenu = () => {
       textarea.select();
       document.execCommand('copy');
       document.body.removeChild(textarea);
-      alert("copied key to clipboard");
+      navigate(`/0/${wallet!.address.substring(2)}`);
     });
   };
   
