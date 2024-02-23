@@ -7,23 +7,21 @@ import styled from "styled-components";
 import { db } from "../../configs/firebase-config";
 import { addMessageWithGeolocation } from "../../api";
 import { socialUrlParser } from "../../utils";
-import { ReactComponent as NumberImg } from '../../assets/images/number.svg'
-import { ReactComponent as SlashImg } from '../../assets/images/slash.svg'
 
 export const HeaderText = styled(Text)`
   font-size: min(1em, 4vw);
-  color: ${props => props.theme.global.colors.grey1};
+  color: ${(props) => props.theme.global.colors.grey1};
 
   a {
-    color: ${props => props.theme.global.colors.grey1};
+    color: ${(props) => props.theme.global.colors.grey1};
   }
 `;
 
 export const SmallHeaderText = styled(Text)`
   font-size: min(0.8em, 2.5vw);
   line-height: 2.3em;
-  color: ${props => props.theme.global.colors.grey1};
-  
+  color: ${(props) => props.theme.global.colors.grey1};
+
   @media only screen and (min-width: 380px) {
     line-height: 2em;
   }
@@ -33,28 +31,18 @@ export const SmallHeaderText = styled(Text)`
   }
 `;
 
-const HeaderListIcon = styled(Box) <{ isUserPage?: Boolean }>`
-  
-  ${(props) => !props.isUserPage ?
-    `filter: brightness(0) 
-      saturate(100%) 
-      invert(94%) 
-      sepia(54%) 
-      saturate(626%) 
-      hue-rotate(317deg) 
-      brightness(106%) 
-      contrast(104%);` : ''};
+const HeaderIcon = styled.span<{ isUserPage?: Boolean }>`
+  font-family: "M PLUS Rounded 1c", sans-serif;
+  color: transparent;
+  font-size: 80px;
+  -webkit-text-stroke: 1.5px
+    ${(props) =>
+      props.isUserPage
+        ? props.theme.global.colors.blue1
+        : props.theme.global.colors.yellow1};
+  font-weight: 700;
+`;
 
-  svg {
-    height: 70px
-  }
-   
-  @media only screen and (min-width: 450px) {
-    svg {
-      height: 100px
-    }
-  }
-`
 interface HeaderListProps {
   userId: string;
   isLoading?: boolean;
@@ -89,9 +77,11 @@ export const HeaderList = (props: HeaderListProps) => {
   };
 
   const onTitleClick = async ({ providerName }: TitleClickEvent) => {
-    console.log("clicked", providerName)
+    console.log("clicked", providerName);
     const input = window.prompt(
-      type === "hashtag" ? "Enter Hashtag (without #):" : `Enter ${providerName} account:`
+      type === "hashtag"
+        ? "Enter Hashtag (without #):"
+        : `Enter ${providerName} account:`
     );
 
     if (input === null) {
@@ -150,12 +140,9 @@ export const HeaderList = (props: HeaderListProps) => {
   };
 
   return (
-    <Box
-      direction={"row"}
-      align={"center"}
-    >
-      {type === "hashtag"
-        ? <Box style={{ flex: '5' }}>
+    <Box direction={"row"} align={"center"} height={"80px"}>
+      {type === "hashtag" ? (
+        <Box style={{ flex: "5" }}>
           <div
             style={{
               display: "grid",
@@ -170,7 +157,7 @@ export const HeaderList = (props: HeaderListProps) => {
                   gridRowStart: (index % 3) + 1,
                   gridColumnStart: Math.floor(index / 3) + 1,
                   width: "100%",
-                  textAlign: "left"
+                  textAlign: "left",
                 }}
               >
                 <Box key={item.id}>
@@ -180,7 +167,8 @@ export const HeaderList = (props: HeaderListProps) => {
             ))}
           </div>
         </Box>
-        : <Box style={{ flex: '5' }}>
+      ) : (
+        <Box style={{ flex: "5" }}>
           <div
             style={{
               display: "grid",
@@ -195,28 +183,42 @@ export const HeaderList = (props: HeaderListProps) => {
                   gridRowStart: (item.index % 3) + 1,
                   gridColumnStart: Math.floor(item.index / 3) + 1,
                   width: "100%",
-                  textAlign: "left"
+                  textAlign: "left",
                 }}
               >
                 <Box key={item.id}>
-                  {(item.predefined === true && item.providerName !== undefined) ?
+                  {item.predefined === true &&
+                  item.providerName !== undefined ? (
                     <Button plain>
-                      <HeaderText onClick={() => { onTitleClick({ providerName: item.providerName! }) }}>{item.text}</HeaderText>
-                    </Button> :
-                    <HeaderText>{item.text}</HeaderText>}
+                      <HeaderText
+                        onClick={() => {
+                          onTitleClick({ providerName: item.providerName! });
+                        }}
+                      >
+                        {item.text}
+                      </HeaderText>
+                    </Button>
+                  ) : (
+                    <HeaderText>{item.text}</HeaderText>
+                  )}
                 </Box>
               </div>
             ))}
           </div>
         </Box>
-      }
-      <Button plain onClick={() => onTitleClick({ providerName: "any" })}>
-        <HeaderListIcon width={'60px'} align={"start"} pad={'8px'} isUserPage={isUserPage}>
-          {type === "hashtag"
-            ? <NumberImg />
-            : <SlashImg />
-          }
-        </HeaderListIcon>
+      )}
+      <Button
+        plain
+        onClick={() => onTitleClick({ providerName: "any" })}
+        pad={"8px"}
+      >
+        <Box width={"60px"} align={"start"}>
+          {type === "hashtag" ? (
+            <HeaderIcon isUserPage={isUserPage}>#</HeaderIcon>
+          ) : (
+            <HeaderIcon isUserPage={isUserPage}>/</HeaderIcon>
+          )}
+        </Box>
       </Button>
     </Box>
   );
