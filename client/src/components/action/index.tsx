@@ -41,12 +41,12 @@ export const ActionText = styled(Text) <{ type?: ActionType }>`
   color: ${(props) => props.type && handleActionTypeColor(props.type, props.theme)};
   cursor: ${(props) => props.type && props.type !== 'none' ? 'pointer' : 'auto'};
 `
+
 export const ActionLink = styled(Link) <{ type?: ActionType }>`
   :visited, :link, :hover, :active {
     color: ${(props) => props.type && handleActionTypeColor(props.type, props.theme)};
   }
   font-size: min(1em, 4vw);
-  text-decoration: ${(props) => props.type && props.type !== 'none' ? 'underline' : 'none'};
 `;
 
 export interface UserActionProps {
@@ -55,6 +55,11 @@ export interface UserActionProps {
   onTagClicked?: (hashtag: string) => void
   onLocationClicked?: (location: string) => void
 }
+
+// TODO:
+// no underline
+// no yellow addresses in feed
+// only blue for myself
 
 export const UserAction = (props: UserActionProps) => {
   const { action, userId } = props
@@ -128,7 +133,7 @@ export const UserAction = (props: UserActionProps) => {
                 <ActionLink
                   className="link"
                   to={`/0/${action.payload.referrerAddress}`}
-                  type={ActionType.other}
+                  type={ActionType.none}
                 >
                   0/{action.payload.referrerAddress.slice(0, 4)}
                 </ActionLink>
@@ -137,7 +142,13 @@ export const UserAction = (props: UserActionProps) => {
                 <ActionText color='grey1'>{" adds "}</ActionText>
               }
               <ActionText color='grey1'>
-                <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
+                <ActionLink 
+                  className="link" 
+                  to={`/0/${action.from}`}
+                  type={ActionType.none}
+                >
+                  0/{action.fromShort}
+                </ActionLink>
               </ActionText>
               {/* Referrer data is missing, display default text */}
               {!(action.payload && action.payload.referrerAddress) &&
