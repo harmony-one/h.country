@@ -80,7 +80,7 @@ export const UserAction = (props: UserActionProps) => {
     } else if (delta < 24 * 60_000) {
       setActionTime(moment(action.timestamp).fromNow())
     }
-  }, 1000)
+  }, 5000)
 
   const onTagClicked = () => {
     if (props.onTagClicked && action.payload) {
