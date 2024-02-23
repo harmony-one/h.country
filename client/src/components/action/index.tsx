@@ -101,7 +101,7 @@ export const UserAction = (props: UserActionProps) => {
   const address = action.address.short ||
     formatAddress(action.address.road)
 
-  return <Box border={{ side: "bottom", color: 'border' }} pad={"4px 0"}> 
+  return <Box border={{ side: "bottom", color: 'border' }} pad={"4px 0"}>
     {(action.type === 'tag' || action.type === 'new_user' || action.type === 'multi_tag') &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
         <Box basis={address ? "50%" : "90%"}>
@@ -142,8 +142,8 @@ export const UserAction = (props: UserActionProps) => {
                 <ActionText color='grey1'>{" adds "}</ActionText>
               }
               <ActionText color='grey1'>
-                <ActionLink 
-                  className="link" 
+                <ActionLink
+                  className="link"
                   to={`/0/${action.from}`}
                   type={ActionType.none}
                 >
@@ -173,18 +173,21 @@ export const UserAction = (props: UserActionProps) => {
     }
     {action.type === 'link' &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
-        <Box basis={address ? "50%" : "90%"}>
+        <Box basis={address ? "60%" : "90%"}>
           <Text size={"small"} style={{ wordBreak: 'break-all' }}>
             <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
-            {/* <ActionText size={"small"} type={ActionType.none}>{socialUrlParser(action.payload || '')[0]?.name}</ActionText>
-            {' '} */}
             {' '}
             <ActionLink className="link" to={`/0/${action.from}`} type={actionType}>{
               socialUrlParser(action.payload || '', 'any')?.username
             }
             </ActionLink>
             {' '}
-            <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
+            <ActionLink
+                className="link"
+                to={`/0/${action.from}`}
+                type={ActionType.none}>
+                0/{socialUrlParser(action.payload || '', 'any')?.username}
+            </ActionLink>
           </Text>
         </Box>
         {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
