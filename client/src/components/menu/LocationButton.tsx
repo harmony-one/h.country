@@ -6,9 +6,11 @@ import { AddressComponents } from '../../types';
 import { formatAddress } from '../../utils';
 import { addMessageWithGeolocation } from '../../api';
 import { useActionsContext } from '../../context';
+import { useTopTags } from '../../pages/user/hooks';
 
 export const LocationButton = () => {
     const { wallet, pageOwnerAddress } = useUserContext();
+    const tagItems = useTopTags()
     const { loadActions } = useActionsContext();
     const [latestLocation, setLatestLocation] = useState<AddressComponents>();
 
@@ -24,7 +26,9 @@ export const LocationButton = () => {
 
         if (wallet?.address) {
             addMessageWithGeolocation(wallet.address.slice(2), 'check-in').then(
-                () => syncUserLocation()
+                () => {
+                    syncUserLocation()
+                }
             )
         }
 
@@ -33,6 +37,12 @@ export const LocationButton = () => {
         return clearInterval(intervalId);
     }, [wallet?.address, syncUserLocation]);
 
+    useEffect(() => {
+        if (tagItems.length > 0) {
+            syncUserLocation()
+        }
+    }, [tagItems])
+    
     const onCLickLocation = useCallback(async () => {
         if (wallet?.address && latestLocation && pageOwnerAddress) {
             const locationShort = latestLocation.short || formatAddress(latestLocation.road);

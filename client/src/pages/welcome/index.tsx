@@ -2,16 +2,18 @@
 import React, { useState, useEffect } from "react";
 import { Box } from "grommet";
 import { toast } from "react-toastify";
-import { getTopicLits } from "../../constants";
 import styled from "styled-components";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { Typography } from "antd"; // Spin
+
+import { addMessage, postUserTopics } from "../../api/firebase";
+import { addMessageWithGeolocation } from "../../api";
+import { getTopicLits } from "../../constants";
+import useDarkMode from "../../hooks/useDarkMode";
 import { useUserContext } from "../../context/UserContext";
 import { UserTopic } from "../../types";
-import { Typography } from "antd"; // Spin
-import { addMessage, postUserTopics } from "../../api/firebase";
-import useDarkMode from "../../hooks/useDarkMode";
 
-const TOPIC_SELECTED_TRIGGER = 3
+const TOPIC_SELECTED_TRIGGER = 3;
 
 const WelcomeContainer = styled(Box)`
   margin: 0 auto !important;
@@ -47,7 +49,7 @@ const TopicsContainer = styled(Box)`
   }
 `;
 
-const TopicItemContainer = styled(Box) <{ isSelected?: boolean }>`
+const TopicItemContainer = styled(Box)<{ isSelected?: boolean }>`
   position: relative;
   aspect-ratio: 1 / 1;
   width: 100%;
@@ -72,14 +74,16 @@ const TopicItemContainer = styled(Box) <{ isSelected?: boolean }>`
 const TopicItemImage = styled.img<{ isDark?: Boolean }>`
   max-width: 50%;
   max-height: 50%;
-  
-  ${(props) => props.isDark ?
-    `filter: invert(100%)
+
+  ${(props) =>
+    props.isDark
+      ? `filter: invert(100%)
         sepia(92%) 
         saturate(1%) 
         hue-rotate(290deg) 
         brightness(105%) 
-        contrast(101%);` : ''};
+        contrast(101%);`
+      : ""};
 `;
 
 const TopicItemAlias = styled(Box)`
@@ -98,36 +102,36 @@ interface TopicItemProps {
 const TopicItem = (props: TopicItemProps) => {
   const { topic, isSelected, onClick } = props;
   const [image, setImage] = useState(topic.light);
-  const [showLabel, setShowLabel] = useState(true) // false
+  const [showLabel, setShowLabel] = useState(true); // false
 
-  const themeMode = useDarkMode()
+  const themeMode = useDarkMode();
 
   useEffect(() => {
     if (isSelected) {
       setImage(topic.color);
     } else {
-      const logo = topic.light
+      const logo = topic.light;
       setImage(logo);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSelected, themeMode]);
 
-  const prefix = '' // "#"; // topic.type === 'blockchain' ? '$' : '#'
+  const prefix = ""; // "#"; // topic.type === 'blockchain' ? '$' : '#'
 
-//   <TopicItemContainer isSelected={isSelected} onClick={onClick}>
-// {/* {image && <TopicItemImage isDark={!isSelected && themeMode} src={image} alt={`${topic.name} logo`} onLoad={() => isSelected && setShowLabel(true)} />} */}
-// <TopicItemAlias>
-//   {isSelected && showLabel && (
-//     <Typography.Text
-//       style={{ fontSize: "min(2.4vw, 0.8rem)", fontWeight: 600 }}
-//     >
-//       {prefix}
-//       {topic.name}
-//     </Typography.Text>
-//   )}
-// </TopicItemAlias>
-// </TopicItemContainer>
+  //   <TopicItemContainer isSelected={isSelected} onClick={onClick}>
+  // {/* {image && <TopicItemImage isDark={!isSelected && themeMode} src={image} alt={`${topic.name} logo`} onLoad={() => isSelected && setShowLabel(true)} />} */}
+  // <TopicItemAlias>
+  //   {isSelected && showLabel && (
+  //     <Typography.Text
+  //       style={{ fontSize: "min(2.4vw, 0.8rem)", fontWeight: 600 }}
+  //     >
+  //       {prefix}
+  //       {topic.name}
+  //     </Typography.Text>
+  //   )}
+  // </TopicItemAlias>
+  // </TopicItemContainer>
 
   return (
     <TopicItemContainer isSelected={isSelected} onClick={onClick}>
@@ -135,7 +139,11 @@ const TopicItem = (props: TopicItemProps) => {
       <TopicItemAlias>
         {showLabel && (
           <Typography.Text
-            style={{ fontSize: "min(5vw, 1.5rem)", fontWeight: 600, color: isSelected ? '#64ebfd' : '#B3B3B3' }}
+            style={{
+              fontSize: "min(5vw, 1.5rem)",
+              fontWeight: 600,
+              color: isSelected ? "#64ebfd" : "#B3B3B3",
+            }}
           >
             {prefix}
             {topic.name}
@@ -186,35 +194,36 @@ export const WelcomePage: React.FC = () => {
       };
       if (wallet) {
         const addressWithoutPrefix = wallet.address.slice(2);
-        const tags = selectedTopics // firstTimeVisit ? [...selectedTopics, addressWithoutPrefix] : selectedTopics
+        const tags = selectedTopics; // firstTimeVisit ? [...selectedTopics, addressWithoutPrefix] : selectedTopics
         try {
-          await Promise.all(tags.map((tag: string) => addMessage({
-            locationData,
-            from: addressWithoutPrefix,
-            text: `#${tag} @${addressWithoutPrefix}`
-          })));
+          await Promise.all(
+            tags.map(async (tag: string) =>
+              await addMessageWithGeolocation(addressWithoutPrefix,
+                `#${tag} @${addressWithoutPrefix}`))
+          );
         } catch (e) {
-          console.log(e)
+          console.log(e);
         }
       }
-    }
+    };
 
     if (selectedTopics.length >= TOPIC_SELECTED_TRIGGER && wallet?.address) {
       // setTopicsUpdating(true);
-      tagsTopic()
-      .then(() => {
+      tagsTopic().then(() => {
         postUserTopics(wallet.address, selectedTopics)
           .then(() => {
             // toast.success(`Added ${selectedTopics.length} topics!`, { autoClose: 10000 });
             navigate(`/0/${wallet.address.substring(2)}`);
           })
           .catch((e: any) => {
-            toast.error(`Cannot add topics: ${e.message}`, { autoClose: 10000 });
-          })
-          // .finally(() => {
-          //   setTopicsUpdating(false);
-          // });
-      })
+            toast.error(`Cannot add topics: ${e.message}`, {
+              autoClose: 10000,
+            });
+          });
+        // .finally(() => {
+        //   setTopicsUpdating(false);
+        // });
+      });
     }
   }, [selectedTopics, wallet, wallet?.address, navigate, firstTimeVisit]);
 
@@ -224,7 +233,7 @@ export const WelcomePage: React.FC = () => {
         return;
       }
 
-      console.log('Set topics from query: ', topicsQueryParam);
+      console.log("Set topics from query: ", topicsQueryParam);
 
       const parsedTags = parseTagsFromUrl(topicsQueryParam);
       const addressWithoutPrefix = wallet.address.substring(2);
@@ -235,26 +244,27 @@ export const WelcomePage: React.FC = () => {
       };
 
       try {
-        await Promise.all(parsedTags.map((tag: [string, number]) => {
-          if (tag[1] > 1) {
-            return addMessage({
-              locationData,
-              from: addressWithoutPrefix,
-              text: `#${tag[0]} @${addressWithoutPrefix}`,
-              customPayload: {
-                "count": Math.min(tag[1], 99), // cap to 99 for each multi tag,
-                "type": "multi_tag",
-              }
-            });
-          } else {
-            return addMessage({
-              locationData,
-              from: addressWithoutPrefix,
-              text: `#${tag[0]} @${addressWithoutPrefix}`,
-            });
-          }
-        }
-        ));
+        await Promise.all(
+          parsedTags.map((tag: [string, number]) => {
+            if (tag[1] > 1) {
+              return addMessage({
+                locationData,
+                from: addressWithoutPrefix,
+                text: `#${tag[0]} @${addressWithoutPrefix}`,
+                customPayload: {
+                  count: Math.min(tag[1], 99), // cap to 99 for each multi tag,
+                  type: "multi_tag",
+                },
+              });
+            } else {
+              return addMessage({
+                locationData,
+                from: addressWithoutPrefix,
+                text: `#${tag[0]} @${addressWithoutPrefix}`,
+              });
+            }
+          })
+        );
       } catch (error) {
         console.error(error);
       }
@@ -275,7 +285,7 @@ export const WelcomePage: React.FC = () => {
       if (prevSelectedTopics.length < TOPIC_SELECTED_TRIGGER) {
         return [...prevSelectedTopics, name];
       }
-      return  prevSelectedTopics;
+      return prevSelectedTopics;
     });
 
     // if(!selectedTopics.includes(name)) {
@@ -302,14 +312,11 @@ export const WelcomePage: React.FC = () => {
   );
 
   if (topicsQueryParam && wallet?.address) {
-    return <Box></Box>
+    return <Box></Box>;
   }
 
   return (
-    <Box
-      width={'700px'}
-      margin={'0 auto'}
-    >
+    <Box width={"700px"} margin={"0 auto"}>
       {/* <Spin spinning={isTopicsUpdating} size={"large"}> */}
       <WelcomeContainer>
         {[1, 2, 3].map((group) => (
