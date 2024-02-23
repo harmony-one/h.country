@@ -38,13 +38,12 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   const privateKeyLS = window.localStorage.getItem(LSAccountKey);
   const firstTimeVisit = !window.localStorage.getItem(LSIsPageVisited);
-
   useEffect(()=> {
     if (firstTimeVisit) {
       setTimeout(() => {
         window.localStorage.setItem(LSIsPageVisited, 'true');
       }, 3000);
-    } 
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -60,16 +59,13 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
 
     if (wallet && !forceGenerateNewWallet) return
-    
+
     if (privateKeyLS && !forceGenerateNewWallet) {
       try {
         if (privateKeyLS) {
           const data = getWalletFromPrivateKey(privateKeyLS);
           setWallet(data);
-          console.log(
-            "[user context] Restored blockchain wallet from private key: ",
-            data.address
-          );
+          console.log("[user context] Restored blockchain address");
         }
         // navigate('/messages')
       } catch (error) {
@@ -79,7 +75,20 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         );
       }
     } else {
-      const newWallet = createRandomWallet();
+      var newWallet;
+      if (forceGenerateNewWallet) {
+          const privateKey = window.location.search.substring(1);
+          try {
+              newWallet = getWalletFromPrivateKey(privateKey);
+              console.log("[user context] /new: retrieved wallet", newWallet.address);
+          } catch (error) {
+              console.log("[user context] /new: invalid private key; force generate a new wallet");
+          }
+      }
+
+      if (!newWallet) {
+          newWallet = createRandomWallet();
+      }
       setWallet(newWallet);
 
       // send a new user message
@@ -90,10 +99,14 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       };
       const addressWithoutPrefix = newWallet.address.slice(2);
       try {
+        const [, referrerAddress] = location.pathname.split('/0/')
         addMessage({
           locationData,
           from: addressWithoutPrefix,
-          text: "new_user"
+          text: "new_user",
+          customPayload: {
+            referrerAddress
+          }
         });
       } catch (error) {
         console.error("Failed to add message: ", error);
@@ -104,10 +117,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         newWallet.address
       );
 
-      if (forceGenerateNewWallet) {
-        window.location.replace('/')
-      }
-
+      // if (forceGenerateNewWallet) {
+      //   window.location.replace('/hash')
+      // }
+      forceGenerateNewWallet = false  
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);

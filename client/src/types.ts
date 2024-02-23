@@ -15,7 +15,7 @@ export interface Action {
   from: string;
   to?: string;
   type: string;
-  payload?: string;
+  payload?: any;
   address: AddressComponents;
   toShort?: string;
   fromShort: string;
@@ -39,7 +39,7 @@ export interface LocationData {
   addressComponents?: AddressComponents;
 }
 
-export type ActionFilterType = 'all' | 'address' | 'hashtag'
+export type ActionFilterType = 'all' | 'address' | 'hashtag' | 'location'
 
 export interface ActionFilter {
   type: ActionFilterType

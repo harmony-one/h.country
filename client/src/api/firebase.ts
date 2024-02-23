@@ -1,43 +1,30 @@
-import { collection, getDocs, setDoc, doc, query, where, orderBy, addDoc, DocumentData, QueryDocumentSnapshot, limit } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  setDoc,
+  doc,
+  query,
+  where,
+  orderBy,
+  addDoc,
+  DocumentData,
+  QueryDocumentSnapshot,
+  limit,
+  WhereFilterOp,
+  onSnapshot,
+  Unsubscribe
+} from 'firebase/firestore';
 import { db } from "../configs/firebase-config";
-import { Action, ActionFilter, AddressComponents, LocationData } from "../types";
+import { Action, AddressComponents, LocationData } from "../types";
 import axios from "axios";
 import { formatAddress } from '../utils';
 
-export const getMessages = async (filters: ActionFilter[] = []): Promise<Action[]> => {
-  let q = query(
-    collection(db, "actions"),
-    orderBy("timestamp", "desc"),
-  );
+export interface IFilter { fieldPath: string; opStr: WhereFilterOp; value: any; }
 
-  // If query contains "address" ("from" OR "to"), we need to execute second query to get "to" field entries
-  let mentions: QueryDocumentSnapshot<DocumentData, DocumentData>[] = []
-  const addressFilter = filters.find((filter) => filter.type === 'address')
-  if (addressFilter) {
-    // "from" filter
-    q = query(q, where('from', '==', addressFilter.value))
+export const genFilter = (fieldPath: string, opStr: WhereFilterOp, value: any) => ({ fieldPath, opStr, value })
 
-    // "to" query
-    const toQuery = query(
-      collection(db, "actions"),
-      orderBy("timestamp", "desc"),
-      where("to", "==", addressFilter.value)
-    );
-    const toSnapshot = await getDocs(toQuery);
-    mentions = toSnapshot.docs
-  }
-
-  for (const filter of filters) {
-    const { type, value } = filter
-    if (type === 'hashtag') {
-      q = query(q, where('payload', '==', value))
-    }
-  }
-
-  const querySnapshot = await getDocs(q);
-  const actions = querySnapshot.docs
-
-  return [...mentions, ...actions]
+const formatMessages = (messages: QueryDocumentSnapshot[]) => {
+  return messages
     .map((doc) => ({ id: doc.id, data: doc.data() }))
     .filter(
       (value, index, self) =>
@@ -56,10 +43,64 @@ export const getMessages = async (filters: ActionFilter[] = []): Promise<Action[
         type: data.type
       };
     })
-    .filter((action) => ["tag", "link", "new_user", "location"].includes(action.type))
+    .filter((action) => ["tag", "multi_tag", "link", "new_user", "location"].includes(action.type))
     .sort((a, b) => {
       return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     })
+}
+
+export interface GetMessagesParams {
+  filters?: IFilter[]
+  updateCallback?: (actions: Action[]) => void
+}
+
+export const getMessages = async (params: GetMessagesParams = {}): Promise<{
+  actions: Action[],
+  unsubscribeList: Unsubscribe[]
+}> => {
+  const { filters = [], updateCallback } = params
+  let data: QueryDocumentSnapshot<DocumentData, DocumentData>[] = []
+
+  const unsubscribeList = []
+  if (filters.length) {
+    const res = await Promise.all(filters.map(async filter => {
+      const q = query(
+        collection(db, "actions"),
+        orderBy("timestamp", "desc"),
+        where(filter.fieldPath, filter.opStr, filter.value)
+      );
+
+      if (updateCallback) {
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+          updateCallback(formatMessages(querySnapshot.docs))
+        })
+        unsubscribeList.push(unsubscribe)
+      }
+
+      return (await getDocs(q)).docs;
+    }))
+
+    data = [].concat.apply([], res as any);
+  } else {
+    const q = query(
+      collection(db, "actions"),
+      orderBy("timestamp", "desc")
+    );
+
+    if (updateCallback) {
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        updateCallback(formatMessages(querySnapshot.docs))
+      })
+      unsubscribeList.push(unsubscribe)
+    }
+
+    data = (await getDocs(q)).docs;
+  }
+
+  return {
+    actions: formatMessages(data),
+    unsubscribeList
+  }
 }
 
 export const getLatestLocation = async (address: string): Promise<Action> => {
@@ -94,9 +135,8 @@ export const addMessage = async (params: {
   text: string,
   customPayload?: any,
 }) => {
-  const { locationData, from, text, customPayload } = params;
+  const { locationData, from, text, customPayload = {} } = params;
   const timestamp = new Date().toISOString();
-
   // TODO: Conditional check based on determined type
   // const duplicateCheckQuery = query(
   //   collection(db, "actions"),
@@ -128,7 +168,7 @@ export const addMessage = async (params: {
   const mentions = [...text.matchAll(/@(\w+)/g)].map((match) => match[1]);
   const hashtags = [...text.matchAll(/#(\w+)/g)].map((match) => match[1]);
   let type: string = "message";
-  let payload: string = text;
+  let payload: any = text;
 
   const urlRegex = /https?:\/\/[^\s]+/;
   const urlMatch = text.match(urlRegex);
@@ -142,9 +182,18 @@ export const addMessage = async (params: {
     type = "check-in";
   } else if (text.includes("new_user")) {
     type = "new_user";
+    payload = customPayload
   } else if (mentions.length > 0 && hashtags.length > 0) {
-    type = "tag";
-    payload = hashtags[0]
+    if (customPayload.type && customPayload.type === "multi_tag") {
+      type = "multi_tag";
+      payload = {
+        "tag": hashtags[0],
+        "count": customPayload.count,
+      };
+    } else {
+      type = "tag";
+      payload = hashtags[0]
+    }
   }
 
   let action = {

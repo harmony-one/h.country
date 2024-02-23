@@ -12,6 +12,7 @@ export const AppRoutes = () => {
   return (
     <Routes>
       <Route path={'/hash'} element={<WelcomePage />} />
+      <Route path={'/new'} element={<WelcomePage />} />
       <Route element={<AppLayout />}>
         <Route path={'/'} element={<MainPage />} />
         <Route path="/h/:tagName" element={<TagPageByName />} />
@@ -19,6 +20,7 @@ export const AppRoutes = () => {
         <Route path="/:socialType/:username" element={<UserPageBySocial />} />
         <Route path={'/auth'} element={<AuthPage />} />
         <Route path="/auth/openid-callback" element={<OpenIdCallback />} />
+        <Route path="/home" element={<MainPage />} />
       </Route>
       <Route path={'*'} element={<PageNotFound />} />
     </Routes>
