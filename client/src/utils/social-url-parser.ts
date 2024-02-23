@@ -1,4 +1,6 @@
-import { regexes } from "../components/links";
+import { regexes, RegexObject } from "../components/links";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+
 
 // function removeEmpty<T>(object: any): T {
 //     for (const key of Object.keys(object)) {
@@ -20,6 +22,22 @@ export interface ParseResult {
     url: string;
     /** deprecation warning of the site */
     deprecated?: boolean;
+}
+
+const db = getFirestore();
+async function urlExistsInUserLinks(input: string, walletAddress: string) {
+    const docRef = doc(db, "userLinks", walletAddress);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        const data = docSnap.data();
+        for (const key in data) {
+            if (typeof data[key] === 'object' && data[key].url === input) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 function isLikelyURL(input: string) {
@@ -55,12 +73,46 @@ function extractUsernameFromURL(input: string) {
     return username;
 }
 
+function extractUsernameForProvider(input: string) {
+    const url = new URL(normalizeInput(input));
+    const pathSegments = url.pathname.split('/').filter(segment => segment.length > 0);
+    const username = pathSegments.length > 0 ? pathSegments[pathSegments.length - 1] : '';
+    return username;
+}
+
 export function socialUrlParser(input: string, providerName: string): ParseResult | null {
     const isUrl = isLikelyURL(input);
     const uuid = generateUUID()
-
+    
     if (providerName === "any") {
-        if (!isUrl) {
+        if (isUrl) {
+            const normalizedInput = normalizeInput(input);
+
+            let matchedProvider: RegexObject | undefined = regexes.find(regex => {
+                const baseUrlDomain = new URL(regex.baseUrl).hostname.replace(/^www\./, '');
+                const inputDomain = new URL(normalizedInput).hostname.replace(/^www\./, '');
+                return inputDomain === baseUrlDomain || inputDomain.endsWith('.' + baseUrlDomain);
+            });
+            
+
+            if (matchedProvider) {
+                const username = extractUsernameForProvider(normalizedInput);
+                return {
+                    type: matchedProvider.type,
+                    providerName: matchedProvider.providerName,
+                    url: normalizedInput,
+                    username: username,
+                };
+            } else {
+                const username = extractUsernameFromURL(normalizedInput);
+                return {
+                    type: uuid,
+                    providerName: uuid,
+                    url: normalizedInput,
+                    username: username,
+                };
+            }
+        } else {
             return {
                 type: uuid,
                 providerName: uuid,
@@ -68,14 +120,6 @@ export function socialUrlParser(input: string, providerName: string): ParseResul
                 username: input,
             };
         }
-
-        const username = extractUsernameFromURL(input);
-        return {
-            type: uuid,
-            providerName: uuid,
-            url: normalizeInput(input),
-            username: username,
-        };
     } else {
         const regexObject = regexes.find(regex => regex.providerName === providerName);
         if (!regexObject) return null;

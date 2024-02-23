@@ -74,14 +74,16 @@ interface TitleClickEvent {
   providerName: string;
 }
 
+
 export const HeaderList = (props: HeaderListProps) => {
   const { userId: key, type, items, wallet, isUserPage } = props;
+  const addressWithoutPrefix = wallet ? wallet.address.slice(2) : '';
+
   const onHashSubmit = async (hashtag: string) => {
     if (!wallet || !key) {
       console.log("Invalid user wallet or key");
       return;
     }
-    const addressWithoutPrefix = wallet.address.slice(2);
     const submitText = `#${hashtag} @${key}`;
 
     await addMessageWithGeolocation(addressWithoutPrefix, submitText);
@@ -134,8 +136,6 @@ export const HeaderList = (props: HeaderListProps) => {
         console.log("Invalid user wallet or key");
         return;
       }
-
-      const addressWithoutPrefix = wallet.address.slice(2);
 
       await addMessageWithGeolocation(
         addressWithoutPrefix,
