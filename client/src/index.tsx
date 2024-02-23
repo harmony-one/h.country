@@ -16,7 +16,7 @@ root.render(
   domain={domain as string}
   clientId={clientId as string}
   authorizationParams={{
-    redirect_uri: "http://localhost:3000/"
+    redirect_uri: "http://oauth.hcountry.pages.dev"
   }}
 >
   <App />
