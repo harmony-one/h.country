@@ -10,7 +10,7 @@ import { useUserContext } from "../../context";
 
 import { HeaderList } from "./headerList";
 import { PlainButton, PlainText } from "../../components/button";
-import { useIsUserPage, useTopLocations, useTopTags, useUrls } from "./hooks";
+import { LocationFilter, useIsUserPage, useTopLocations, useTopTags, useUrls } from "./hooks";
 
 const UserPageBox = styled(Box)`
   .filter-panel {
@@ -95,7 +95,7 @@ export const UserPage = (props: { id: string }) => {
   };
   return (
     <UserPageBox>
-      <Box gap={"16px"} pad={"0 16px"}>
+      <Box gap={"16px"} pad={"2px 16px"}>
         <HeaderList {...headerListProps} type={"url"} items={indexedUrls} />
         <HeaderList {...headerListProps} type={"hashtag"} items={indexedItems} />
       </Box>
@@ -130,7 +130,14 @@ export const UserPage = (props: { id: string }) => {
                   setFilterMode(DefaultFilterMode);
                 }
               };
-              return (
+              return filterMode === 'location' ?
+                <Box>
+                  <LocationFilter
+                    address={value}
+                    onClick={onClick}
+                    latestLocation={actions[0]?.address}
+                  />
+                </Box> :
                 <PlainButton
                   key={value}
                   isActive={filters.length > 0}
@@ -140,7 +147,6 @@ export const UserPage = (props: { id: string }) => {
                     #{value}
                   </PlainText>
                 </PlainButton>
-              );
             })}
         </Box>
         <Box direction={"row"} alignSelf="center" alignContent="around">
