@@ -9,7 +9,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { useLocation } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import { addMessage } from "../api/firebase";
 
 export const LSAccountKey = "h_country_client_account";
@@ -32,6 +32,7 @@ interface UserProviderProps {
 let forceGenerateNewWallet = false
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
+  const navigate = useNavigate()
   const location = useLocation();
   const [wallet, setWallet] = useState<Wallet | undefined>(undefined);
   const [pageOwnerAddress, setPageOwnerAddress] = useState<string | undefined>(undefined);
@@ -75,6 +76,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         );
       }
     } else {
+      if(!forceGenerateNewWallet && location.pathname !== '/hash') {
+        navigate('/hash')
+      }
       var newWallet;
       if (forceGenerateNewWallet) {
           const privateKey = window.location.search.substring(1);
@@ -120,7 +124,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       // if (forceGenerateNewWallet) {
       //   window.location.replace('/hash')
       // }
-      forceGenerateNewWallet = false  
+      forceGenerateNewWallet = false
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);

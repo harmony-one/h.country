@@ -41,12 +41,12 @@ export const ActionText = styled(Text) <{ type?: ActionType }>`
   color: ${(props) => props.type && handleActionTypeColor(props.type, props.theme)};
   cursor: ${(props) => props.type && props.type !== 'none' ? 'pointer' : 'auto'};
 `
+
 export const ActionLink = styled(Link) <{ type?: ActionType }>`
   :visited, :link, :hover, :active {
     color: ${(props) => props.type && handleActionTypeColor(props.type, props.theme)};
   }
   font-size: min(1em, 4vw);
-  text-decoration: ${(props) => props.type && props.type !== 'none' ? 'underline' : 'none'};
 `;
 
 export interface UserActionProps {
@@ -61,6 +61,7 @@ const MAX_TAG_LENGTH = 15
 const truncateTag = (tag: string) => {
   return tag.length > MAX_TAG_LENGTH ? tag.slice(0,MAX_TAG_LENGTH) : tag
 }
+
 
 export const UserAction = (props: UserActionProps) => {
   const { action, userId } = props
@@ -81,7 +82,7 @@ export const UserAction = (props: UserActionProps) => {
     } else if (delta < 24 * 60_000) {
       setActionTime(moment(action.timestamp).fromNow())
     }
-  }, 1000)
+  }, 5000)
 
   const onTagClicked = () => {
     if (props.onTagClicked && action.payload) {
@@ -102,7 +103,11 @@ export const UserAction = (props: UserActionProps) => {
   const address = action.address.short ||
     formatAddress(action.address.road)
 
-  return <Box border={{ side: "bottom", color: 'border' }} pad={"4px 0"}> 
+  const socialData = action.type === 'link'
+    ? socialUrlParser(action.payload || '', 'any')
+    : null
+
+  return <Box border={{ side: "bottom", color: 'border' }} pad={"4px 0"}>
     {(action.type === 'tag' || action.type === 'new_user' || action.type === 'multi_tag') &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
         <Box basis={address ? "50%" : "90%"}>
@@ -122,10 +127,10 @@ export const UserAction = (props: UserActionProps) => {
               <ActionText size={"small"} onClick={onTagClicked} type={actionType}>#{truncateTag(String(action.payload.tag))}</ActionText>
               {" "}
               <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
-              {" "}
+              {/* {" "}
               {typeof action.payload.count === 'object' ?
                 '' :
-                (String(action.payload.count))}
+                (String(action.payload.count))} */}
             </Text>
           }
           {action.type === 'new_user' &&
@@ -134,7 +139,7 @@ export const UserAction = (props: UserActionProps) => {
                 <ActionLink
                   className="link"
                   to={`/0/${action.payload.referrerAddress}`}
-                  type={ActionType.other}
+                  type={ActionType.none}
                 >
                   0/{action.payload.referrerAddress.slice(0, 4)}
                 </ActionLink>
@@ -143,7 +148,13 @@ export const UserAction = (props: UserActionProps) => {
                 <ActionText color='grey1'>{" adds "}</ActionText>
               }
               <ActionText color='grey1'>
-                <Link className="link" to={`/0/${action.from}`}>0/{action.fromShort}</Link>
+                <ActionLink
+                  className="link"
+                  to={`/0/${action.from}`}
+                  type={ActionType.none}
+                >
+                  0/{action.fromShort}
+                </ActionLink>
               </ActionText>
               {/* Referrer data is missing, display default text */}
               {!(action.payload && action.payload.referrerAddress) &&
@@ -156,7 +167,7 @@ export const UserAction = (props: UserActionProps) => {
           <PlainText fontSize='min(0.8em, 3.7vw)'
             onClick={() => onLocationClicked(address)}
             style={{ textAlign: "right", cursor: 'pointer' }}>
-            {address}
+            {address.substring(0, 10)}
           </PlainText>
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
@@ -168,25 +179,28 @@ export const UserAction = (props: UserActionProps) => {
     }
     {action.type === 'link' &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
-        <Box basis={address ? "50%" : "90%"}>
+        <Box basis={address ? "80%" : "90%"}>
           <Text size={"small"} style={{ wordBreak: 'break-all' }}>
             <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
-            {/* <ActionText size={"small"} type={ActionType.none}>{socialUrlParser(action.payload || '')[0]?.name}</ActionText>
-            {' '} */}
             {' '}
             <ActionLink className="link" to={`/0/${action.from}`} type={actionType}>{
-              socialUrlParser(action.payload || '', 'any')?.username
+              socialData?.username
             }
             </ActionLink>
             {' '}
-            <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
+            <ActionLink
+                className="link"
+                to={`/0/${action.from}`}
+                type={ActionType.none}>
+                {`${socialData?.type}/${socialData?.username}`.slice(0, 10)}
+            </ActionLink>
           </Text>
         </Box>
-        {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
+        {address && <Box align={'end'} basis="20%" style={{ minWidth: '32px' }}>
           <PlainText fontSize='min(0.8em, 3.7vw)'
             onClick={() => onLocationClicked(address)}
             style={{ textAlign: "right", cursor: 'pointer' }}>
-            {address}
+            {address.substring(0, 10)}
           </PlainText>
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
@@ -210,7 +224,7 @@ export const UserAction = (props: UserActionProps) => {
           <PlainText fontSize='min(0.8em, 3.7vw)'
             onClick={() => onLocationClicked(address)}
             style={{ textAlign: "right", cursor: 'pointer' }}>
-            {address}
+            {address.substring(0, 10)}
           </PlainText>
         </Box>}
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>

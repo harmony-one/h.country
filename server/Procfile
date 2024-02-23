@@ -1,0 +1,2 @@
+web: node openidAuth.js
+worker: node openidAuth.js

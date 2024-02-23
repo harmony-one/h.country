@@ -3,6 +3,7 @@ import { Box, Button, Text } from "grommet";
 import { ethers } from "ethers";
 import { doc, setDoc } from "firebase/firestore";
 import styled from "styled-components";
+import { handleOpenIdLogin } from "../../oAuth/openIdLogin";
 
 import { db } from "../../configs/firebase-config";
 import { addMessageWithGeolocation } from "../../api";
@@ -63,14 +64,16 @@ interface TitleClickEvent {
   providerName: string;
 }
 
+
 export const HeaderList = (props: HeaderListProps) => {
   const { userId: key, type, items, wallet, isUserPage } = props;
+  const addressWithoutPrefix = wallet ? wallet.address.slice(2) : '';
+
   const onHashSubmit = async (hashtag: string) => {
     if (!wallet || !key) {
       console.log("Invalid user wallet or key");
       return;
     }
-    const addressWithoutPrefix = wallet.address.slice(2);
     const submitText = `#${hashtag} @${key}`;
 
     await addMessageWithGeolocation(addressWithoutPrefix, submitText);
@@ -79,13 +82,12 @@ export const HeaderList = (props: HeaderListProps) => {
   const onTitleClick = async ({ providerName }: TitleClickEvent) => {
     console.log("clicked", providerName);
     const input = window.prompt(
-      type === "hashtag"
-        ? "Enter Hashtag (without #):"
-        : `Enter ${providerName} account:`
+      type === "hashtag" ? "hash?" : `${providerName}?`
     );
 
     if (input === null) {
       console.log("Prompt was cancelled.");
+      handleOpenIdLogin({providerName})
       return;
     }
 
@@ -125,8 +127,6 @@ export const HeaderList = (props: HeaderListProps) => {
         console.log("Invalid user wallet or key");
         return;
       }
-
-      const addressWithoutPrefix = wallet.address.slice(2);
 
       await addMessageWithGeolocation(
         addressWithoutPrefix,
@@ -187,20 +187,16 @@ export const HeaderList = (props: HeaderListProps) => {
                 }}
               >
                 <Box key={item.id}>
-                  {item.predefined === true &&
-                  item.providerName !== undefined ? (
-                    <Button plain>
-                      <HeaderText
-                        onClick={() => {
-                          onTitleClick({ providerName: item.providerName! });
-                        }}
-                      >
-                        {item.text}
-                      </HeaderText>
-                    </Button>
-                  ) : (
-                    <HeaderText>{item.text}</HeaderText>
-                  )}
+                  {(item.predefined === true && item.providerName !== undefined)
+                    ? <Button plain>
+                        <HeaderText onClick={() => {
+                          onTitleClick({ providerName: item.providerName! })
+                        }}>
+                          {item.text}
+                        </HeaderText>
+                      </Button>
+                    :
+                    <HeaderText>{item.text}</HeaderText>}
                 </Box>
               </div>
             ))}
