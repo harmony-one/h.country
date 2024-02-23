@@ -5,6 +5,9 @@ import { useActionsContext, useUserContext } from "../../../context";
 import { HeaderText } from "../headerList";
 import { predefinedLinks } from "../../../components/links";
 import { formatAddress, linkToMapByAddress } from "../../../utils";
+import { PinIcon } from "../../../components/icons";
+import { Box } from "grommet";
+import { AddressComponents } from "../../../types";
 
 interface LinkItem {
     id: string;
@@ -15,10 +18,46 @@ interface LinkItem {
 
 const MaxStringLength = 10
 
+export const LocationFilter = (props:
+    { address: string, latestLocation: AddressComponents, onClick: (value: string) => void }
+) => {
+    const { address, latestLocation, onClick } = props;
+
+    return <Box direction="row" align="start">
+        <a
+            href={linkToMapByAddress(latestLocation?.road || address)}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ textDecoration: "none", margin: '2px 0 0 0' }}
+        >
+            <PinIcon size="20" color="rgb(42, 174, 233)" />
+        </a>
+        <Box
+            onClick={() => onClick(address)}
+            style={{ cursor: 'pointer' }}
+        >
+            {address}
+        </Box>
+    </Box>
+}
+
 export const useUrls = () => {
-    const { actions } = useActionsContext();
+    const { actions, setFilters, filters, setFilterMode } = useActionsContext();
     const { pageOwnerAddress, wallet } = useUserContext();
     const [urls, setUrls] = useState<LinkItem[]>([]);
+
+    const onLocationClicked = (location: string) => {
+        if (!filters.find((item) => item.value === location)) {
+            setFilters([
+                ...filters,
+                {
+                    type: "location",
+                    value: location,
+                },
+            ]);
+            setFilterMode("location");
+        }
+    };
 
     useEffect(() => {
         if (!pageOwnerAddress) return;
@@ -109,22 +148,21 @@ export const useUrls = () => {
             return urls;
         }
 
+        const address = latestLocation?.short?.slice(0, MaxStringLength) || formatAddress(latestLocation?.road);
+        const trimmedAddress = address.length > 12 ? `${address.slice(0, 12)}...` : address
+
         return [
             {
                 id: "latest_location" + latestLocation?.postcode,
                 text: (
                     <HeaderText>
-                        <a
-                            href={linkToMapByAddress(latestLocation)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ textDecoration: "none" }}
-                        >
-                            {`m/${
-                              latestLocation?.short?.slice(0, MaxStringLength)
-                              || formatAddress(latestLocation?.road)
-                            }`}
-                        </a>
+                        <Box margin={{ left: "-6px" }}>
+                            <LocationFilter
+                                latestLocation={latestLocation}
+                                address={trimmedAddress}
+                                onClick={() => onLocationClicked(address)}
+                            />
+                        </Box>
                     </HeaderText>
                 ),
             },
