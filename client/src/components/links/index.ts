@@ -58,6 +58,13 @@ export const predefinedLinks = [
         baseUrl: 'https://twitter.com/'
     },
     {
+        type: 'x',
+        providerName: 'x',
+        // eslint-disable-next-line no-useless-escape
+        regex: /(?:https?:\/\/(?:(www|mobile)\.)?(twitter|x).com\/)?([^\/\n "]+)\/?/gi,
+        baseUrl: 'https://x.com/'
+    },
+    {
         type: 's',
         providerName: 'substack',
         regex: /(https?:\/\/)?([a-zA-Z0-9-]+).substack.com\/?/gi,
