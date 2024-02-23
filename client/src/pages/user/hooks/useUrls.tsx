@@ -23,22 +23,24 @@ export const LocationFilter = (props:
 ) => {
     const { address, latestLocation, onClick } = props;
 
-    return <Box direction="row" align="start">
-        <a
-            href={linkToMapByAddress(latestLocation?.road || address)}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ textDecoration: "none", margin: '2px 0 0 0' }}
-        >
-            <PinIcon size="20" color="rgb(42, 174, 233)" />
-        </a>
-        <Box
-            onClick={() => onClick(address)}
-            style={{ cursor: 'pointer' }}
-        >
-            {address}
+    return <HeaderText>
+        <Box direction="row" align="start">
+            <a
+                href={linkToMapByAddress(latestLocation?.road || address)}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: "none", margin: '2px 0 0 0' }}
+            >
+                <PinIcon size="20" color="rgb(42, 174, 233)" />
+            </a>
+            <Box
+                onClick={() => onClick(address)}
+                style={{ cursor: 'pointer' }}
+            >
+                {address}
+            </Box>
         </Box>
-    </Box>
+    </HeaderText>
 }
 
 export const useUrls = () => {
@@ -155,15 +157,13 @@ export const useUrls = () => {
             {
                 id: "latest_location" + latestLocation?.postcode,
                 text: (
-                    <HeaderText>
-                        <Box margin={{ left: "-6px" }}>
-                            <LocationFilter
-                                latestLocation={latestLocation}
-                                address={trimmedAddress}
-                                onClick={() => onLocationClicked(address)}
-                            />
-                        </Box>
-                    </HeaderText>
+                    <Box margin={{ left: "-6px" }}>
+                        <LocationFilter
+                            latestLocation={latestLocation}
+                            address={trimmedAddress}
+                            onClick={() => onLocationClicked(address)}
+                        />
+                    </Box>
                 ),
             },
             ...urls,
