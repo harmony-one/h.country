@@ -24,22 +24,6 @@ export interface ParseResult {
     deprecated?: boolean;
 }
 
-const db = getFirestore();
-async function urlExistsInUserLinks(input: string, walletAddress: string) {
-    const docRef = doc(db, "userLinks", walletAddress);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-        const data = docSnap.data();
-        for (const key in data) {
-            if (typeof data[key] === 'object' && data[key].url === input) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
 function isLikelyURL(input: string) {
     return /^https?:\/\//.test(input) ||
            /^www\./.test(input) ||
