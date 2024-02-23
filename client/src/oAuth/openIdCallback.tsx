@@ -10,6 +10,7 @@ export const OpenIdCallback = () => {
     const code = queryParams.get('code');
 
     if (code) {
+      console.log('code: ', code)
       // Update the endpoint to a more general name reflecting its purpose
       fetch('https://arcane-scrubland-65117-d47280ee383b.herokuapp.com/api/openid/exchange-code', {
         method: 'POST',
