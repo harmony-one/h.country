@@ -169,9 +169,12 @@ export const addMessage = async (params: {
   const hashtags = [...text.matchAll(/#(\w+)/g)].map((match) => match[1]);
   let type: string = "message";
   let payload: any = text;
+  let to = mentions[0] || ""
 
   const urlRegex = /https?:\/\/[^\s]+/;
   const urlMatch = text.match(urlRegex);
+
+  // TODO: pass "type" param directly from components
   if (urlMatch) {
     type = "link";
     payload = urlMatch[0];
@@ -197,10 +200,10 @@ export const addMessage = async (params: {
   }
 
   let action = {
-    from: from,
-    to: mentions[0] || "",
-    type: type,
-    payload: payload,
+    from,
+    to,
+    type,
+    payload,
     address: {
       short: formatAddress(addressComponents.road || ""),
       lattitude: locationData.latitude || "",

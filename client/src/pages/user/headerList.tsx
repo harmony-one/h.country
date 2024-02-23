@@ -201,10 +201,15 @@ export const HeaderList = (props: HeaderListProps) => {
                 }}
               >
                 <Box key={item.id}>
-                  {(item.predefined === true && item.providerName !== undefined) ?
-                    <Button plain>
-                      <HeaderText onClick={() => { onTitleClick({ providerName: item.providerName! }) }}>{item.text}</HeaderText>
-                    </Button> :
+                  {(item.predefined === true && item.providerName !== undefined)
+                    ? <Button plain>
+                        <HeaderText onClick={() => {
+                          onTitleClick({ providerName: item.providerName! })
+                        }}>
+                          {item.text}
+                        </HeaderText>
+                      </Button>
+                    :
                     <HeaderText>{item.text}</HeaderText>}
                 </Box>
               </div>

@@ -101,7 +101,11 @@ export const UserAction = (props: UserActionProps) => {
   const address = action.address.short ||
     formatAddress(action.address.road)
 
-  return <Box border={{ side: "bottom", color: 'border' }} pad={"4px 0"}> 
+  const socialData = action.type === 'link'
+    ? socialUrlParser(action.payload || '', 'any')
+    : null
+
+  return <Box border={{ side: "bottom", color: 'border' }} pad={"4px 0"}>
     {(action.type === 'tag' || action.type === 'new_user' || action.type === 'multi_tag') &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
         <Box basis={address ? "50%" : "90%"}>
@@ -109,7 +113,7 @@ export const UserAction = (props: UserActionProps) => {
             <Text size={"small"} style={{ wordBreak: 'break-all' }}>
               <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
               {" "}
-              <ActionText onClick={onTagClicked} type={actionType}>#{String(action.payload)}</ActionText>
+              <ActionText onClick={onTagClicked} type={actionType}>#{String(action.payload).slice(0, 16)}</ActionText>
               {" "}
               <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
             </Text>
@@ -142,8 +146,8 @@ export const UserAction = (props: UserActionProps) => {
                 <ActionText color='grey1'>{" adds "}</ActionText>
               }
               <ActionText color='grey1'>
-                <ActionLink 
-                  className="link" 
+                <ActionLink
+                  className="link"
                   to={`/0/${action.from}`}
                   type={ActionType.none}
                 >
@@ -173,21 +177,24 @@ export const UserAction = (props: UserActionProps) => {
     }
     {action.type === 'link' &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
-        <Box basis={address ? "50%" : "90%"}>
+        <Box basis={address ? "80%" : "90%"}>
           <Text size={"small"} style={{ wordBreak: 'break-all' }}>
             <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
-            {/* <ActionText size={"small"} type={ActionType.none}>{socialUrlParser(action.payload || '')[0]?.name}</ActionText>
-            {' '} */}
             {' '}
             <ActionLink className="link" to={`/0/${action.from}`} type={actionType}>{
-              socialUrlParser(action.payload || '', 'any')?.username
+              socialData?.username
             }
             </ActionLink>
             {' '}
-            <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
+            <ActionLink
+                className="link"
+                to={`/0/${action.from}`}
+                type={ActionType.none}>
+                {`${socialData?.type}/${socialData?.username}`.slice(0, 10)}
+            </ActionLink>
           </Text>
         </Box>
-        {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
+        {address && <Box align={'end'} basis="20%" style={{ minWidth: '32px' }}>
           <PlainText fontSize='min(0.8em, 3.7vw)'
             onClick={() => onLocationClicked(address)}
             style={{ textAlign: "right", cursor: 'pointer' }}>
