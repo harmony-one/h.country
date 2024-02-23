@@ -42,7 +42,7 @@ export const useUrls = () => {
                                             rel="noopener noreferrer"
                                             style={{ textDecoration: "none" }}
                                         >
-                                            {`${key}/${data[key].username.slice(0, MaxStringLength)}`}
+                                            {`${key}/${data[key].username}`.slice(0, MaxStringLength)}
                                         </a>
                                     </HeaderText>
                                 ),
@@ -121,7 +121,7 @@ export const useUrls = () => {
                             style={{ textDecoration: "none" }}
                         >
                             {`m/${
-                              latestLocation?.short?.slice(0, MaxStringLength)
+                              latestLocation?.short?.slice(0, MaxStringLength - 2)
                               || formatAddress(latestLocation?.road)
                             }`}
                         </a>
