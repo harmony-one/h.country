@@ -50,7 +50,7 @@ const formatMessages = (messages: QueryDocumentSnapshot[]) => {
 }
 
 export interface GetMessagesParams {
-  filters?: IFilter[]
+  filters?: IFilter[][]
   updateCallback?: (actions: Action[]) => void
 }
 
@@ -64,11 +64,12 @@ export const getMessages = async (params: GetMessagesParams = {}): Promise<{
   const unsubscribeList = []
   if (filters.length) {
     const res = await Promise.all(filters.map(async filter => {
-      const q = query(
+      let q = query(
         collection(db, "actions"),
         orderBy("timestamp", "desc"),
-        where(filter.fieldPath, filter.opStr, filter.value)
       );
+
+      filter.forEach(f => q = query(q, where(f.fieldPath, f.opStr, f.value)))
 
       if (updateCallback) {
         const unsubscribe = onSnapshot(q, (querySnapshot) => {

@@ -12,7 +12,7 @@ import {
 import { ActionFilter, ActionFilterType, AddressComponents } from "../types";
 import { getMessages, genFilter, IFilter } from "../api";
 import { useUserContext } from "./UserContext";
-import {  Unsubscribe } from 'firebase/firestore';
+import { Unsubscribe } from 'firebase/firestore';
 
 interface Action {
   timestamp: string;
@@ -73,25 +73,39 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
     })
 
     try {
-      let actionFilters: IFilter[] = []
-      if (filterMode === "address" && pageOwnerAddress) {
+      let actionFilters: IFilter[][] = [[]];
+
+      if (filters.length > 1 && ['location', 'hashtag'].includes(filterMode)) {
         actionFilters = [
-          genFilter('from', '==', pageOwnerAddress),
-          genFilter('to', '==', pageOwnerAddress)
+          filters.map(f => {
+            if (f.type === 'hashtag') {
+              return genFilter('payload', '==', f.value)
+            } else {
+              return genFilter('address.short', '==', f.value)
+            }
+          })
         ]
-      } else if (filterMode === 'location' && filters.length > 0) {
-        const [{ value }] = filters
-        actionFilters = [
-          genFilter('payload', '==', value),
-          genFilter('address.short', '==', value)
-        ]
-      } else if (filterMode === 'hashtag' && filters.length > 0) {
-        const [{ value }] = filters
-        actionFilters = [
-          genFilter('payload', '==', value),
-        ]
+      } else {
+        if (filterMode === "address" && pageOwnerAddress) {
+          actionFilters = [
+            [genFilter('from', '==', pageOwnerAddress)],
+            [genFilter('to', '==', pageOwnerAddress)]
+          ]
+        } else if (filterMode === 'location' && filters.length > 0) {
+          const [{ value }] = filters
+          actionFilters = [
+            [genFilter('payload', '==', value)],
+            [genFilter('address.short', '==', value)]
+          ]
+        } else if (filterMode === 'hashtag' && filters.length > 0) {
+          const [{ value }] = filters
+          actionFilters = [
+            [genFilter('payload', '==', value)]
+          ]
+        }
       }
-      console.log('Fetching actions...', actionFilters)
+
+      console.log('Fetching actions...', actionFilters, filterMode)
       const data = await getMessages({
         filters: actionFilters,
         updateCallback: (actionsUpdate: Action[]) => {

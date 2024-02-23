@@ -120,17 +120,16 @@ export const UserPage = (props: { id: string }) => {
           {filters
             .filter((f) => f.value !== "one" && f.value !== "ai")
             .map((filter) => {
-              const { value } = filter;
+              const { value, type } = filter;
               const onClick = () => {
                 const newFilters = filters.filter(
                   (item) => item.value !== value
                 );
+                
                 setFilters(newFilters);
-                if (newFilters.length === 0) {
-                  setFilterMode(DefaultFilterMode);
-                }
+                setFilterMode(newFilters[0]?.type || DefaultFilterMode);
               };
-              return filterMode === 'location' ?
+              return type === 'location' ?
                 <Box>
                   <LocationFilter
                     address={value}
