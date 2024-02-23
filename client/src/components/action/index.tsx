@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Box, Text } from "grommet";
+import styled from "styled-components";
 import { Link } from "react-router-dom";
 import moment from 'moment'
+
 import { Action } from "../../types";
 import { socialUrlParser, formatAddress } from "../../utils";
-import styled from "styled-components";
 import useInterval from "../../hooks/useInterval";
 import { PlainText } from "../button";
+import { StarOutlined } from "@ant-design/icons"; // FireOutlined, HeartOutlined,
 
 export enum ActionType {
   self = 'self',
@@ -109,7 +111,7 @@ export const UserAction = (props: UserActionProps) => {
   return <Box border={{ side: "bottom", color: 'border' }} pad={"4px 0"}>
     {(action.type === 'tag' || action.type === 'new_user' || action.type === 'multi_tag') &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
-        <Box basis={address ? "50%" : "90%"}>
+        <Box basis={address ? "45%" : "85%"}>
           {action.type === 'tag' &&
             <Text size={"small"} style={{ wordBreak: 'break-all' }}>
               <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
@@ -169,16 +171,21 @@ export const UserAction = (props: UserActionProps) => {
             {address.substring(0, 10)}
           </PlainText>
         </Box>}
-        <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
+        <Box align={'end'} basis="10%" style={{ minWidth: '10px' }}>
           <PlainText fontSize='min(0.8em, 3vw)'>
             {actionTime}
+          </PlainText>
+        </Box>
+        <Box align={'end'} basis="5%">
+          <PlainText fontSize='min(0.8em, 3vw)'>
+            <StarOutlined />
           </PlainText>
         </Box>
       </Box>
     }
     {action.type === 'link' &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
-        <Box basis={address ? "50%" : "90%"}>
+        <Box basis={address ? "45%" : "85%"}>
           <Text size={"small"} style={{ wordBreak: 'break-all' }}>
             <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
             {' '}
@@ -202,9 +209,14 @@ export const UserAction = (props: UserActionProps) => {
             {address.substring(0, 10)}
           </PlainText>
         </Box>}
-        <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
+        <Box align={'end'} basis="10%" style={{ minWidth: '10px' }}>
           <PlainText fontSize='min(0.8em, 3vw)'>
             {actionTime}
+          </PlainText>
+        </Box>
+        <Box align={'end'} basis="5%">
+          <PlainText fontSize='min(0.8em, 3vw)'>
+            <StarOutlined />
           </PlainText>
         </Box>
       </Box>}
