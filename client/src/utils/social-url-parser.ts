@@ -1,6 +1,4 @@
 import { regexes, RegexObject } from "../components/links";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
-
 
 // function removeEmpty<T>(object: any): T {
 //     for (const key of Object.keys(object)) {
