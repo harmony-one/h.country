@@ -16,7 +16,7 @@ root.render(
   domain={domain as string}
   clientId={clientId as string}
   authorizationParams={{
-    redirect_uri: "http://g.country.pages.dev"
+    redirect_uri: process.env.REACT_APP_AUTH0_REDIRECT
   }}
 >
   <App />

@@ -3,12 +3,18 @@ const cors = require('cors');
 const axios = require('axios');
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: 'https://g.country', // Allow only your React app's domain
+  methods: ['GET', 'POST'], // Specify allowed methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+  credentials: true, // If your client needs to send cookies or authorization headers
+}));
 app.use(express.json());
 require('dotenv').config();
 
 app.post('/api/openid/exchange-code', async (req, res) => {
   const { code } = req.body;
+  console.log("code token: ", code)
 
   try {
     // Exchange the authorization code for tokens with Auth0
