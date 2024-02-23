@@ -122,7 +122,7 @@ export function socialUrlParser(input: string, providerName: string): ParseResul
             if (regexObject.providerName === 'substack') {
                 url = `https://${username}.substack.com`
             } else {
-                url = regexObject.baseUrl + "/" + username;
+                url = regexObject.baseUrl + username;
             }
         }
     
