@@ -26,7 +26,7 @@ function UsernamePrompt({ providerName, displayName, providerShorthand, authType
         onClick={handlePrompt} 
         style={{
           background: 'none',
-          color: 'white',
+          color: 'grey1',
           border: 'none',
           padding: 0,
           cursor: 'pointer',
