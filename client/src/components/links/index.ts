@@ -1,7 +1,7 @@
 // And no, providerName and displayName are not the same, they will be changed later for oAuth so don't remove one or the other
 export const predefinedLinks = [
     { key: "x", displayName: "twitter", providerName: "twitter" },
-    { key: "ig", displayName: "instagram", providerName: "instagram" },
+    { key: "i", displayName: "instagram", providerName: "instagram" },
     { key: "g", displayName: "github", providerName: "github" },
     { key: "f", displayName: "facebook", providerName: "facebook" },
     { key: "l", displayName: "linkedIn", providerName: "linkedin" },
@@ -25,7 +25,7 @@ export const predefinedLinks = [
       baseUrl: 'https://github.com/'
     },
     {
-        type: 'ig',
+        type: 'i',
         providerName: 'instagram',
         regex: /(?:https?:\/\/(?:www\.)?instagram.com\/)?([^\n "/]+)/gi,
         baseUrl: 'https://www.instagram.com/'
