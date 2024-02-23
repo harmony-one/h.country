@@ -60,14 +60,12 @@ export const useTopTags = () => {
               acc[tag] = (acc[tag] || 0) + count;
             }
           }
-
           return acc;
         },
         {}
       );
 
       const tagsList = Object.entries(hashtagFrequency);
-      console.log("FRANK", tagsList);
       const sortedHashtags = tagsList
         .filter((item) => item[0] !== "")
         .sort((a, b) => b[1] - a[1])
