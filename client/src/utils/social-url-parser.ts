@@ -24,8 +24,8 @@ export interface ParseResult {
 
 function isLikelyURL(input: string) {
     return /^https?:\/\//.test(input) ||
-           /^www\./.test(input) ||
-           /\.[a-z]{2,15}($|\/)/i.test(input);
+        /^www\./.test(input) ||
+        /\.[a-z]{2,15}($|\/)/i.test(input);
 }
 
 function normalizeInput(input: string) {
@@ -65,7 +65,7 @@ function extractUsernameForProvider(input: string) {
 export function socialUrlParser(input: string, providerName: string): ParseResult | null {
     const isUrl = isLikelyURL(input);
     const uuid = generateUUID()
-    
+
     if (providerName === "any") {
         if (isUrl) {
             const normalizedInput = normalizeInput(input);
@@ -75,7 +75,7 @@ export function socialUrlParser(input: string, providerName: string): ParseResul
                 const inputDomain = new URL(normalizedInput).hostname.replace(/^www\./, '');
                 return inputDomain === baseUrlDomain || inputDomain.endsWith('.' + baseUrlDomain);
             });
-            
+
 
             if (matchedProvider) {
                 const username = extractUsernameForProvider(normalizedInput);
@@ -99,22 +99,22 @@ export function socialUrlParser(input: string, providerName: string): ParseResul
                 type: uuid,
                 providerName: uuid,
                 url: `https://www.google.com/search?q=${encodeURIComponent(input)}`,
-                username: input,
+                username: "/" + input,
             };
         }
     } else {
         const regexObject = regexes.find(regex => regex.providerName === providerName);
         if (!regexObject) return null;
-    
+
         let username;
         let url;
-    
+
         if (isLikelyURL(input)) {
             const normalizedInput = normalizeInput(input);
             regexObject.regex.lastIndex = 0;
             const result = regexObject.regex.exec(normalizedInput);
             if (!result) return null;
-    
+
             username = result[result.length - 1];
             url = normalizedInput;
         } else {
@@ -125,7 +125,7 @@ export function socialUrlParser(input: string, providerName: string): ParseResul
                 url = regexObject.baseUrl + username;
             }
         }
-    
+
         return {
             type: regexObject.type,
             providerName: regexObject.providerName,
@@ -133,5 +133,5 @@ export function socialUrlParser(input: string, providerName: string): ParseResul
             username: username,
         };
     }
-    
+
 }
