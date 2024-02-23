@@ -1,2 +1,2 @@
-web: node openidAuth.js
-worker: node openidAuth.js
+web: node openidAuth.ts
+worker: node openidAuth.ts
