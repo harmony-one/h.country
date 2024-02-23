@@ -101,6 +101,10 @@ export const UserAction = (props: UserActionProps) => {
   const address = action.address.short ||
     formatAddress(action.address.road)
 
+  const socialData = action.type === 'link'
+    ? socialUrlParser(action.payload || '', 'any')
+    : null
+
   return <Box border={{ side: "bottom", color: 'border' }} pad={"4px 0"}>
     {(action.type === 'tag' || action.type === 'new_user' || action.type === 'multi_tag') &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
@@ -178,7 +182,7 @@ export const UserAction = (props: UserActionProps) => {
             <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
             {' '}
             <ActionLink className="link" to={`/0/${action.from}`} type={actionType}>{
-              socialUrlParser(action.payload || '', 'any')?.username
+              socialData?.username
             }
             </ActionLink>
             {' '}
@@ -186,7 +190,7 @@ export const UserAction = (props: UserActionProps) => {
                 className="link"
                 to={`/0/${action.from}`}
                 type={ActionType.none}>
-                0/{socialUrlParser(action.payload || '', 'any')?.username}
+                {`${socialData?.type}/${socialData?.username}`.slice(0, 10)}
             </ActionLink>
           </Text>
         </Box>
