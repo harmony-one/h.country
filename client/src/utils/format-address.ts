@@ -1,5 +1,3 @@
-import { AddressComponents } from "../types";
-
 export const removeSpacesAndSpecialChars = (str: string) => {
     return str.replace(/[\s~`!@#$%^&*(){};:"'<,.>?\\|_+=-]/g, '');
 }
