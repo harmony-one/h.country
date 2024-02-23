@@ -115,7 +115,7 @@ export const UserPage = (props: { id: string }) => {
             <PlainText
               fontSize="min(1em, 4vw)"
             >
-              {key?.substring(0, 4)}
+              0/{key?.substring(0, 4)}
             </PlainText>
           </PlainButton>
           {filters

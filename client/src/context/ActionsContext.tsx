@@ -42,7 +42,7 @@ interface ActionsProviderProps {
   children: ReactNode;
 }
 
-const DefaultFilterMode: ActionFilterType = 'address'
+const DefaultFilterMode: ActionFilterType = 'all'
 
 export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) => {
   const { firstTimeVisit, pageOwnerAddress } = useUserContext();
