@@ -13,6 +13,7 @@ interface LinkItem {
     providerName?: string;
 }
 
+const MaxStringLength = 10
 
 export const useUrls = () => {
     const { actions } = useActionsContext();
@@ -41,7 +42,7 @@ export const useUrls = () => {
                                             rel="noopener noreferrer"
                                             style={{ textDecoration: "none" }}
                                         >
-                                            {`${key}/${data[key].username}`}
+                                            {`${key}/${data[key].username.slice(0, MaxStringLength)}`}
                                         </a>
                                     </HeaderText>
                                 ),
@@ -52,7 +53,7 @@ export const useUrls = () => {
                             // Return a default link item with the display text if the key does not exist
                             return {
                                 id: docSnap.id + key,
-                                text: <HeaderText>{displayName}</HeaderText>,
+                                text: <HeaderText>{displayName.slice(0, MaxStringLength)}</HeaderText>,
                                 predefined: true,
                                 providerName: providerName,
                             };
@@ -74,9 +75,7 @@ export const useUrls = () => {
                                     rel="noopener noreferrer"
                                     style={{ textDecoration: "none" }}
                                 >
-                                    {data[key].username.length > 12
-                                        ? `${data[key].username.slice(0, 12)}...`
-                                        : data[key].username}
+                                    {data[key].username.slice(0, MaxStringLength)}
                                 </a>
                             </HeaderText>),
                         predefined: false,
@@ -121,8 +120,10 @@ export const useUrls = () => {
                             rel="noopener noreferrer"
                             style={{ textDecoration: "none" }}
                         >
-                            {`m/${latestLocation?.short || formatAddress(latestLocation?.road)
-                                }`}
+                            {`m/${
+                              latestLocation?.short?.slice(0, MaxStringLength)
+                              || formatAddress(latestLocation?.road)
+                            }`}
                         </a>
                     </HeaderText>
                 ),
