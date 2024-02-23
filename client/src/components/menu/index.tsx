@@ -26,14 +26,19 @@ export const AppMenu = () => {
   
   return <Box>
     <Box direction={'row'} justify={'between'}>
-      <Box>
-        <LocationButton />
-      </Box>
-      <Box flex="grow" />
       <Box onClick={handleCopyPrivateKey}>
         <Text color={"blue1"}>
           h.country
         </Text>
+      </Box>
+      <a href="https://harmony.one/hcountry" target="_blank" rel="noopener noreferrer" style={{ cursor: 'pointer', textDecoration: 'none' }}>
+        <Text margin={{ left: 'medium' }} color={"grey1"}>
+          about
+        </Text>
+      </a>
+      <Box flex="grow" />
+      <Box>
+        <LocationButton />
       </Box>
     </Box>
   </Box>
