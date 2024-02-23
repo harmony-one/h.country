@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Box, Spinner, Text } from "grommet";
 import styled from "styled-components";
-import { StarOutlined } from "@ant-design/icons"; // FireOutlined, HeartOutlined,
+// import { StarOutlined } from "@ant-design/icons"; // FireOutlined, HeartOutlined,
 
 import { useActionsContext } from "../../context";
 import { UserAction } from "../../components/action";
@@ -165,7 +165,7 @@ export const UserPage = (props: { id: string }) => {
               }
             }}
           >
-            <PlainText fontSize="min(1em, 4vw)">#one</PlainText>
+            {/* <PlainText fontSize="min(1em, 4vw)">#one</PlainText> */}
           </PlainButton>
           <PlainButton
             isActive={filterMode === "hashtag"}
@@ -187,13 +187,13 @@ export const UserPage = (props: { id: string }) => {
               }
             }}
           >
-            <PlainText fontSize="min(1em, 4vw)">#ai</PlainText>
+            {/* <PlainText fontSize="min(1em, 4vw)">#ai</PlainText> */}
           </PlainButton>
-          <PlainButton style={{ padding: '2px' }}>
+          {/* <PlainButton style={{ padding: '2px' }}>
             <PlainText fontSize="min(1em, 4vw)">
               <StarOutlined />
             </PlainText>
-          </PlainButton>
+          </PlainButton> */}
         </Box>
       </div>
       <Box>
