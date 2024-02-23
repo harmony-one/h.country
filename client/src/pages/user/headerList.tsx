@@ -3,6 +3,7 @@ import { Box, Button, Text } from "grommet";
 import { ethers } from "ethers";
 import { doc, setDoc } from "firebase/firestore";
 import styled from "styled-components";
+import { handleOpenIdLogin } from "../../oAuth/openIdLogin";
 
 import { db } from "../../configs/firebase-config";
 import { addMessageWithGeolocation } from "../../api";
@@ -98,6 +99,7 @@ export const HeaderList = (props: HeaderListProps) => {
 
     if (input === null) {
       console.log("Prompt was cancelled.");
+      handleOpenIdLogin({providerName})
       return;
     }
 

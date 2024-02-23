@@ -27,7 +27,6 @@ const UserPageBox = styled(Box)`
 export const UserPage = (props: { id: string }) => {
   const { wallet } = useUserContext();
   const { id: key } = props;
-
   const tagItems = useTopTags();
   const locationItems = useTopLocations();
   const urls = useUrls();
