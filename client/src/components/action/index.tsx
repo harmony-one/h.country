@@ -62,7 +62,6 @@ const truncateTag = (tag: string) => {
   return tag.length > MAX_TAG_LENGTH ? tag.slice(0,MAX_TAG_LENGTH) : tag
 }
 
-
 export const UserAction = (props: UserActionProps) => {
   const { action, userId } = props
 
@@ -179,7 +178,7 @@ export const UserAction = (props: UserActionProps) => {
     }
     {action.type === 'link' &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
-        <Box basis={address ? "80%" : "90%"}>
+        <Box basis={address ? "50%" : "90%"}>
           <Text size={"small"} style={{ wordBreak: 'break-all' }}>
             <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
             {' '}
@@ -196,7 +195,7 @@ export const UserAction = (props: UserActionProps) => {
             </ActionLink>
           </Text>
         </Box>
-        {address && <Box align={'end'} basis="20%" style={{ minWidth: '32px' }}>
+        {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
           <PlainText fontSize='min(0.8em, 3.7vw)'
             onClick={() => onLocationClicked(address)}
             style={{ textAlign: "right", cursor: 'pointer' }}>

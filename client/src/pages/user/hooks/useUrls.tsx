@@ -30,7 +30,7 @@ export const LocationFilter = (props:
             rel="noopener noreferrer"
             style={{ textDecoration: "none", margin: '2px 0 0 0' }}
         >
-            <PinIcon size="20" color="rgb(42, 174, 233)" />
+            <PinIcon size="18" color="rgb(42, 174, 233)" />
         </a>
         <Box
             onClick={() => onClick(address)}
@@ -81,7 +81,7 @@ export const useUrls = () => {
                                             rel="noopener noreferrer"
                                             style={{ textDecoration: "none" }}
                                         >
-                                            {`${key}/${data[key].username.slice(0, MaxStringLength)}`}
+                                            {`${key}/${data[key].username}`.slice(0, MaxStringLength)}
                                         </a>
                                     </HeaderText>
                                 ),
