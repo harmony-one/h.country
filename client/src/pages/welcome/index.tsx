@@ -135,7 +135,7 @@ const TopicItem = (props: TopicItemProps) => {
       <TopicItemAlias>
         {showLabel && (
           <Typography.Text
-            style={{ fontSize: "min(5vw, 1.5rem)", fontWeight: 600, color: isSelected ? '#64ebfd' : 'white' }}
+            style={{ fontSize: "min(5vw, 1.5rem)", fontWeight: 600, color: isSelected ? '#64ebfd' : '#B3B3B3' }}
           >
             {prefix}
             {topic.name}
