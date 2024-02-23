@@ -6,6 +6,8 @@ body {
   
   height: 100svh;
   height: -webkit-fill-available;
+  overflow-x:hidden;
+
   .ant-typography {
     font-family: 'Nunito', 'Helvetica Neue', sans-serif !important;
     /* color: #B3B3B3; only dark mode */

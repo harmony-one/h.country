@@ -56,10 +56,12 @@ export interface UserActionProps {
   onLocationClicked?: (location: string) => void
 }
 
-// TODO:
-// no underline
-// no yellow addresses in feed
-// only blue for myself
+const MAX_TAG_LENGTH = 15
+
+const truncateTag = (tag: string) => {
+  return tag.length > MAX_TAG_LENGTH ? tag.slice(0,MAX_TAG_LENGTH) : tag
+}
+
 
 export const UserAction = (props: UserActionProps) => {
   const { action, userId } = props
@@ -113,7 +115,7 @@ export const UserAction = (props: UserActionProps) => {
             <Text size={"small"} style={{ wordBreak: 'break-all' }}>
               <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
               {" "}
-              <ActionText onClick={onTagClicked} type={actionType}>#{String(action.payload).slice(0, 16)}</ActionText>
+              <ActionText onClick={onTagClicked} type={actionType}>#{truncateTag(String(action.payload))}</ActionText>
               {" "}
               <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
             </Text>
@@ -122,7 +124,7 @@ export const UserAction = (props: UserActionProps) => {
             <Text size={"small"} style={{ wordBreak: 'break-all' }}>
               <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
               {" "}
-              <ActionText size={"small"} onClick={onTagClicked} type={actionType}>#{String(action.payload.tag)}</ActionText>
+              <ActionText size={"small"} onClick={onTagClicked} type={actionType}>#{truncateTag(String(action.payload.tag))}</ActionText>
               {" "}
               <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
               {/* {" "}

@@ -6,6 +6,7 @@ import { Action } from "../../../types";
 import { Box, Button } from "grommet";
 import { HeaderText, SmallHeaderText } from "../headerList";
 import { TagItem } from "./useTopTags";
+import { MAX_TAG_LENGTH } from ".";
 
 export const useTopLocations = () => {
     const { pageOwnerAddress } = useUserContext();
@@ -41,7 +42,7 @@ export const useTopLocations = () => {
                     text: (<Button plain>
                         <Box direction={"row"}>
                             <HeaderText>
-                                {text}
+                                {text.length > MAX_TAG_LENGTH ? text.slice(0,MAX_TAG_LENGTH) : text}
                             </HeaderText>
                             <SmallHeaderText>{count}</SmallHeaderText>
                         </Box>

@@ -135,7 +135,7 @@ const TopicItem = (props: TopicItemProps) => {
       <TopicItemAlias>
         {showLabel && (
           <Typography.Text
-            style={{ fontSize: "min(3.2vw, 1.1rem)", fontWeight: 600, color: isSelected ? '#64ebfd' : 'grey1' }}
+            style={{ fontSize: "min(5vw, 1.5rem)", fontWeight: 600, color: isSelected ? '#64ebfd' : '#B3B3B3' }}
           >
             {prefix}
             {topic.name}
@@ -186,7 +186,7 @@ export const WelcomePage: React.FC = () => {
       };
       if (wallet) {
         const addressWithoutPrefix = wallet.address.slice(2);
-        const tags = firstTimeVisit ? [...selectedTopics, addressWithoutPrefix] : selectedTopics
+        const tags = selectedTopics // firstTimeVisit ? [...selectedTopics, addressWithoutPrefix] : selectedTopics
         try {
           await Promise.all(tags.map((tag: string) => addMessage({
             locationData,
