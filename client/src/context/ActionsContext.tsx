@@ -53,6 +53,7 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
   );
   const [isLoading, setLoading] = useState(false);
   const [filters, setFilters] = useState<ActionFilter[]>([])
+  const [unsubscribeUpdates, setUnsubscribeUpdates] = useState<Unsubscribe[]>([])
 
   useEffect(() => {
     // Drop sub-filters if user select All of <Address> filter
@@ -65,7 +66,11 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
     setLoading(true)
     setActions([])
 
-    let unsubscribeList: Unsubscribe[] = []
+    // Unsubscribe from previous updates
+    // console.log(`Unsubscribe from ${unsubscribeUpdates.length} updates`)
+    unsubscribeUpdates.forEach(unsubscribe => {
+      unsubscribe()
+    })
 
     try {
       let actionFilters: IFilter[] = []
@@ -89,27 +94,18 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
       console.log('Fetching actions...', actionFilters)
       const data = await getMessages({
         filters: actionFilters,
-        updateCallback: (newActions: Action[]) => {
-          // if(!isLoading) {
-          //   setActions(newActions)
-          //   console.log('Actions updated', newActions)
-          // }
+        updateCallback: (actionsUpdate: Action[]) => {
+          setActions(actionsUpdate)
         }
       });
 
       setActions(data.actions)
       console.log('Actions loaded:', data.actions)
-      unsubscribeList = data.unsubscribeList
+      setUnsubscribeUpdates(data.unsubscribeList)
     } catch (e) {
       console.error('Failed to load messages:', e)
     } finally {
       setLoading(false)
-    }
-
-    return () => {
-      unsubscribeList.forEach(unsubscribe => {
-        unsubscribe()
-      })
     }
   }, [filterMode, pageOwnerAddress, filters]);
 
