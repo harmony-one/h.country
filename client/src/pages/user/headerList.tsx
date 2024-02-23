@@ -64,7 +64,6 @@ interface TitleClickEvent {
   providerName: string;
 }
 
-
 export const HeaderList = (props: HeaderListProps) => {
   const { userId: key, type, items, wallet, isUserPage } = props;
   const addressWithoutPrefix = wallet ? wallet.address.slice(2) : '';

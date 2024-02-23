@@ -46,7 +46,8 @@ export const useTopTags = () => {
           const payload = message.payload;
           if (message.type === "tag") {
             if (typeof payload === "string") {
-              acc[payload] = (acc[payload] || 0) + 1;
+              const processedTag = payload.toLowerCase();
+              acc[processedTag] = (acc[processedTag] || 0) + 1;
             }
           } else if (message.type === "multi_tag") {
             if (
@@ -55,9 +56,10 @@ export const useTopTags = () => {
               "count" in payload
             ) {
               const tag = payload.tag as string;
+              const processedTag = tag.toLowerCase();
               const count =
                 typeof payload.count === "number" ? payload.count : 1;
-              acc[tag] = (acc[tag] || 0) + count;
+              acc[processedTag] = (acc[processedTag] || 0) + count;
             }
           }
 

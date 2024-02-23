@@ -115,7 +115,7 @@ export const UserAction = (props: UserActionProps) => {
             <Text size={"small"} style={{ wordBreak: 'break-all' }}>
               <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
               {" "}
-              <ActionText onClick={onTagClicked} type={actionType}>#{truncateTag(String(action.payload))}</ActionText>
+              <ActionText onClick={onTagClicked} type={actionType}>#{truncateTag(String(action.payload).toLowerCase())}</ActionText>
               {" "}
               <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
             </Text>
@@ -124,7 +124,7 @@ export const UserAction = (props: UserActionProps) => {
             <Text size={"small"} style={{ wordBreak: 'break-all' }}>
               <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
               {" "}
-              <ActionText size={"small"} onClick={onTagClicked} type={actionType}>#{truncateTag(String(action.payload.tag))}</ActionText>
+              <ActionText size={"small"} onClick={onTagClicked} type={actionType}>#{truncateTag(String(action.payload.tag).toLowerCase())}</ActionText>
               {" "}
               <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>
               {/* {" "}
