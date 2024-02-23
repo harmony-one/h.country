@@ -105,17 +105,33 @@ export function socialUrlParser(input: string, providerName: string): ParseResul
     } else {
         const regexObject = regexes.find(regex => regex.providerName === providerName);
         if (!regexObject) return null;
-
-        const normalizedInput = normalizeInput(input);
-        regexObject.regex.lastIndex = 0;
-        const result = regexObject.regex.exec(normalizedInput);
-        if (!result) return null;
-
+    
+        let username;
+        let url;
+    
+        if (isLikelyURL(input)) {
+            const normalizedInput = normalizeInput(input);
+            regexObject.regex.lastIndex = 0;
+            const result = regexObject.regex.exec(normalizedInput);
+            if (!result) return null;
+    
+            username = result[result.length - 1];
+            url = normalizedInput;
+        } else {
+            username = input;
+            if (regexObject.providerName === 'substack') {
+                url = `https://${username}.substack.com`
+            } else {
+                url = regexObject.baseUrl + "/" + username;
+            }
+        }
+    
         return {
             type: regexObject.type,
             providerName: regexObject.providerName,
-            url: normalizedInput,
-            username: result[result.length - 1],
+            url: url,
+            username: username,
         };
     }
+    
 }
