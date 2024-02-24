@@ -87,7 +87,7 @@ export const LocationButton = () => {
 
     return <Box onClick={() => onCLickLocation()}>
         <Text color={"grey1"}>
-            {latestLocation.short || formatAddress(latestLocation.road)}
+            {latestLocation.short || formatAddress(latestLocation.road) || 'location'}
         </Text>
     </Box>;
 }
