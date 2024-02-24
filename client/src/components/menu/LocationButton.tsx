@@ -81,13 +81,9 @@ export const LocationButton = () => {
         // }
     }, [wallet?.address, latestLocation, pageOwnerAddress, loadActions]);
 
-    if (!latestLocation) {
-        return null;
-    }
-
     return <Box onClick={() => onCLickLocation()}>
         <Text color={"grey1"}>
-            {latestLocation.short || formatAddress(latestLocation.road) || 'location'}
+            {latestLocation ? latestLocation.short || formatAddress(latestLocation.road) : 'location'}
         </Text>
     </Box>;
 }
