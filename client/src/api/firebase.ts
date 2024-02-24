@@ -43,14 +43,15 @@ const formatMessages = (messages: QueryDocumentSnapshot[]) => {
         type: data.type
       };
     })
-    .filter((action) => ["tag", "multi_tag", "link", "new_user", "location"].includes(action.type))
+    .filter((action) => ["tag", "multi_tag", "link", "new_user", "location", "check-in"].includes(action.type))
+    .filter((action) => action.type !== 'check-in' || action.payload !== 'check-in' ||  action.address?.short)
     .sort((a, b) => {
       return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     })
 }
 
 export interface GetMessagesParams {
-  filters?: IFilter[]
+  filters?: IFilter[][]
   updateCallback?: (actions: Action[]) => void
 }
 
@@ -64,11 +65,12 @@ export const getMessages = async (params: GetMessagesParams = {}): Promise<{
   const unsubscribeList = []
   if (filters.length) {
     const res = await Promise.all(filters.map(async filter => {
-      const q = query(
+      let q = query(
         collection(db, "actions"),
         orderBy("timestamp", "desc"),
-        where(filter.fieldPath, filter.opStr, filter.value)
       );
+
+      filter.forEach(f => q = query(q, where(f.fieldPath, f.opStr, f.value)))
 
       if (updateCallback) {
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -183,6 +185,7 @@ export const addMessage = async (params: {
     payload = customPayload || hashtags[0]
   } else if (text.includes("check-in")) {
     type = "check-in";
+    payload = customPayload
   } else if (text.includes("new_user")) {
     type = "new_user";
     payload = customPayload

@@ -277,7 +277,7 @@ export const UserAction = (props: UserActionProps) => {
           </Box>
         </Box>
       )}
-      {action.type === "link" && (
+      {['link'].includes(action.type) && (
         <Box direction={"row"} justify={"start"}> {/* pad={"0 16px"} */}
           <Box basis={address ? "45%" : "85%"}>
             <Text size={"small"} style={{ wordBreak: "break-all" }}>
@@ -287,19 +287,18 @@ export const UserAction = (props: UserActionProps) => {
                 type={ActionType.none}
               >
                 0/{action.fromShort}
-              </ActionLink>{" "}
+              </ActionLink>{' '}
               <ActionLink
                 className="link"
                 to={`/0/${action.from}`}
                 type={actionType}
               >
                 {socialData?.username}
-              </ActionLink>{" "}
+              </ActionLink>{' '}
               <ActionLink
                 className="link"
                 to={`/0/${action.from}`}
-                type={ActionType.none}
-              >
+                type={ActionType.none}>
                 {`${socialData?.type}/${socialData?.username}`.slice(0, 10)}
               </ActionLink>
             </Text>
@@ -325,44 +324,28 @@ export const UserAction = (props: UserActionProps) => {
           </Box>
         </Box>
       )}
-      {action.type === "location" && (
+       {['check-in', 'location'].includes(action.type) && (
         <Box direction={"row"} justify={"start"} pad={"0 16px"}>
           <Box basis={address ? "45%" : "85%"}>
-            <Text size={"small"} style={{ wordBreak: "break-all" }}>
-              <ActionLink
-                className="link"
-                to={`/0/${action.from}`}
-                type={ActionType.none}
-              >
-                0/{action.fromShort}
-              </ActionLink>{" "}
-              <ActionText
-                size={"small"}
-                onClick={() => onLocationClicked(action.payload)}
-                type={actionType}
-              >
-                {String(action.payload)}
-              </ActionText>{" "}
-              <ActionLink
-                className="link"
-                to={`/0/${action.to}`}
-                type={ActionType.none}
-              >
-                0/{action.toShort}
-              </ActionLink>
+            <Text size={"small"} style={{ wordBreak: 'break-all' }}>
+              <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
+              {" "}
+              <ActionText size={"small"} onClick={() => onLocationClicked(
+                action.payload === "check-in" ? action.address.short : action.payload
+              )} type={actionType}>
+                {String(action.payload === "check-in" ? action.address.short : action.payload)}
+              </ActionText>
+              {" "}
+              {action.type === 'location' && <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>}
             </Text>
           </Box>
-          {address && (
-            <Box align={"end"} basis="40%" style={{ minWidth: "32px" }}>
-              <PlainText
-                fontSize="min(0.8em, 3.7vw)"
-                onClick={() => onLocationClicked(address)}
-                style={{ textAlign: "right", cursor: "pointer" }}
-              >
-                {address.substring(0, 10)}
-              </PlainText>
-            </Box>
-          )}
+          {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
+            <PlainText fontSize='min(0.8em, 3.7vw)'
+              onClick={() => onLocationClicked(address)}
+              style={{ textAlign: "right", cursor: 'pointer' }}>
+              {address.substring(0, 10)}
+            </PlainText>
+          </Box>}
           <Box align={"end"} basis="10%" style={{ minWidth: "32px" }}>
             <PlainText fontSize="min(0.8em, 3vw)">{actionTime}</PlainText>
           </Box>
