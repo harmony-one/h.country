@@ -6,19 +6,16 @@ const axios = require('axios');
 
 const app = express();
 
-// Your cors and express.json middleware setup remains the same
 app.use(cors({
-  origin: 'https://g.country', // Allow only your React app's domain
-  methods: ['GET', 'POST'], // Specify allowed methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
-  credentials: true, // If your client needs to send cookies or authorization headers
+  origin: 'https://g.country',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 }));
 app.use(express.json());
 
-// Initialize dotenv
 dotenv.config();
 
-// The rest of your server logic remains largely unchanged
 app.post('/api/openid/exchange-code', async (req, res) => {
   const { code } = req.body;
   console.log("code token: ", code);
@@ -33,6 +30,8 @@ app.post('/api/openid/exchange-code', async (req, res) => {
     }, {
       headers: { 'Content-Type': 'application/json' },
     });
+
+    console.log("tokenresponse: ", tokenResponse)
 
     const { access_token, id_token } = tokenResponse.data;
 
