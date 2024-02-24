@@ -1,8 +1,12 @@
+// Change the import syntax to require
+const dotenv = require('dotenv');
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+
 const app = express();
 
+// Your cors and express.json middleware setup remains the same
 app.use(cors({
   origin: 'https://g.country', // Allow only your React app's domain
   methods: ['GET', 'POST'], // Specify allowed methods
@@ -10,14 +14,16 @@ app.use(cors({
   credentials: true, // If your client needs to send cookies or authorization headers
 }));
 app.use(express.json());
-require('dotenv').config();
 
+// Initialize dotenv
+dotenv.config();
+
+// The rest of your server logic remains largely unchanged
 app.post('/api/openid/exchange-code', async (req, res) => {
   const { code } = req.body;
-  console.log("code token: ", code)
+  console.log("code token: ", code);
 
   try {
-    // Exchange the authorization code for tokens with Auth0
     const tokenResponse = await axios.post(`https://${process.env.AUTH0_DOMAIN}/oauth/token`, {
       grant_type: 'authorization_code',
       client_id: process.env.AUTH0_CLIENT_ID,
@@ -30,12 +36,10 @@ app.post('/api/openid/exchange-code', async (req, res) => {
 
     const { access_token, id_token } = tokenResponse.data;
 
-    // Optionally, fetch user profile information from Auth0's /userinfo endpoint
     const userInfoResponse = await axios.get(`https://${process.env.AUTH0_DOMAIN}/userinfo`, {
       headers: { Authorization: `Bearer ${access_token}` },
     });
 
-    // Respond with tokens and user information
     res.json({
       success: true,
       accessToken: access_token,
