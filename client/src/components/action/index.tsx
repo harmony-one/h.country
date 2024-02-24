@@ -8,7 +8,8 @@ import { Action } from "../../types";
 import { socialUrlParser, formatAddress } from "../../utils";
 import useInterval from "../../hooks/useInterval";
 import { PlainText } from "../button";
-import { StarOutlined } from "@ant-design/icons"; // FireOutlined, HeartOutlined,
+import { HeartOutlined, HeartFilled, FireTwoTone, StarFilled, StarTwoTone } from "@ant-design/icons"; // FireOutlined, HeartOutlined,
+import { useReactionContext } from "../../context/ReactionsContext";
 
 export enum ActionType {
   self = 'self',
@@ -64,12 +65,32 @@ const truncateTag = (tag: string) => {
   return tag.length > MAX_TAG_LENGTH ? tag.slice(0,MAX_TAG_LENGTH) : tag
 }
 
+const getUniqueId = (action: Action) => {
+  const prefix = `${action.from}_action.timestamp}`;
+  if (action.type === 'multi_tag' || action.type === 'tag') {    
+    return `${prefix}_${action.type}_${
+      action.type === 'tag' ? action.payload : action.payload.tag
+    }`;
+  }
+  return prefix;
+};
+
+const reactionsList = [<HeartOutlined />, <HeartFilled color='#fff'/>, <FireTwoTone twoToneColor="#eb2f4b"/>, <StarTwoTone twoToneColor='#f6ff43'/>];
 export const UserAction = (props: UserActionProps) => {
   const { action, userId } = props
-
+  const { reactions, updateReactions } = useReactionContext()
   const [actionTime, setActionTime] = useState(moment(action.timestamp).fromNow())
   const [actionType, setActionType] = useState<ActionType>(ActionType.none)
+  const [reactionIndex, setReactionIndex] = useState(0);
+  
+  const uniqueId = getUniqueId(action)
 
+  useEffect(() => {
+    if (reactions && reactions[uniqueId]) {
+      setReactionIndex(reactions[uniqueId])
+    }
+  }, [])
+  
   useEffect(() => {
     setActionType(handleActionType(action, userId || ''))
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,6 +128,13 @@ export const UserAction = (props: UserActionProps) => {
   const socialData = action.type === 'link'
     ? socialUrlParser(action.payload || '', 'any')
     : null
+
+  const handleReaction = () => {
+    console.log('reaction', action.from, action.timestamp, action.type, action.payload)
+    const updatedIndex = (reactionIndex + 1) % reactionsList.length;
+    setReactionIndex(updatedIndex);
+    updateReactions(uniqueId, updatedIndex)
+  };
 
   return <Box border={{ side: "bottom", color: 'border' }} pad={"4px 0"}>
     {(action.type === 'tag' || action.type === 'new_user' || action.type === 'multi_tag') &&
@@ -177,8 +205,8 @@ export const UserAction = (props: UserActionProps) => {
           </PlainText>
         </Box>
         <Box align={'end'} basis="5%">
-          <PlainText fontSize='min(0.8em, 3vw)'>
-            <StarOutlined />
+          <PlainText fontSize='min(0.8em, 3vw)' onClick={handleReaction}>
+            {reactionsList[reactionIndex]}
           </PlainText>
         </Box>
       </Box>
@@ -215,14 +243,14 @@ export const UserAction = (props: UserActionProps) => {
           </PlainText>
         </Box>
         <Box align={'end'} basis="5%">
-          <PlainText fontSize='min(0.8em, 3vw)'>
-            <StarOutlined />
+          <PlainText fontSize='min(0.8em, 3vw)' onClick={handleReaction}>
+            {reactionsList[reactionIndex]}
           </PlainText>
         </Box>
       </Box>}
     {action.type === 'location' &&
       <Box direction={'row'} justify={'start'} pad={'0 16px'}>
-        <Box basis={address ? "50%" : "90%"}>
+        <Box basis={address ? "45%" : "85%"}>
           <Text size={"small"} style={{ wordBreak: 'break-all' }}>
             <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
             {" "}
@@ -241,6 +269,11 @@ export const UserAction = (props: UserActionProps) => {
         <Box align={'end'} basis="10%" style={{ minWidth: '32px' }}>
           <PlainText fontSize='min(0.8em, 3vw)'>
             {actionTime}
+          </PlainText>
+        </Box>
+        <Box align={'end'} basis="5%">
+          <PlainText fontSize='min(0.8em, 3vw)' onClick={handleReaction}>
+            {reactionsList[reactionIndex]}
           </PlainText>
         </Box>
       </Box>}

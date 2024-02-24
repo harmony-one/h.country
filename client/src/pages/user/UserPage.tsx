@@ -11,6 +11,7 @@ import { useUserContext } from "../../context";
 import { HeaderList } from "./headerList";
 import { PlainButton, PlainText } from "../../components/button";
 import { LocationFilter, useIsUserPage, useTopLocations, useTopTags, useUrls } from "./hooks";
+import { ReactionsProvider } from "../../context/ReactionsContext";
 
 const UserPageBox = styled(Box)`
   .filter-panel {
@@ -212,16 +213,18 @@ export const UserPage = (props: { id: string }) => {
             <Text color='grey1'>No actions found</Text>
           </Box>
         )}
-        {!isLoading &&
-          actions.map((action, index) => (
-            <UserAction
-              userId={key}
-              key={index + action.timestamp}
-              action={action}
-              onTagClicked={onTagClicked}
-              onLocationClicked={onLocationClicked}
-            />
-          ))}
+        <ReactionsProvider>
+          {!isLoading &&
+            actions.map((action, index) => (
+              <UserAction
+                userId={key}
+                key={index + action.timestamp}
+                action={action}
+                onTagClicked={onTagClicked}
+                onLocationClicked={onLocationClicked}
+              />
+            ))}
+        </ReactionsProvider>
       </Box>
     </UserPageBox>
   );

@@ -8,8 +8,6 @@ export interface UserTopic {
   color: any
   group: number
 }
-
-
 export interface Action {
   timestamp: string;
   from: string;
@@ -45,4 +43,3 @@ export interface ActionFilter {
   type: ActionFilterType
   value: string
 }
-
