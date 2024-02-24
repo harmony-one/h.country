@@ -11,11 +11,11 @@ import { PlainText } from "../button";
 import {
   HeartOutlined,
   HeartFilled,
-  FireTwoTone,
-  StarTwoTone,
+  FireFilled,
+  StarFilled
 } from "@ant-design/icons"; // FireOutlined, HeartOutlined,
 import { useReactionContext } from "../../context/ReactionsContext";
-
+// import { ReactComponent as HeartIcon } from "../../assets/images/heart.svg"
 export enum ActionType {
   self = "self",
   other = "other",
@@ -77,7 +77,7 @@ const truncateTag = (tag: string) => {
 };
 
 const getUniqueId = (action: Action) => {
-  const prefix = `${action.from}_action.timestamp}`;
+  const prefix = `${action.from}_${action.timestamp}`;
   if (action.type === "multi_tag" || action.type === "tag") {
     return `${prefix}_${action.type}_${
       action.type === "tag" ? action.payload : action.payload.tag
@@ -86,11 +86,25 @@ const getUniqueId = (action: Action) => {
   return prefix;
 };
 
+// const ReactionEmoji = styled.span`
+//   width: 5px;
+//   text-align: right;
+//   padding-top: 5px;
+//   margin-top: 20px;
+// `
+
+// const reactionsList = [
+//   <ReactionEmoji><HeartIcon /></ReactionEmoji>,
+//   <ReactionEmoji>🤍</ReactionEmoji>,
+//   <ReactionEmoji>🔥</ReactionEmoji>,
+//   <ReactionEmoji>🌟</ReactionEmoji>,
+// ];
+
 const reactionsList = [
   <HeartOutlined />,
-  <HeartFilled color="#fff" />,
-  <FireTwoTone twoToneColor="#eb2f4b" />,
-  <StarTwoTone twoToneColor="#f6ff43" />,
+  <HeartFilled style={{ color:"#fff" }} />,
+  <FireFilled style={{ color:"#eb2f4b" }} />,
+  <StarFilled style={{ color:"#f9fc42" }}/>,
 ];
 
 export const UserAction = (props: UserActionProps) => {
@@ -160,7 +174,7 @@ export const UserAction = (props: UserActionProps) => {
       {(action.type === "tag" ||
         action.type === "new_user" ||
         action.type === "multi_tag") && (
-        <Box direction={"row"} justify={"start"} pad={"0 16px"}>
+        <Box direction={"row"} justify={"start"}  wrap={true}> {/* pad={"0 16px"} */}
           <Box basis={address ? "45%" : "85%"}>
             {action.type === "tag" && (
               <Text size={"small"} style={{ wordBreak: "break-all" }}>
@@ -257,14 +271,14 @@ export const UserAction = (props: UserActionProps) => {
             <PlainText fontSize="min(0.8em, 3vw)">{actionTime}</PlainText>
           </Box>
           <Box align={"end"} basis="5%">
-            <PlainText fontSize="min(0.8em, 3vw)" onClick={handleReaction}>
+            <PlainText fontSize="min(1em, 3.5vw)" onClick={handleReaction} style={{ verticalAlign: 'center'}}>
               {reactionsList[reactionIndex]}
             </PlainText>
           </Box>
         </Box>
       )}
       {action.type === "link" && (
-        <Box direction={"row"} justify={"start"} pad={"0 16px"}>
+        <Box direction={"row"} justify={"start"}> {/* pad={"0 16px"} */}
           <Box basis={address ? "45%" : "85%"}>
             <Text size={"small"} style={{ wordBreak: "break-all" }}>
               <ActionLink
@@ -305,7 +319,7 @@ export const UserAction = (props: UserActionProps) => {
             <PlainText fontSize="min(0.8em, 3vw)">{actionTime}</PlainText>
           </Box>
           <Box align={"end"} basis="5%">
-            <PlainText fontSize="min(0.8em, 3vw)" onClick={handleReaction}>
+            <PlainText fontSize="min(1em, 3.5vw)" onClick={handleReaction} style={{ verticalAlign: 'center'}}>
               {reactionsList[reactionIndex]}
             </PlainText>
           </Box>
@@ -353,7 +367,7 @@ export const UserAction = (props: UserActionProps) => {
             <PlainText fontSize="min(0.8em, 3vw)">{actionTime}</PlainText>
           </Box>
           <Box align={"end"} basis="5%">
-            <PlainText fontSize="min(0.8em, 3vw)" onClick={handleReaction}>
+            <PlainText fontSize="min(1em, 3.5vw)" onClick={handleReaction} style={{ verticalAlign: 'center'}}>
               {reactionsList[reactionIndex]}
             </PlainText>
           </Box>
