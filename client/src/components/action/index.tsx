@@ -8,7 +8,7 @@ import { Action } from "../../types";
 import { socialUrlParser, formatAddress } from "../../utils";
 import useInterval from "../../hooks/useInterval";
 import { PlainText } from "../button";
-import { HeartOutlined, HeartFilled, FireTwoTone, StarFilled, StarTwoTone } from "@ant-design/icons"; // FireOutlined, HeartOutlined,
+import { HeartOutlined, HeartFilled, FireTwoTone,  StarTwoTone } from "@ant-design/icons"; // FireOutlined, HeartOutlined,
 import { useReactionContext } from "../../context/ReactionsContext";
 
 export enum ActionType {
@@ -130,7 +130,6 @@ export const UserAction = (props: UserActionProps) => {
     : null
 
   const handleReaction = () => {
-    console.log('reaction', action.from, action.timestamp, action.type, action.payload)
     const updatedIndex = (reactionIndex + 1) % reactionsList.length;
     setReactionIndex(updatedIndex);
     updateReactions(uniqueId, updatedIndex)
