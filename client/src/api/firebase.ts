@@ -43,7 +43,8 @@ const formatMessages = (messages: QueryDocumentSnapshot[]) => {
         type: data.type
       };
     })
-    .filter((action) => ["tag", "multi_tag", "link", "new_user", "location"].includes(action.type))
+    .filter((action) => ["tag", "multi_tag", "link", "new_user", "location", "check-in"].includes(action.type))
+    .filter((action) => action.type !== 'check-in' || action.payload !== 'check-in' ||  action.address?.short)
     .sort((a, b) => {
       return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     })
@@ -184,6 +185,7 @@ export const addMessage = async (params: {
     payload = customPayload || hashtags[0]
   } else if (text.includes("check-in")) {
     type = "check-in";
+    payload = customPayload
   } else if (text.includes("new_user")) {
     type = "new_user";
     payload = customPayload
