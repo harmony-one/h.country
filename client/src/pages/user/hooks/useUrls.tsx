@@ -123,7 +123,8 @@ export const useUrls = () => {
                         // providerName: providerName,
                     }))
 
-                setUrls(linkItems.concat(customLinkItems));
+                const urlsList = linkItems.concat(customLinkItems.reverse()).slice(0, 8)
+                setUrls(urlsList);
             } else {
                 console.log("No such document!");
                 // for other users (isUserPage == false)
