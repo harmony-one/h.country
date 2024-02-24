@@ -25,7 +25,7 @@ export const baseTopicList = [
   { name: 'one', group: 2, type: 'blockchain'},
   { name: 'sol', group: 2, type: 'blockchain'},
   { name: 'near', group: 2, type: 'blockchain'},
-  { name: 'strk', group: 2, type: 'blockchain'},
+  { name: 'eth', group: 2, type: 'blockchain'},
   { name: 'base', group: 2, type: 'blockchain'},
   { name: 'arb', group: 2, type: 'blockchain'},
   { name: 'op', group: 2, type: 'blockchain'},
