@@ -1,17 +1,23 @@
-import React, { useMemo } from "react";
-import { Box, Spinner, Text } from "grommet";
+import React, { useMemo, Suspense } from "react";
+import { Box, Text } from "grommet"; // Spinner,
 import styled from "styled-components";
-// import { StarOutlined } from "@ant-design/icons"; // FireOutlined, HeartOutlined,
 
 import { useActionsContext } from "../../context";
-import { UserAction } from "../../components/action";
 import { isValidAddress } from "../../utils/user";
 import { useUserContext } from "../../context";
 
 import { HeaderList } from "./headerList";
 import { PlainButton, PlainText } from "../../components/button";
-import { LocationFilter, useIsUserPage, useTopLocations, useTopTags, useUrls } from "./hooks";
+import {
+  LocationFilter,
+  useIsUserPage,
+  useTopLocations,
+  useTopTags,
+  useUrls,
+} from "./hooks";
 import { ReactionsProvider } from "../../context/ReactionsContext";
+import UserActionSkeleton from "../../components/action/UserActionSkeleton";
+import UserAction from "../../components/action";
 
 const UserPageBox = styled(Box)`
   .filter-panel {
@@ -32,6 +38,15 @@ export const UserPage = (props: { id: string }) => {
   const locationItems = useTopLocations();
   const urls = useUrls();
   const isUserPage = useIsUserPage();
+  const {
+    actions,
+    filters,
+    setFilters,
+    filterMode,
+    setFilterMode,
+    DefaultFilterMode,
+    isLoading,
+  } = useActionsContext();
 
   const indexedUrls = useMemo(
     () => urls.map((u, i) => ({ ...u, index: i })),
@@ -43,20 +58,10 @@ export const UserPage = (props: { id: string }) => {
       // to be displayed in column 1,2
       ...tagItems.slice(0, 6).map((item, idx) => ({ ...item, index: idx })),
       // to be displayed in column 3
-      ...locationItems.map((item, idx) => ({ ...item, index: 6 + idx }))
+      ...locationItems.map((item, idx) => ({ ...item, index: 6 + idx })),
     ],
     [tagItems, locationItems]
   );
-
-  const {
-    actions,
-    filters,
-    setFilters,
-    filterMode,
-    setFilterMode,
-    DefaultFilterMode,
-    isLoading,
-  } = useActionsContext();
 
   if (!key || !isValidAddress(key)) {
     return <Box>Not a valid user ID</Box>;
@@ -98,7 +103,11 @@ export const UserPage = (props: { id: string }) => {
     <UserPageBox>
       <Box gap={"16px"} pad={"2px 16px"}>
         <HeaderList {...headerListProps} type={"url"} items={indexedUrls} />
-        <HeaderList {...headerListProps} type={"hashtag"} items={indexedItems} />
+        <HeaderList
+          {...headerListProps}
+          type={"hashtag"}
+          items={indexedItems}
+        />
       </Box>
       <div className="filter-panel">
         <Box direction={"row"}>
@@ -112,9 +121,7 @@ export const UserPage = (props: { id: string }) => {
             isActive={filterMode === "address"}
             onClick={() => setFilterMode("address")}
           >
-            <PlainText
-              fontSize="min(1em, 4vw)"
-            >
+            <PlainText fontSize="min(1em, 4vw)">
               0/{key?.substring(0, 4)}
             </PlainText>
           </PlainButton>
@@ -126,18 +133,19 @@ export const UserPage = (props: { id: string }) => {
                 const newFilters = filters.filter(
                   (item) => item.value !== value
                 );
-                
+
                 setFilters(newFilters);
                 setFilterMode(newFilters[0]?.type || DefaultFilterMode);
               };
-              return type === 'location' ?
+              return type === "location" ? (
                 <Box>
                   <LocationFilter
                     address={value}
                     onClick={onClick}
                     latestLocation={actions[0]?.address}
                   />
-                </Box> :
+                </Box>
+              ) : (
                 <PlainButton
                   key={value}
                   isActive={filters.length > 0}
@@ -147,6 +155,7 @@ export const UserPage = (props: { id: string }) => {
                     #{value}
                   </PlainText>
                 </PlainButton>
+              );
             })}
         </Box>
         <Box direction={"row"} alignSelf="center" alignContent="around">
@@ -202,26 +211,29 @@ export const UserPage = (props: { id: string }) => {
         </Box>
       </div>
       <Box>
-        {isLoading && (
+        {/* {isLoading && (
           <Box align={"center"}>
             <Spinner color={"spinner"} />
           </Box>
-        )}
+        )} */}
         {!isLoading && actions.length === 0 && (
           <Box align={"center"}>
-            <Text color='grey1'>No actions found</Text>
+            <Text color="grey1">No actions found</Text>
           </Box>
         )}
         <ReactionsProvider>
           {!isLoading &&
             actions.map((action, index) => (
-              <UserAction
-                userId={key}
-                key={index + action.timestamp}
-                action={action}
-                onTagClicked={onTagClicked}
-                onLocationClicked={onLocationClicked}
-              />
+              <Suspense key={index} fallback={<UserActionSkeleton />}>
+                <UserAction
+                  userId={key}
+                  index={index + action.timestamp}
+                  key={index + action.timestamp}
+                  action={action}
+                  onTagClicked={onTagClicked}
+                  onLocationClicked={onLocationClicked}
+                />
+              </Suspense>
             ))}
         </ReactionsProvider>
       </Box>

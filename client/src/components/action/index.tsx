@@ -15,6 +15,7 @@ import {
   StarFilled
 } from "@ant-design/icons"; // FireOutlined, HeartOutlined,
 import { useReactionContext } from "../../context/ReactionsContext";
+import UserActionSkeleton from "./UserActionSkeleton";
 // import { ReactComponent as HeartIcon } from "../../assets/images/heart.svg"
 export enum ActionType {
   self = "self",
@@ -66,6 +67,7 @@ export const ActionLink = styled(Link)<{ type?: ActionType }>`
 export interface UserActionProps {
   userId?: any;
   action: Action;
+  index: string;
   onTagClicked?: (hashtag: string) => void;
   onLocationClicked?: (location: string) => void;
 }
@@ -107,15 +109,15 @@ const reactionsList = [
   <StarFilled style={{ color:"#f9fc42" }}/>,
 ];
 
-export const UserAction = (props: UserActionProps) => {
-  const { action, userId } = props;
+const UserAction = (props: UserActionProps) => {
+  const { action, userId, index } = props;
   const { reactions, updateReactions } = useReactionContext();
   const [actionTime, setActionTime] = useState(
     moment(action.timestamp).fromNow()
   );
   const [actionType, setActionType] = useState<ActionType>(ActionType.none);
   const [reactionIndex, setReactionIndex] = useState(0);
-
+  const [isVisible, setIsVisible] = useState(false);
   const uniqueId = getUniqueId(action);
 
   useEffect(() => {
@@ -129,6 +131,24 @@ export const UserAction = (props: UserActionProps) => {
     setActionType(handleActionType(action, userId || ""));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      });
+    });
+
+    observer.observe(document.querySelector(`.lazy-action[data-index="${index}"]`) as Element);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [index]);
+
 
   // Dynamically update date
   useInterval(() => {
@@ -168,6 +188,14 @@ export const UserAction = (props: UserActionProps) => {
     setReactionIndex(updatedIndex);
     updateReactions(uniqueId, updatedIndex);
   };
+
+  if (!isVisible) {
+    return (
+      <div className="lazy-action" data-index={index}>
+        <UserActionSkeleton /> {/* Placeholder or loading indicator */}
+      </div>
+    );
+  }
 
   return (
     <Box border={{ side: "bottom", color: "border" }} pad={"4px 0"}>
@@ -359,3 +387,5 @@ export const UserAction = (props: UserActionProps) => {
     </Box>
   );
 };
+
+export default UserAction;

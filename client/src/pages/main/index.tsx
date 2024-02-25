@@ -3,7 +3,7 @@ import {Box, Spinner, Text} from "grommet";
 import {useNavigate, useParams, useLocation} from "react-router-dom";
 import '../../index.css'
 import {Action} from "../../types";
-import {UserAction} from "../../components/action";
+import UserAction from "../../components/action";
 import {getMessages} from "../../api/firebase";
 import { useUserContext } from "../../context/UserContext";
 
@@ -61,7 +61,7 @@ export const MainPage = () => {
       {!isLoading && actions
         .slice(0,30)
         .map((action, index) => (
-        <UserAction key={index + action.timestamp} action={action} />
+        <UserAction index={index + action.timestamp} key={index + action.timestamp} action={action} />
       ))}
     </Box>
   );
