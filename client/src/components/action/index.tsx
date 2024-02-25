@@ -325,7 +325,7 @@ export const UserAction = (props: UserActionProps) => {
         </Box>
       )}
        {['check-in', 'location'].includes(action.type) && (
-        <Box direction={"row"} justify={"start"} pad={"0 16px"}>
+        <Box direction={"row"} justify={"start"}> {/* pad={"0 16px"} */}
           <Box basis={address ? "45%" : "85%"}>
             <Text size={"small"} style={{ wordBreak: 'break-all' }}>
               <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
