@@ -78,7 +78,7 @@ const truncateTag = (tag: string) => {
   return tag.length > MAX_TAG_LENGTH ? tag.slice(0, MAX_TAG_LENGTH) : tag;
 };
 
-const getUniqueId = (action: Action) => {
+export const getUniqueId = (action: Action) => {
   const prefix = `${action.from}_${action.timestamp}`;
   if (action.type === "multi_tag" || action.type === "tag") {
     return `${prefix}_${action.type}_${
@@ -118,7 +118,7 @@ const UserAction = (props: UserActionProps) => {
   const [actionType, setActionType] = useState<ActionType>(ActionType.none);
   const [reactionIndex, setReactionIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-  const uniqueId = getUniqueId(action);
+  const uniqueId = index;
 
   useEffect(() => {
     if (reactions && reactions[uniqueId]) {
@@ -141,9 +141,12 @@ const UserAction = (props: UserActionProps) => {
         }
       });
     });
-
-    observer.observe(document.querySelector(`.lazy-action[data-index="${index}"]`) as Element);
-
+  
+    const element = document.querySelector(`.lazy-action[data-index="${index}"]`) as Element | null;
+    if (element) {
+      observer.observe(element);
+    }
+  
     return () => {
       observer.disconnect();
     };
@@ -202,7 +205,7 @@ const UserAction = (props: UserActionProps) => {
       {(action.type === "tag" ||
         action.type === "new_user" ||
         action.type === "multi_tag") && (
-        <Box direction={"row"} justify={"start"}  wrap={true}> {/* pad={"0 16px"} */}
+        <Box direction={"row"} justify={"start"}  wrap={true}>
           <Box basis={address ? "45%" : "85%"}>
             {action.type === "tag" && (
               <Text size={"small"} style={{ wordBreak: "break-all" }}>
@@ -353,15 +356,15 @@ const UserAction = (props: UserActionProps) => {
         </Box>
       )}
        {['check-in', 'location'].includes(action.type) && (
-        <Box direction={"row"} justify={"start"}> {/* pad={"0 16px"} */}
+        <Box direction={"row"} justify={"start"}> 
           <Box basis={address ? "45%" : "85%"}>
             <Text size={"small"} style={{ wordBreak: 'break-all' }}>
               <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
               {" "}
               <ActionText size={"small"} onClick={() => onLocationClicked(
-                action.payload === "check-in" ? action.address.short : action.payload
+                action.type === "check-in" ? action.address.short : action.payload
               )} type={actionType}>
-                {String(action.payload === "check-in" ? action.address.short : action.payload)}
+                {String(action.type === "check-in" ? action.address.short : action.payload)}
               </ActionText>
               {" "}
               {action.type === 'location' && <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>}

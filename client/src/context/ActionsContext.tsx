@@ -23,6 +23,7 @@ interface Action {
   address: AddressComponents;
   toShort?: string;
   fromShort: string;
+  id: string;
 }
 
 interface ActionsContextType {

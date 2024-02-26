@@ -223,18 +223,21 @@ export const UserPage = (props: { id: string }) => {
         )}
         <ReactionsProvider>
           {!isLoading &&
-            actions.map((action, index) => (
-              <Suspense key={index} fallback={<UserActionSkeleton />}>
-                <UserAction
-                  userId={key}
-                  index={index + action.timestamp}
-                  key={index + action.timestamp}
-                  action={action}
-                  onTagClicked={onTagClicked}
-                  onLocationClicked={onLocationClicked}
-                />
-              </Suspense>
-            ))}
+            actions.map((action, index) => {
+              // const id = getUniqueId(action) // now using doc id.
+              return (
+                <Suspense key={index} fallback={<UserActionSkeleton />}>
+                  <UserAction
+                    userId={key}
+                    index={action.id} // index + action.timestamp}
+                    key={action.id} // {index + action.timestamp}
+                    action={action}
+                    onTagClicked={onTagClicked}
+                    onLocationClicked={onLocationClicked}
+                  />
+                </Suspense>
+              )
+            })}
         </ReactionsProvider>
       </Box>
     </UserPageBox>

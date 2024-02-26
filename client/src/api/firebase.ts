@@ -40,7 +40,8 @@ const formatMessages = (messages: QueryDocumentSnapshot[]) => {
         payload: data.payload,
         to: data.to,
         toShort: typeof data.to === 'string' ? data.to.substring(0, 4) : '',
-        type: data.type
+        type: data.type,
+        id: doc.id
       };
     })
     .filter((action) => ["tag", "multi_tag", "link", "new_user", "location", "check-in"].includes(action.type))
@@ -118,7 +119,6 @@ export const getLatestLocation = async (address: string): Promise<Action> => {
   const toSnapshot = await getDocs(fromQuery);
 
   const data = toSnapshot.docs[0]?.data();
-
   return data && {
     address: data.address,
     timestamp: data.timestamp,
@@ -127,7 +127,8 @@ export const getLatestLocation = async (address: string): Promise<Action> => {
     payload: data.payload,
     to: data.to,
     toShort: typeof data.to === 'string' ? data.to.substring(0, 4) : '',
-    type: data.type
+    type: data.type,
+    id: toSnapshot.docs[0].id
   }
 }
 

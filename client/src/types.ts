@@ -17,6 +17,7 @@ export interface Action {
   address: AddressComponents;
   toShort?: string;
   fromShort: string;
+  id: string;
 }
 
 export interface AddressComponents {
