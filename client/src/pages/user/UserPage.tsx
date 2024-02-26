@@ -99,10 +99,6 @@ export const UserPage = (props: { id: string }) => {
     isUserPage,
     wallet,
   };
-  function loadActions(lastVisible: any) {
-    throw new Error("Function not implemented.");
-  }
-
   return (
     <UserPageBox margin={{ top: '28px' }}>
       <Box gap={"16px"} pad={"2px 16px"}>
