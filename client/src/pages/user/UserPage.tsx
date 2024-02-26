@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Box } from "grommet"; // Spinner,
+import { Box, Spinner } from "grommet"; // Spinner,
 import styled from "styled-components";
 import InfiniteScroll from 'react-infinite-scroll-component';
 
@@ -211,8 +211,13 @@ export const UserPage = (props: { id: string }) => {
             </PlainText>
           </PlainButton> */}
         </Box>
-      </div>
-      <Box>
+      </Box>
+      <Box pad={'0 16px'}>
+        {!actions.length && isLoading && (
+          <Box align={"center"}>
+            <Spinner color={"spinner"} />
+          </Box>
+        )}
         {/* {actions.length === 0 && (
           <Box align={"center"}>
             <Text color="grey1">No actions found</Text>
@@ -226,7 +231,7 @@ export const UserPage = (props: { id: string }) => {
             }}
             hasMore={true}
             loader={''}
-            // scrollThreshold="200px"
+          // scrollThreshold="200px"
           >
             {actions.map((action, index) => {
               // const id = getUniqueId(action) // now using doc id.
