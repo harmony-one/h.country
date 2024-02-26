@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Box } from "grommet"; // Spinner,
+import { Box, Spinner } from "grommet"; // Spinner,
 import styled from "styled-components";
 import InfiniteScroll from 'react-infinite-scroll-component';
 
@@ -21,8 +21,6 @@ import UserAction from "../../components/action";
 
 const UserPageBox = styled(Box)`
   .filter-panel {
-    margin-top: 10px;
-    margin-bottom: 5px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -102,7 +100,7 @@ export const UserPage = (props: { id: string }) => {
     wallet,
   };
   return (
-    <UserPageBox>
+    <UserPageBox margin={{ top: '28px' }}>
       <Box gap={"16px"} pad={"2px 16px"}>
         <HeaderList {...headerListProps} type={"url"} items={indexedUrls} />
         <HeaderList
@@ -111,54 +109,56 @@ export const UserPage = (props: { id: string }) => {
           items={indexedItems}
         />
       </Box>
-      <div className="filter-panel">
+      <Box margin={{ top: '32px', bottom: '8px' }} className="filter-panel" pad={'0 16px'}>
         <Box direction={"row"}>
           <PlainButton
             isActive={filterMode === "all"}
             onClick={() => setFilterMode("all")}
           >
-            <PlainText fontSize="min(1em, 4vw)">all</PlainText>
+            <PlainText>all</PlainText>
           </PlainButton>
           <PlainButton
             isActive={filterMode === "address"}
             onClick={() => setFilterMode("address")}
           >
-            <PlainText fontSize="min(1em, 4vw)">
+            <PlainText>
               0/{key?.substring(0, 4)}
             </PlainText>
           </PlainButton>
-          {filters
-            .filter((f) => f.value !== "one" && f.value !== "ai")
-            .map((filter) => {
-              const { value, type } = filter;
-              const onClick = () => {
-                const newFilters = filters.filter(
-                  (item) => item.value !== value
-                );
+          <Box>
+            {filters
+              .filter((f) => f.value !== "one" && f.value !== "ai")
+              .map((filter) => {
+                const { value, type } = filter;
+                const onClick = () => {
+                  const newFilters = filters.filter(
+                    (item) => item.value !== value
+                  );
 
-                setFilters(newFilters);
-                setFilterMode(newFilters[0]?.type || DefaultFilterMode);
-              };
-              return type === "location" ? (
-                <Box>
-                  <LocationFilter
-                    address={value}
+                  setFilters(newFilters);
+                  setFilterMode(newFilters[0]?.type || DefaultFilterMode);
+                };
+                return type === "location" ? (
+                  <Box>
+                    <LocationFilter
+                      address={value}
+                      onClick={onClick}
+                      latestLocation={actions[0]?.address}
+                    />
+                  </Box>
+                ) : (
+                  <PlainButton
+                    key={value}
+                    isActive={filters.length > 0}
                     onClick={onClick}
-                    latestLocation={actions[0]?.address}
-                  />
-                </Box>
-              ) : (
-                <PlainButton
-                  key={value}
-                  isActive={filters.length > 0}
-                  onClick={onClick}
-                >
-                  <PlainText color={isUserPage ? "blue1" : "yellow1"}>
-                    #{value}
-                  </PlainText>
-                </PlainButton>
-              );
-            })}
+                  >
+                    <PlainText color={isUserPage ? "blue1" : "yellow1"}>
+                      #{value}
+                    </PlainText>
+                  </PlainButton>
+                );
+              })}
+          </Box>
         </Box>
         <Box direction={"row"} alignSelf="center" alignContent="around">
           <PlainButton
@@ -211,8 +211,13 @@ export const UserPage = (props: { id: string }) => {
             </PlainText>
           </PlainButton> */}
         </Box>
-      </div>
-      <Box>
+      </Box>
+      <Box pad={'0 16px'}>
+        {!actions.length && isLoading && (
+          <Box align={"center"}>
+            <Spinner color={"spinner"} />
+          </Box>
+        )}
         {/* {actions.length === 0 && (
           <Box align={"center"}>
             <Text color="grey1">No actions found</Text>
@@ -226,7 +231,7 @@ export const UserPage = (props: { id: string }) => {
             }}
             hasMore={true}
             loader={''}
-            // scrollThreshold="200px"
+          // scrollThreshold="200px"
           >
             {actions.map((action, index) => {
               // const id = getUniqueId(action) // now using doc id.
