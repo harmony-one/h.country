@@ -16,7 +16,7 @@ import {
   useTopTags,
   useUrls,
 } from "./hooks";
-import { ReactionsProvider } from "../../context/ReactionsContext";
+import { ReactionsProvider } from "../../context";
 import UserAction from "../../components/action";
 
 const UserPageBox = styled(Box)`
@@ -109,8 +109,12 @@ export const UserPage = (props: { id: string }) => {
           items={indexedItems}
         />
       </Box>
-      <Box margin={{ top: '32px', bottom: '8px' }} className="filter-panel" pad={'0 16px'}>
-        <Box direction={"row"}>
+      <Box
+        className="filter-panel"
+        margin={{ top: '32px', bottom: '8px' }}
+        pad={'0 16px'}
+      >
+        <Box direction={"row"} gap={'4px'} justify={'between'}>
           <PlainButton
             isActive={filterMode === "all"}
             onClick={() => setFilterMode("all")}
@@ -125,92 +129,95 @@ export const UserPage = (props: { id: string }) => {
               0/{key?.substring(0, 4)}
             </PlainText>
           </PlainButton>
-          <Box>
-            {filters
-              .filter((f) => f.value !== "one" && f.value !== "ai")
-              .map((filter) => {
-                const { value, type } = filter;
-                const onClick = () => {
-                  const newFilters = filters.filter(
-                    (item) => item.value !== value
-                  );
+          {filters
+            .filter((f) => f.value !== "one" && f.value !== "ai")
+            // hashtags first
+            .sort((a, b) => {
+              if(a.type === 'hashtag') {
+                return -1
+              }
+              return 1
+            })
+            .map((filter) => {
+              const { value, type } = filter;
+              const onClick = () => {
+                const newFilters = filters.filter(
+                  (item) => item.value !== value
+                );
 
-                  setFilters(newFilters);
-                  setFilterMode(newFilters[0]?.type || DefaultFilterMode);
-                };
-                return type === "location" ? (
-                  <Box>
-                    <LocationFilter
-                      address={value}
-                      onClick={onClick}
-                      latestLocation={actions[0]?.address}
-                    />
-                  </Box>
-                ) : (
-                  <PlainButton
-                    key={value}
-                    isActive={filters.length > 0}
-                    onClick={onClick}
-                  >
-                    <PlainText color={isUserPage ? "blue1" : "yellow1"}>
-                      #{value}
-                    </PlainText>
-                  </PlainButton>
-                );
-              })}
-          </Box>
-        </Box>
-        <Box direction={"row"} alignSelf="center" alignContent="around">
-          <PlainButton
-            isActive={filterMode === "hashtag"}
-            onClick={() => {
-              if (filters.find((item) => item.value === "one")) {
-                const newFilters = filters.filter(
-                  (item) => item.value !== "one"
-                );
                 setFilters(newFilters);
-              } else {
-                setFilters([
-                  ...filters,
-                  {
-                    type: "location",
-                    value: "one",
-                  },
-                ]);
-                setFilterMode("hashtag");
-              }
-            }}
-          >
-            {/* <PlainText fontSize="min(1em, 4vw)">#one</PlainText> */}
-          </PlainButton>
-          <PlainButton
-            isActive={filterMode === "hashtag"}
-            onClick={() => {
-              if (filters.find((item) => item.value === "ai")) {
-                const newFilters = filters.filter(
-                  (item) => item.value !== "ai"
-                );
-                setFilters(newFilters);
-              } else {
-                setFilters([
-                  ...filters,
-                  {
-                    type: "location",
-                    value: "ai",
-                  },
-                ]);
-                setFilterMode("hashtag");
-              }
-            }}
-          >
-            {/* <PlainText fontSize="min(1em, 4vw)">#ai</PlainText> */}
-          </PlainButton>
-          {/* <PlainButton style={{ padding: '2px' }}>
-            <PlainText fontSize="min(1em, 4vw)">
-              <StarOutlined />
-            </PlainText>
-          </PlainButton> */}
+                setFilterMode(newFilters[0]?.type || DefaultFilterMode);
+              };
+              return type === "location" ? (
+                <LocationFilter
+                  address={value}
+                  onClick={onClick}
+                  latestLocation={actions[0]?.address}
+                />
+              ) : (
+                <PlainButton
+                  key={value}
+                  isActive={filters.length > 0}
+                  onClick={onClick}
+                >
+                  <PlainText color={isUserPage ? "blue1" : "yellow1"}>
+                    #{value}
+                  </PlainText>
+                </PlainButton>
+              );
+            })}
         </Box>
+        {/*<Box direction={"row"} alignSelf="center" alignContent="around">*/}
+        {/*  <PlainButton*/}
+        {/*    isActive={filterMode === "hashtag"}*/}
+        {/*    onClick={() => {*/}
+        {/*      if (filters.find((item) => item.value === "one")) {*/}
+        {/*        const newFilters = filters.filter(*/}
+        {/*          (item) => item.value !== "one"*/}
+        {/*        );*/}
+        {/*        setFilters(newFilters);*/}
+        {/*      } else {*/}
+        {/*        setFilters([*/}
+        {/*          ...filters,*/}
+        {/*          {*/}
+        {/*            type: "location",*/}
+        {/*            value: "one",*/}
+        {/*          },*/}
+        {/*        ]);*/}
+        {/*        setFilterMode("hashtag");*/}
+        {/*      }*/}
+        {/*    }}*/}
+        {/*  >*/}
+        {/*    /!* <PlainText fontSize="min(1em, 4vw)">#one</PlainText> *!/*/}
+        {/*  </PlainButton>*/}
+        {/*  <PlainButton*/}
+        {/*    isActive={filterMode === "hashtag"}*/}
+        {/*    onClick={() => {*/}
+        {/*      if (filters.find((item) => item.value === "ai")) {*/}
+        {/*        const newFilters = filters.filter(*/}
+        {/*          (item) => item.value !== "ai"*/}
+        {/*        );*/}
+        {/*        setFilters(newFilters);*/}
+        {/*      } else {*/}
+        {/*        setFilters([*/}
+        {/*          ...filters,*/}
+        {/*          {*/}
+        {/*            type: "location",*/}
+        {/*            value: "ai",*/}
+        {/*          },*/}
+        {/*        ]);*/}
+        {/*        setFilterMode("hashtag");*/}
+        {/*      }*/}
+        {/*    }}*/}
+        {/*  >*/}
+        {/*    /!* <PlainText fontSize="min(1em, 4vw)">#ai</PlainText> *!/*/}
+        {/*  </PlainButton>*/}
+        {/*  /!* <PlainButton style={{ padding: '2px' }}>*/}
+        {/*    <PlainText fontSize="min(1em, 4vw)">*/}
+        {/*      <StarOutlined />*/}
+        {/*    </PlainText>*/}
+        {/*  </PlainButton> *!/*/}
+        {/*</Box>*/}
       </Box>
       <Box pad={'0 16px'}>
         {!actions.length && isLoading && (
