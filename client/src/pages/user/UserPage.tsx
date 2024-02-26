@@ -99,6 +99,10 @@ export const UserPage = (props: { id: string }) => {
     isUserPage,
     wallet,
   };
+  function loadActions(lastVisible: any) {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <UserPageBox>
       <Box gap={"16px"} pad={"2px 16px"}>
@@ -222,8 +226,17 @@ export const UserPage = (props: { id: string }) => {
           </Box>
         )}
         <ReactionsProvider>
-          {!isLoading &&
-            actions.map((action, index) => {
+          <InfiniteScroll
+            dataLength={actions.length}
+            next={() => {
+              loadActions(lastVisible)
+            }}
+            inverse={true}
+            hasMore={true}
+            loader={''}
+          // scrollThreshold="200px"
+          >
+            {actions.map((action, index) => {
               // const id = getUniqueId(action) // now using doc id.
               return (
                 <Suspense key={index} fallback={<UserActionSkeleton />}>

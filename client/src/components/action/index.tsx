@@ -362,9 +362,9 @@ const UserAction = (props: UserActionProps) => {
               <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
               {" "}
               <ActionText size={"small"} onClick={() => onLocationClicked(
-                action.type === "check-in" ? action.address.short : action.payload
+                action.type === "check-in" ? (action.address.short ? action.address.short : action.payload) : action.payload
               )} type={actionType}>
-                {String(action.type === "check-in" ? action.address.short : action.payload)}
+                {String(action.type === "check-in" ? (action.address.short ? action.address.short : action.payload) : action.payload)}
               </ActionText>
               {" "}
               {action.type === 'location' && <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>}
