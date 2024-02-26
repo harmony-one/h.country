@@ -14,7 +14,13 @@ updateMomentJSConfig()
 
 function App() {
   return (
-    <Grommet full theme={theme} themeMode={useDarkMode() ? 'dark' : 'light'}>
+    <Grommet 
+    theme={theme} 
+    themeMode={useDarkMode() ? 'dark' : 'light'}
+    style={{
+      minHeight: '100vh'
+    }}
+    >
       <BrowserRouter>
         <UserProvider>
           <ActionsProvider>
