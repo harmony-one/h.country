@@ -21,8 +21,6 @@ import UserAction from "../../components/action";
 
 const UserPageBox = styled(Box)`
   .filter-panel {
-    margin-top: 10px;
-    margin-bottom: 5px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -100,7 +98,7 @@ export const UserPage = (props: { id: string }) => {
     wallet,
   };
   return (
-    <UserPageBox>
+    <UserPageBox margin={{ top: '28px' }}>
       <Box gap={"16px"} pad={"2px 16px"}>
         <HeaderList {...headerListProps} type={"url"} items={indexedUrls} />
         <HeaderList
@@ -109,19 +107,19 @@ export const UserPage = (props: { id: string }) => {
           items={indexedItems}
         />
       </Box>
-      <div className="filter-panel">
+      <Box margin={{ top: '32px', bottom: '8px' }} className="filter-panel" pad={'0 16px'}>
         <Box direction={"row"}>
           <PlainButton
             isActive={filterMode === "all"}
             onClick={() => setFilterMode("all")}
           >
-            <PlainText fontSize="min(1em, 4vw)">all</PlainText>
+            <PlainText>all</PlainText>
           </PlainButton>
           <PlainButton
             isActive={filterMode === "address"}
             onClick={() => setFilterMode("address")}
           >
-            <PlainText fontSize="min(1em, 4vw)">
+            <PlainText>
               0/{key?.substring(0, 4)}
             </PlainText>
           </PlainButton>
@@ -209,8 +207,8 @@ export const UserPage = (props: { id: string }) => {
             </PlainText>
           </PlainButton> */}
         </Box>
-      </div>
-      <Box>
+      </Box>
+      <Box pad={'0 16px'}>
         {/* {isLoading && (
           <Box align={"center"}>
             <Spinner color={"spinner"} />
