@@ -123,38 +123,40 @@ export const UserPage = (props: { id: string }) => {
               0/{key?.substring(0, 4)}
             </PlainText>
           </PlainButton>
-          {filters
-            .filter((f) => f.value !== "one" && f.value !== "ai")
-            .map((filter) => {
-              const { value, type } = filter;
-              const onClick = () => {
-                const newFilters = filters.filter(
-                  (item) => item.value !== value
-                );
+          <Box>
+            {filters
+              .filter((f) => f.value !== "one" && f.value !== "ai")
+              .map((filter) => {
+                const { value, type } = filter;
+                const onClick = () => {
+                  const newFilters = filters.filter(
+                    (item) => item.value !== value
+                  );
 
-                setFilters(newFilters);
-                setFilterMode(newFilters[0]?.type || DefaultFilterMode);
-              };
-              return type === "location" ? (
-                <Box>
-                  <LocationFilter
-                    address={value}
+                  setFilters(newFilters);
+                  setFilterMode(newFilters[0]?.type || DefaultFilterMode);
+                };
+                return type === "location" ? (
+                  <Box>
+                    <LocationFilter
+                      address={value}
+                      onClick={onClick}
+                      latestLocation={actions[0]?.address}
+                    />
+                  </Box>
+                ) : (
+                  <PlainButton
+                    key={value}
+                    isActive={filters.length > 0}
                     onClick={onClick}
-                    latestLocation={actions[0]?.address}
-                  />
-                </Box>
-              ) : (
-                <PlainButton
-                  key={value}
-                  isActive={filters.length > 0}
-                  onClick={onClick}
-                >
-                  <PlainText color={isUserPage ? "blue1" : "yellow1"}>
-                    #{value}
-                  </PlainText>
-                </PlainButton>
-              );
-            })}
+                  >
+                    <PlainText color={isUserPage ? "blue1" : "yellow1"}>
+                      #{value}
+                    </PlainText>
+                  </PlainButton>
+                );
+              })}
+          </Box>
         </Box>
         <Box direction={"row"} alignSelf="center" alignContent="around">
           <PlainButton
