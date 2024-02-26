@@ -8,8 +8,6 @@ export interface UserTopic {
   color: any
   group: number
 }
-
-
 export interface Action {
   timestamp: string;
   from: string;
@@ -19,6 +17,7 @@ export interface Action {
   address: AddressComponents;
   toShort?: string;
   fromShort: string;
+  id: string;
 }
 
 export interface AddressComponents {
@@ -45,4 +44,3 @@ export interface ActionFilter {
   type: ActionFilterType
   value: string
 }
-
