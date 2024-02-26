@@ -12,7 +12,7 @@ import {
 import { ActionFilter, ActionFilterType, AddressComponents } from "../types";
 import { getMessages, genFilter, IFilter } from "../api";
 import { useUserContext } from "./UserContext";
-import { Unsubscribe } from 'firebase/firestore';
+import { QueryDocumentSnapshot, Unsubscribe } from 'firebase/firestore';
 
 interface Action {
   timestamp: string;
@@ -28,13 +28,14 @@ interface Action {
 
 interface ActionsContextType {
   actions: Action[];
-  loadActions: () => Promise<void>
+  loadActions: (lastVisible?: QueryDocumentSnapshot) => Promise<void>
   isLoading: boolean;
   filters: ActionFilter[];
   setFilters: Dispatch<SetStateAction<ActionFilter[]>>
   filterMode: ActionFilterType;
   setFilterMode: Dispatch<SetStateAction<ActionFilterType>>
   DefaultFilterMode: ActionFilterType;
+  lastVisible?: QueryDocumentSnapshot;
 }
 
 const UserContext = createContext<ActionsContextType | undefined>(undefined);
@@ -49,6 +50,8 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
   const { firstTimeVisit, pageOwnerAddress } = useUserContext();
 
   const [actions, setActions] = useState<Action[]>([]);
+  const [lastVisible, setLastVisible] = useState<QueryDocumentSnapshot | undefined>();
+
   const [filterMode, setFilterMode] = useState<ActionFilterType>(
     firstTimeVisit ? 'all' : DefaultFilterMode
   );
@@ -63,9 +66,8 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
     }
   }, [filterMode]);
 
-  const loadActions = useCallback(async () => {
+  const loadActions = useCallback(async (lastVisible?: QueryDocumentSnapshot) => {
     setLoading(true)
-    setActions([])
 
     // Unsubscribe from previous updates
     // console.log(`Unsubscribe from ${unsubscribeUpdates.length} updates`)
@@ -108,13 +110,27 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
 
       console.log('Fetching actions...', actionFilters, filterMode)
       const data = await getMessages({
+        lastVisible,
         filters: actionFilters,
+        size: 100,
         updateCallback: (actionsUpdate: Action[]) => {
-          setActions(actionsUpdate)
+          setActions(oldActions => {
+            const newActions = actionsUpdate.filter(
+              a => !oldActions.find(oA => oA.id === a.id)
+            );
+
+            return [...newActions, ...oldActions];
+          })
         }
       });
 
-      setActions(data.actions)
+      if (lastVisible) {
+        setActions(oldActions => oldActions.concat(data.actions))
+      } else {
+        setActions(data.actions)
+      }
+
+      setLastVisible(data.lastVisible);
       console.log('Actions loaded:', data.actions)
       setUnsubscribeUpdates(data.unsubscribeList)
     } catch (e) {
@@ -125,7 +141,10 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
   }, [filterMode, pageOwnerAddress, filters]);
 
   useEffect(() => {
-    loadActions()
+    setLastVisible(undefined);
+    if (pageOwnerAddress) {
+      loadActions()
+    }
   }, [filterMode, pageOwnerAddress, filters, loadActions]);
 
   const value = useMemo(() => {
@@ -137,7 +156,8 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
       setFilters,
       filterMode,
       setFilterMode,
-      DefaultFilterMode
+      DefaultFilterMode,
+      lastVisible
     } as any;
   }, [
     actions,
@@ -147,6 +167,7 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
     setFilters,
     filterMode,
     setFilterMode,
+    lastVisible
   ]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

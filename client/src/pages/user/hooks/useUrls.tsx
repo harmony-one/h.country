@@ -37,7 +37,7 @@ export const LocationFilter = (props:
                 onClick={() => onClick(address)}
                 style={{ cursor: 'pointer' }}
             >
-                {address}
+                {address.slice(0, 10)}
             </Box>
         </Box>
     </HeaderText>
