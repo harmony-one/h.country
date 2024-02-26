@@ -1,6 +1,7 @@
-import React, { useMemo, Suspense } from "react";
-import { Box, Text } from "grommet"; // Spinner,
+import React, { useMemo } from "react";
+import { Box } from "grommet"; // Spinner,
 import styled from "styled-components";
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 import { useActionsContext } from "../../context";
 import { isValidAddress } from "../../utils/user";
@@ -16,7 +17,6 @@ import {
   useUrls,
 } from "./hooks";
 import { ReactionsProvider } from "../../context/ReactionsContext";
-import UserActionSkeleton from "../../components/action/UserActionSkeleton";
 import UserAction from "../../components/action";
 
 const UserPageBox = styled(Box)`
@@ -44,6 +44,8 @@ export const UserPage = (props: { id: string }) => {
     setFilterMode,
     DefaultFilterMode,
     isLoading,
+    lastVisible,
+    loadActions
   } = useActionsContext();
 
   const indexedUrls = useMemo(
@@ -209,35 +211,35 @@ export const UserPage = (props: { id: string }) => {
             </PlainText>
           </PlainButton> */}
         </Box>
-      </Box>
-      <Box pad={'0 16px'}>
-        {/* {isLoading && (
-          <Box align={"center"}>
-            <Spinner color={"spinner"} />
-          </Box>
-        )} */}
-        {!isLoading && actions.length === 0 && (
+      </div>
+      <Box>
+        {/* {actions.length === 0 && (
           <Box align={"center"}>
             <Text color="grey1">No actions found</Text>
           </Box>
-        )}
+        )} */}
         <ReactionsProvider>
-          {!isLoading &&
-            actions.map((action, index) => {
+          <InfiniteScroll
+            dataLength={actions.length}
+            next={() => {
+              loadActions(lastVisible)
+            }}
+            hasMore={true}
+            loader={''}
+            // scrollThreshold="200px"
+          >
+            {actions.map((action, index) => {
               // const id = getUniqueId(action) // now using doc id.
-              return (
-                <Suspense key={index} fallback={<UserActionSkeleton />}>
-                  <UserAction
-                    userId={key}
-                    index={action.id} // index + action.timestamp}
-                    key={action.id} // {index + action.timestamp}
-                    action={action}
-                    onTagClicked={onTagClicked}
-                    onLocationClicked={onLocationClicked}
-                  />
-                </Suspense>
-              )
+              return (<UserAction
+                userId={key}
+                index={action.id} // index + action.timestamp}
+                key={index + action.timestamp}
+                action={action}
+                onTagClicked={onTagClicked}
+                onLocationClicked={onLocationClicked}
+              />)
             })}
+          </InfiniteScroll>
         </ReactionsProvider>
       </Box>
     </UserPageBox>

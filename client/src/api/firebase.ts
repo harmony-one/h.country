@@ -12,7 +12,8 @@ import {
   limit,
   WhereFilterOp,
   onSnapshot,
-  Unsubscribe
+  Unsubscribe,
+  startAfter
 } from 'firebase/firestore';
 import { db } from "../configs/firebase-config";
 import { Action, AddressComponents, LocationData } from "../types";
@@ -41,11 +42,12 @@ const formatMessages = (messages: QueryDocumentSnapshot[]) => {
         to: data.to,
         toShort: typeof data.to === 'string' ? data.to.substring(0, 4) : '',
         type: data.type,
-        id: doc.id
+        id: doc.id,
+        createdAt: data.createdAt
       };
     })
     .filter((action) => ["tag", "multi_tag", "link", "new_user", "location", "check-in"].includes(action.type))
-    .filter((action) => action.type !== 'check-in' || action.payload !== 'check-in' ||  action.address?.short)
+    .filter((action) => action.type !== 'check-in' || action.payload !== 'check-in' || action.address?.short)
     .sort((a, b) => {
       return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     })
@@ -54,13 +56,16 @@ const formatMessages = (messages: QueryDocumentSnapshot[]) => {
 export interface GetMessagesParams {
   filters?: IFilter[][]
   updateCallback?: (actions: Action[]) => void
+  size?: number,
+  lastVisible?: QueryDocumentSnapshot
 }
 
 export const getMessages = async (params: GetMessagesParams = {}): Promise<{
   actions: Action[],
-  unsubscribeList: Unsubscribe[]
+  unsubscribeList: Unsubscribe[],
+  lastVisible: QueryDocumentSnapshot
 }> => {
-  const { filters = [], updateCallback } = params
+  const { filters = [], updateCallback, size = 100, lastVisible } = params
   let data: QueryDocumentSnapshot<DocumentData, DocumentData>[] = []
 
   const unsubscribeList = []
@@ -69,7 +74,12 @@ export const getMessages = async (params: GetMessagesParams = {}): Promise<{
       let q = query(
         collection(db, "actions"),
         orderBy("timestamp", "desc"),
+        limit(size)
       );
+
+      if(lastVisible) {
+        q = query(q, startAfter(lastVisible))
+      }
 
       filter.forEach(f => q = query(q, where(f.fieldPath, f.opStr, f.value)))
 
@@ -85,10 +95,15 @@ export const getMessages = async (params: GetMessagesParams = {}): Promise<{
 
     data = [].concat.apply([], res as any);
   } else {
-    const q = query(
+    let q = query(
       collection(db, "actions"),
-      orderBy("timestamp", "desc")
+      orderBy("timestamp", "desc"),
+      limit(size)
     );
+
+    if(lastVisible) {
+      q = query(q, startAfter(lastVisible))
+    }
 
     if (updateCallback) {
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -102,7 +117,8 @@ export const getMessages = async (params: GetMessagesParams = {}): Promise<{
 
   return {
     actions: formatMessages(data),
-    unsubscribeList
+    unsubscribeList,
+    lastVisible: data[data.length - 1]
   }
 }
 
