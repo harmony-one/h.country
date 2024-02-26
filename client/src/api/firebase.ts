@@ -83,7 +83,7 @@ export const getMessages = async (params: GetMessagesParams = {}): Promise<{
 
       filter.forEach(f => q = query(q, where(f.fieldPath, f.opStr, f.value)))
 
-      if (updateCallback) {
+      if (updateCallback && !lastVisible) {
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
           updateCallback(formatMessages(querySnapshot.docs))
         })
@@ -105,7 +105,7 @@ export const getMessages = async (params: GetMessagesParams = {}): Promise<{
       q = query(q, startAfter(lastVisible))
     }
 
-    if (updateCallback) {
+    if (updateCallback && !lastVisible) {
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         updateCallback(formatMessages(querySnapshot.docs))
       })

@@ -114,7 +114,13 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
         filters: actionFilters,
         size: 100,
         updateCallback: (actionsUpdate: Action[]) => {
-          // setActions(actionsUpdate)
+          setActions(oldActions => {
+            const newActions = actionsUpdate.filter(
+              a => !oldActions.find(oA => oA.id === a.id)
+            );
+
+            return [...newActions, ...oldActions];
+          })
         }
       });
 
