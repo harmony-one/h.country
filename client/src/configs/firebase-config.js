@@ -1,6 +1,9 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager
+} from "firebase/firestore";
 
 export const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -13,7 +16,12 @@ export const firebaseConfig = {
 };
 
 export const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
 
-export { db, storage };
+// const db = getFirestore(app);
+
+// Use multi-tab IndexedDb persistence.
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache(/*settings*/{ tabManager: persistentMultipleTabManager() })
+});
+
+export { db };
