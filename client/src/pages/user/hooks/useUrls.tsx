@@ -4,7 +4,7 @@ import { db } from "../../../configs/firebase-config";
 import { useActionsContext, useUserContext } from "../../../context";
 import { HeaderText } from "../headerList";
 import { predefinedLinks } from "../../../components/links";
-import { formatAddress, linkToMapByAddress } from "../../../utils";
+import { formatAddress } from "../../../utils";
 import { PinIcon } from "../../../components/icons";
 import { Box } from "grommet";
 import { AddressComponents } from "../../../types";
@@ -23,18 +23,33 @@ export const LocationFilter = (props:
 ) => {
     const { address, latestLocation, onClick } = props;
 
+    let fullAddress = [
+        latestLocation.country,
+        latestLocation.city,
+        latestLocation.road,
+        latestLocation.postcode,
+    ].join('+');
+
+    fullAddress = fullAddress.replace(/ /g, '+');
+
+    const place = latestLocation?.road ?
+        fullAddress :
+        address;
+
+    const linkToMap = `https://www.google.ca/maps/place/${place}`;
+
     return <Box direction="row">
         <a
-          href={linkToMapByAddress(latestLocation?.road || address)}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{textDecoration: "none", margin: '2px 0 0 0'}}
+            href={linkToMap}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ textDecoration: "none", margin: '2px 0 0 0' }}
         >
-            <PinIcon size="18" color="rgb(42, 174, 233)"/>
+            <PinIcon size="18" color="rgb(42, 174, 233)" />
         </a>
         <HeaderText
-          onClick={() => onClick(address)}
-          style={{cursor: 'pointer'}}
+            onClick={() => onClick(address)}
+            style={{ cursor: 'pointer' }}
         >
             {address.slice(0, 10)}
         </HeaderText>
@@ -42,8 +57,8 @@ export const LocationFilter = (props:
 }
 
 export const useUrls = () => {
-    const {actions, setFilters, filters, setFilterMode} = useActionsContext();
-    const {pageOwnerAddress, wallet} = useUserContext();
+    const { actions, setFilters, filters, setFilterMode } = useActionsContext();
+    const { pageOwnerAddress, wallet } = useUserContext();
     const [urls, setUrls] = useState<LinkItem[]>([]);
 
     const onLocationClicked = (location: string) => {

@@ -103,7 +103,6 @@ export const UserPage = (props: { id: string }) => {
     }
   };
 
-
   const headerListProps = {
     userId: key,
     isLoading,
@@ -126,8 +125,8 @@ export const UserPage = (props: { id: string }) => {
         pad={"0 16px"}
       >
         <Box direction={"row"} gap="12px">
-          <PlainText onClick={() => setFilterMode("all")}>all</PlainText>
-          <PlainText onClick={() => setFilterMode("address")}>
+          <PlainText style={{ cursor: 'pointer' }} onClick={() => setFilterMode("all")}>all</PlainText>
+          <PlainText style={{ cursor: 'pointer' }} onClick={() => setFilterMode("address")}>
             0/{key?.substring(0, 4)}
           </PlainText>
           {filters
@@ -153,6 +152,7 @@ export const UserPage = (props: { id: string }) => {
               ) : (
                 <PlainText
                   key={value}
+                  style={{ cursor: 'pointer' }}
                   color={isUserPage ? "blue1" : "yellow1"}
                   onClick={onClick}
                 >
