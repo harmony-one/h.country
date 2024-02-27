@@ -47,7 +47,8 @@ const formatMessages = (messages: QueryDocumentSnapshot[]) => {
       };
     })
     .filter((action) => ["tag", "multi_tag", "link", "new_user", "location", "check-in"].includes(action.type))
-    .filter((action) => action.type !== 'check-in' || action.payload !== 'check-in' || action.address?.short)
+    .filter((action) => action.type !== 'check-in' ||
+      ((typeof action.payload === 'string' && action.payload !== 'check-in') || action.address?.short))
     .sort((a, b) => {
       return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     })
@@ -77,7 +78,7 @@ export const getMessages = async (params: GetMessagesParams = {}): Promise<{
         limit(size)
       );
 
-      if(lastVisible) {
+      if (lastVisible) {
         q = query(q, startAfter(lastVisible))
       }
 
@@ -101,7 +102,7 @@ export const getMessages = async (params: GetMessagesParams = {}): Promise<{
       limit(size)
     );
 
-    if(lastVisible) {
+    if (lastVisible) {
       q = query(q, startAfter(lastVisible))
     }
 
