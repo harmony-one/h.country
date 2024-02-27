@@ -152,7 +152,6 @@ const UserAction = (props: UserActionProps) => {
     };
   }, [index]);
 
-
   // Dynamically update date
   useInterval(() => {
     const delta = Date.now() - new Date(action.timestamp).valueOf();
@@ -207,7 +206,7 @@ const UserAction = (props: UserActionProps) => {
     if (typeof action.payload === 'string') {
       return action.payload
     }
-    console.log(action)
+    // console.log(action)
     return ''
   }
 
@@ -222,7 +221,7 @@ const UserAction = (props: UserActionProps) => {
               <Text size={"small"} style={{ wordBreak: "break-all" }}>
                 <ActionLink
                   className="link"
-                  to={`/0/${action.from}`}
+                  to={`/0/${action.from}?filter`}
                   type={ActionType.none}
                 >
                   0/{action.fromShort}
@@ -232,7 +231,7 @@ const UserAction = (props: UserActionProps) => {
                 </ActionText>{" "}
                 <ActionLink
                   className="link"
-                  to={`/0/${action.to}`}
+                  to={`/0/${action.to}?filter`}
                   type={ActionType.none}
                 >
                   0/{action.toShort}
@@ -243,7 +242,7 @@ const UserAction = (props: UserActionProps) => {
               <Text size={"small"} style={{ wordBreak: "break-all" }}>
                 <ActionLink
                   className="link"
-                  to={`/0/${action.from}`}
+                  to={`/0/${action.from}?filter`}
                   type={ActionType.none}
                 >
                   0/{action.fromShort}
@@ -257,7 +256,7 @@ const UserAction = (props: UserActionProps) => {
                 </ActionText>{" "}
                 <ActionLink
                   className="link"
-                  to={`/0/${action.to}`}
+                  to={`/0/${action.to}?filter`}
                   type={ActionType.none}
                 >
                   0/{action.toShort}
@@ -285,7 +284,7 @@ const UserAction = (props: UserActionProps) => {
                 <ActionText color="grey1">
                   <ActionLink
                     className="link"
-                    to={`/0/${action.from}`}
+                    to={`/0/${action.from}?filter`}
                     type={ActionType.none}
                   >
                     0/{action.fromShort}
@@ -325,21 +324,21 @@ const UserAction = (props: UserActionProps) => {
             <Text size={"small"} style={{ wordBreak: "break-all" }}>
               <ActionLink
                 className="link"
-                to={`/0/${action.from}`}
+                to={`/0/${action.from}?filter`}
                 type={ActionType.none}
               >
                 0/{action.fromShort}
               </ActionLink>{' '}
               <ActionLink
                 className="link"
-                to={`/0/${action.from}`}
+                to={`/0/${action.from}?filter`}
                 type={actionType}
               >
                 {socialData?.username}
               </ActionLink>{' '}
               <ActionLink
                 className="link"
-                to={`/0/${action.from}`}
+                to={`/0/${action.from}?filter`}
                 type={ActionType.none}>
                 {`${socialData?.type}/${socialData?.username}`.slice(0, 10)}
               </ActionLink>
@@ -370,7 +369,7 @@ const UserAction = (props: UserActionProps) => {
         <Box direction={"row"} justify={"start"}>
           <Box basis={address ? "45%" : "85%"}>
             <Text size={"small"} style={{ wordBreak: 'break-all' }}>
-              <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
+              <ActionLink className="link" to={`/0/${action.from}?filter`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
               {" "}
               <ActionText size={"small"} onClick={() => onLocationClicked(
                 action.type === "check-in" ? getCheckInMessage() : action.payload
@@ -378,7 +377,7 @@ const UserAction = (props: UserActionProps) => {
                 {String(action.type === "check-in" ? getCheckInMessage() : action.payload)}
               </ActionText>
               {" "}
-              {action.type === 'location' && <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>}
+              {action.type === 'location' && <ActionLink className="link" to={`/0/${action.to}?filter`} type={ActionType.none}>0/{action.toShort}</ActionLink>}
             </Text>
           </Box>
           {address && <Box align={'end'} basis="40%" style={{ minWidth: '32px' }}>
