@@ -321,7 +321,7 @@ const UserAction = (props: UserActionProps) => {
       )}
       {['link'].includes(action.type) && (
         <Box direction={"row"} justify={"start"}> {/* pad={"0 16px"} */}
-          <Box basis={address ? "65%" : "85%"}>
+          <Box basis={address ? "65%" : "85%"} justify={'center'}>
             <Text size={"small"} style={{ wordBreak: "break-all" }}>
               <ActionLink
                 className="link"
