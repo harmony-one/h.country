@@ -14,7 +14,7 @@ import {
   FireFilled,
   StarFilled
 } from "@ant-design/icons"; // FireOutlined, HeartOutlined,
-import { useReactionContext } from "../../context/ReactionsContext";
+import { useReactionContext } from "../../context";
 import UserActionSkeleton from "./UserActionSkeleton";
 // import { ReactComponent as HeartIcon } from "../../assets/images/heart.svg"
 export enum ActionType {
@@ -141,12 +141,12 @@ const UserAction = (props: UserActionProps) => {
         }
       });
     });
-  
+
     const element = document.querySelector(`.lazy-action[data-index="${index}"]`) as Element | null;
     if (element) {
       observer.observe(element);
     }
-  
+
     return () => {
       observer.disconnect();
     };
@@ -367,7 +367,7 @@ const UserAction = (props: UserActionProps) => {
         </Box>
       )}
        {['check-in', 'location'].includes(action.type) && (
-        <Box direction={"row"} justify={"start"}> 
+        <Box direction={"row"} justify={"start"}>
           <Box basis={address ? "45%" : "85%"}>
             <Text size={"small"} style={{ wordBreak: 'break-all' }}>
               <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>

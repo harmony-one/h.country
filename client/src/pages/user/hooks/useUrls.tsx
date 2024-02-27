@@ -23,29 +23,27 @@ export const LocationFilter = (props:
 ) => {
     const { address, latestLocation, onClick } = props;
 
-    return <HeaderText>
-        <Box direction="row" align="start">
-            <a
-                href={linkToMapByAddress(latestLocation?.road || address)}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ textDecoration: "none", margin: '2px 0 0 0' }}
-            >
-                <PinIcon size="18" color="rgb(42, 174, 233)" />
-            </a>
-            <Box
-                onClick={() => onClick(address)}
-                style={{ cursor: 'pointer' }}
-            >
-                {address.slice(0, 10)}
-            </Box>
-        </Box>
-    </HeaderText>
+    return <Box direction="row">
+        <a
+          href={linkToMapByAddress(latestLocation?.road || address)}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{textDecoration: "none", margin: '2px 0 0 0'}}
+        >
+            <PinIcon size="18" color="rgb(42, 174, 233)"/>
+        </a>
+        <HeaderText
+          onClick={() => onClick(address)}
+          style={{cursor: 'pointer'}}
+        >
+            {address.slice(0, 10)}
+        </HeaderText>
+    </Box>
 }
 
 export const useUrls = () => {
-    const { actions, setFilters, filters, setFilterMode } = useActionsContext();
-    const { pageOwnerAddress, wallet } = useUserContext();
+    const {actions, setFilters, filters, setFilterMode} = useActionsContext();
+    const {pageOwnerAddress, wallet} = useUserContext();
     const [urls, setUrls] = useState<LinkItem[]>([]);
 
     const onLocationClicked = (location: string) => {

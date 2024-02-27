@@ -16,7 +16,7 @@ import {
   useTopTags,
   useUrls,
 } from "./hooks";
-import { ReactionsProvider } from "../../context/ReactionsContext";
+import { ReactionsProvider } from "../../context";
 import UserAction from "../../components/action";
 import { useLocation } from "react-router-dom";
 
@@ -189,8 +189,9 @@ export const UserPage = (props: { id: string }) => {
             onClick={() => {
               if (filters.find((item) => item.value === "ai")) {
                 const newFilters = filters.filter(
-                  (item) => item.value !== "ai"
+                  (item) => item.value !== value
                 );
+
                 setFilters(newFilters);
               } else {
                 setFilters([
