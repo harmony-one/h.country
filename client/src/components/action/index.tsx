@@ -200,6 +200,17 @@ const UserAction = (props: UserActionProps) => {
     );
   }
 
+  const getCheckInMessage = () => {
+    if (action.address.short) {
+      return action.address.short
+    }
+    if (typeof action.payload === 'string') {
+      return action.payload
+    }
+    console.log(action)
+    return ''
+  }
+
   return (
     <Box border={{ side: "bottom", color: "border" }} pad={"4px 0"}>
       {(action.type === "tag" ||
@@ -362,9 +373,9 @@ const UserAction = (props: UserActionProps) => {
               <ActionLink className="link" to={`/0/${action.from}`} type={ActionType.none}>0/{action.fromShort}</ActionLink>
               {" "}
               <ActionText size={"small"} onClick={() => onLocationClicked(
-                action.type === "check-in" ? action.address.short : action.payload
+                action.type === "check-in" ? getCheckInMessage() : action.payload
               )} type={actionType}>
-                {String(action.type === "check-in" ? action.address.short : action.payload)}
+                {String(action.type === "check-in" ? getCheckInMessage() : action.payload)}
               </ActionText>
               {" "}
               {action.type === 'location' && <ActionLink className="link" to={`/0/${action.to}`} type={ActionType.none}>0/{action.toShort}</ActionLink>}
