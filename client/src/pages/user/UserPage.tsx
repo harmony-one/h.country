@@ -1,14 +1,14 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Box, Spinner } from "grommet"; // Spinner,
 import styled from "styled-components";
-import InfiniteScroll from 'react-infinite-scroll-component';
+import InfiniteScroll from "react-infinite-scroll-component";
 
 import { useActionsContext } from "../../context";
 import { isValidAddress } from "../../utils/user";
 import { useUserContext } from "../../context";
 
 import { HeaderList } from "./headerList";
-import { PlainButton, PlainText } from "../../components/button";
+import { PlainText } from "../../components/button";
 import {
   LocationFilter,
   useIsUserPage,
@@ -18,6 +18,7 @@ import {
 } from "./hooks";
 import { ReactionsProvider } from "../../context";
 import UserAction from "../../components/action";
+import { useLocation } from "react-router-dom";
 
 const UserPageBox = styled(Box)`
   .filter-panel {
@@ -40,18 +41,27 @@ export const UserPage = (props: { id: string }) => {
     actions,
     filters,
     setFilters,
-    filterMode,
+    // filterMode,
     setFilterMode,
     DefaultFilterMode,
     isLoading,
     lastVisible,
-    loadActions
+    loadActions,
   } = useActionsContext();
+
+  const location = useLocation();
+  const topicsQueryParam = location.search.substring(1);
 
   const indexedUrls = useMemo(
     () => urls.map((u, i) => ({ ...u, index: i })),
     [urls]
   );
+
+  useEffect(() => {
+    if (topicsQueryParam === 'clear') {
+      setFilters([])
+    }
+  }, [topicsQueryParam])
 
   const indexedItems = useMemo(
     () => [
@@ -93,6 +103,7 @@ export const UserPage = (props: { id: string }) => {
     }
   };
 
+
   const headerListProps = {
     userId: key,
     isLoading,
@@ -100,7 +111,7 @@ export const UserPage = (props: { id: string }) => {
     wallet,
   };
   return (
-    <UserPageBox margin={{ top: '28px' }}>
+    <UserPageBox margin={{ top: "28px" }}>
       <Box gap={"16px"} pad={"2px 16px"}>
         <HeaderList {...headerListProps} type={"url"} items={indexedUrls} />
         <HeaderList
@@ -110,34 +121,17 @@ export const UserPage = (props: { id: string }) => {
         />
       </Box>
       <Box
+        margin={{ top: "32px", bottom: "8px" }}
         className="filter-panel"
-        margin={{ top: '32px', bottom: '8px' }}
-        pad={'0 16px'}
+        pad={"0 16px"}
       >
-        <Box direction={"row"} gap={'4px'} justify={'between'}>
-          <PlainButton
-            isActive={filterMode === "all"}
-            onClick={() => setFilterMode("all")}
-          >
-            <PlainText>all</PlainText>
-          </PlainButton>
-          <PlainButton
-            isActive={filterMode === "address"}
-            onClick={() => setFilterMode("address")}
-          >
-            <PlainText>
-              0/{key?.substring(0, 4)}
-            </PlainText>
-          </PlainButton>
+        <Box direction={"row"} gap="12px">
+          <PlainText onClick={() => setFilterMode("all")}>all</PlainText>
+          <PlainText onClick={() => setFilterMode("address")}>
+            0/{key?.substring(0, 4)}
+          </PlainText>
           {filters
             .filter((f) => f.value !== "one" && f.value !== "ai")
-            // hashtags first
-            .sort((a, b) => {
-              if(a.type === 'hashtag') {
-                return -1
-              }
-              return 1
-            })
             .map((filter) => {
               const { value, type } = filter;
               const onClick = () => {
@@ -149,77 +143,78 @@ export const UserPage = (props: { id: string }) => {
                 setFilterMode(newFilters[0]?.type || DefaultFilterMode);
               };
               return type === "location" ? (
-                <LocationFilter
-                  address={value}
-                  onClick={onClick}
-                  latestLocation={actions[0]?.address}
-                />
+                <Box key={value}>
+                  <LocationFilter
+                    address={value}
+                    onClick={onClick}
+                    latestLocation={actions[0]?.address}
+                  />
+                </Box>
               ) : (
-                <PlainButton
+                <PlainText
                   key={value}
-                  isActive={filters.length > 0}
+                  color={isUserPage ? "blue1" : "yellow1"}
                   onClick={onClick}
                 >
-                  <PlainText color={isUserPage ? "blue1" : "yellow1"}>
-                    #{value}
-                  </PlainText>
-                </PlainButton>
+                  #{value}
+                </PlainText>
               );
             })}
         </Box>
-        {/*<Box direction={"row"} alignSelf="center" alignContent="around">*/}
-        {/*  <PlainButton*/}
-        {/*    isActive={filterMode === "hashtag"}*/}
-        {/*    onClick={() => {*/}
-        {/*      if (filters.find((item) => item.value === "one")) {*/}
-        {/*        const newFilters = filters.filter(*/}
-        {/*          (item) => item.value !== "one"*/}
-        {/*        );*/}
-        {/*        setFilters(newFilters);*/}
-        {/*      } else {*/}
-        {/*        setFilters([*/}
-        {/*          ...filters,*/}
-        {/*          {*/}
-        {/*            type: "location",*/}
-        {/*            value: "one",*/}
-        {/*          },*/}
-        {/*        ]);*/}
-        {/*        setFilterMode("hashtag");*/}
-        {/*      }*/}
-        {/*    }}*/}
-        {/*  >*/}
-        {/*    /!* <PlainText fontSize="min(1em, 4vw)">#one</PlainText> *!/*/}
-        {/*  </PlainButton>*/}
-        {/*  <PlainButton*/}
-        {/*    isActive={filterMode === "hashtag"}*/}
-        {/*    onClick={() => {*/}
-        {/*      if (filters.find((item) => item.value === "ai")) {*/}
-        {/*        const newFilters = filters.filter(*/}
-        {/*          (item) => item.value !== "ai"*/}
-        {/*        );*/}
-        {/*        setFilters(newFilters);*/}
-        {/*      } else {*/}
-        {/*        setFilters([*/}
-        {/*          ...filters,*/}
-        {/*          {*/}
-        {/*            type: "location",*/}
-        {/*            value: "ai",*/}
-        {/*          },*/}
-        {/*        ]);*/}
-        {/*        setFilterMode("hashtag");*/}
-        {/*      }*/}
-        {/*    }}*/}
-        {/*  >*/}
-        {/*    /!* <PlainText fontSize="min(1em, 4vw)">#ai</PlainText> *!/*/}
-        {/*  </PlainButton>*/}
-        {/*  /!* <PlainButton style={{ padding: '2px' }}>*/}
-        {/*    <PlainText fontSize="min(1em, 4vw)">*/}
-        {/*      <StarOutlined />*/}
-        {/*    </PlainText>*/}
-        {/*  </PlainButton> *!/*/}
-        {/*</Box>*/}
+        {/* <Box direction={"row"} alignSelf="center" alignContent="around">
+          <PlainButton
+            isActive={filterMode === "hashtag"}
+            onClick={() => {
+              if (filters.find((item) => item.value === "one")) {
+                const newFilters = filters.filter(
+                  (item) => item.value !== "one"
+                );
+                setFilters(newFilters);
+              } else {
+                setFilters([
+                  ...filters,
+                  {
+                    type: "location",
+                    value: "one",
+                  },
+                ]);
+                setFilterMode("hashtag");
+              }
+            }}
+          >
+            <PlainText fontSize="min(1em, 4vw)">#one</PlainText>
+          </PlainButton>
+          <PlainButton
+            isActive={filterMode === "hashtag"}
+            onClick={() => {
+              if (filters.find((item) => item.value === "ai")) {
+                const newFilters = filters.filter(
+                  (item) => item.value !== value
+                );
+
+                setFilters(newFilters);
+              } else {
+                setFilters([
+                  ...filters,
+                  {
+                    type: "location",
+                    value: "ai",
+                  },
+                ]);
+                setFilterMode("hashtag");
+              }
+            }}
+          >
+            <PlainText fontSize="min(1em, 4vw)">#ai</PlainText>
+          </PlainButton>
+          {/* <PlainButton style={{ padding: '2px' }}>
+            <PlainText fontSize="min(1em, 4vw)">
+              <StarOutlined />
+            </PlainText>
+          </PlainButton> */}
+        {/* </Box> */}
       </Box>
-      <Box pad={'0 16px'}>
+      <Box pad={"0 16px"}>
         {!actions.length && isLoading && (
           <Box align={"center"}>
             <Spinner color={"spinner"} />
@@ -234,22 +229,24 @@ export const UserPage = (props: { id: string }) => {
           <InfiniteScroll
             dataLength={actions.length}
             next={() => {
-              loadActions(lastVisible)
+              loadActions(lastVisible);
             }}
             hasMore={true}
-            loader={''}
-          // scrollThreshold="200px"
+            loader={""}
+            // scrollThreshold="200px"
           >
             {actions.map((action, index) => {
               // const id = getUniqueId(action) // now using doc id.
-              return (<UserAction
-                userId={key}
-                index={action.id} // index + action.timestamp}
-                key={index + action.timestamp}
-                action={action}
-                onTagClicked={onTagClicked}
-                onLocationClicked={onLocationClicked}
-              />)
+              return (
+                <UserAction
+                  userId={key}
+                  index={action.id} // index + action.timestamp}
+                  key={index + action.timestamp}
+                  action={action}
+                  onTagClicked={onTagClicked}
+                  onLocationClicked={onLocationClicked}
+                />
+              );
             })}
           </InfiniteScroll>
         </ReactionsProvider>

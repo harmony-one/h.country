@@ -27,7 +27,7 @@ export const AppMenu = () => {
   return <Box>
     <Box direction={'row'} justify={'between'}>
       <Box onClick={handleCopyPrivateKey}>
-        <Text color={"blue1"} onClick={() => navigate('/')}>
+        <Text color={"blue1"} onClick={() => navigate(`/0/${wallet!.address.substring(2)}?clear`)}>
           h.country
         </Text>
       </Box>
