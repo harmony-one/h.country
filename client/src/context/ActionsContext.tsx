@@ -112,7 +112,7 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
       const data = await getMessages({
         lastVisible,
         filters: actionFilters,
-        size: 100,
+        size: 200,
         updateCallback: (actionsUpdate: Action[]) => {
           setActions(oldActions => {
             const newActions = actionsUpdate.filter(
