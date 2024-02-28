@@ -321,7 +321,7 @@ const UserAction = (props: UserActionProps) => {
       )}
       {['link'].includes(action.type) && (
         <Box direction={"row"} justify={"start"}> {/* pad={"0 16px"} */}
-          <Box basis={address ? "45%" : "85%"}>
+          <Box basis={address ? "65%" : "85%"} justify={'center'}>
             <Text size={"small"} style={{ wordBreak: "break-all" }}>
               <ActionLink
                 className="link"
@@ -335,7 +335,7 @@ const UserAction = (props: UserActionProps) => {
                 to={`/0/${action.from}`}
                 type={actionType}
               >
-                {socialData?.username}
+                {socialData?.username.slice(0, 10)}
               </ActionLink>{' '}
               <ActionLink
                 className="link"
@@ -346,7 +346,7 @@ const UserAction = (props: UserActionProps) => {
             </Text>
           </Box>
           {address && (
-            <Box align={"end"} basis="40%" style={{ minWidth: "32px" }}>
+            <Box align={"end"} basis="20%" style={{ minWidth: "32px" }}>
               <PlainText
                 fontSize="min(0.8em, 3.7vw)"
                 onClick={() => onLocationClicked(address)}
