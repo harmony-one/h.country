@@ -59,9 +59,18 @@ export const UserPage = (props: { id: string }) => {
 
   useEffect(() => {
     if (topicsQueryParam === 'clear') {
-      setFilters([])
+      setFilterMode("all")
+      // setFilters([])
+    } else if (topicsQueryParam === 'filter') {
+      setFilters([
+        {
+          type: "address",
+          value: key,
+        },
+      ]);
+      setFilterMode("address");
     }
-  }, [topicsQueryParam])
+  }, [key, topicsQueryParam])
 
   const indexedItems = useMemo(
     () => [
