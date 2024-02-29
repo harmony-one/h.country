@@ -35,12 +35,13 @@ export const SmallHeaderText = styled(Text)`
 const HeaderIcon = styled.span<{ isUserPage?: Boolean }>`
   font-family: "M PLUS Rounded 1c", sans-serif;
   color: transparent;
-  font-size: 80px;
+  font-size: 96px;
   -webkit-text-stroke: 1.5px
-    ${(props) =>
-      props.isUserPage
-        ? props.theme.global.colors.blue1
-        : props.theme.global.colors.yellow1};
+  ${(props) =>
+    props.isUserPage
+      ? props.theme.global.colors.blue1
+      : props.theme.global.colors.yellow1
+  };
   font-weight: 700;
 `;
 
