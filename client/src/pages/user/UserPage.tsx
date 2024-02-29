@@ -117,8 +117,8 @@ export const UserPage = (props: { id: string }) => {
     wallet,
   };
   return (
-    <UserPageBox margin={{ top: "28px" }}>
-      <Box gap={"16px"} pad={"2px 16px"}>
+    <UserPageBox margin={{ top: "30px" }}>
+      <Box gap={"32px"} pad={"0 16px"}>
         <HeaderList {...headerListProps} type={"url"} items={indexedUrls} />
         <HeaderList
           {...headerListProps}

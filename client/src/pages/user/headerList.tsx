@@ -148,6 +148,7 @@ export const HeaderList = (props: HeaderListProps) => {
               display: "grid",
               gridTemplateRows: "repeat(3, 1fr)",
               gridAutoColumns: "1fr",
+              rowGap: '6px',
             }}
           >
             {items.map((item, index) => (
@@ -174,6 +175,7 @@ export const HeaderList = (props: HeaderListProps) => {
               display: "grid",
               gridTemplateRows: "repeat(3, 1fr)",
               gridAutoColumns: "1fr",
+              rowGap: '6px',
             }}
           >
             {items.map((item) => (
