@@ -221,7 +221,7 @@ export const UserPage = (props: { id: string }) => {
           </PlainButton> */}
         {/* </Box> */}
       </Box>
-      <Box pad={"0 16px"}>
+      <Box>
         {!actions.length && isLoading && (
           <Box align={"center"}>
             <Spinner color={"spinner"} />

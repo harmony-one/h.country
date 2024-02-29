@@ -215,7 +215,7 @@ const UserAction = (props: UserActionProps) => {
   }
 
   return (
-    <Box border={{ side: "bottom", color: "border" }} pad={"4px 0"}>
+    <Box border={{ side: "bottom", color: "border" }} pad={"4px 16px"}>
       {(action.type === "tag" ||
         action.type === "new_user" ||
         action.type === "multi_tag") && (
