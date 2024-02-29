@@ -341,9 +341,10 @@ const UserAction = (props: UserActionProps) => {
                 {socialData?.username}
               </ActionLink>{' '} */}
               <ActionLink
-                target="_blank"
+                // target="_blank"
                 className="link"
-                to={typeof action.payload === 'string' && action.payload ? action.payload : `/0/${action.from}?filter`}
+                to={`/0/${action.from}`}
+                // to={typeof action.payload === 'string' && action.payload ? action.payload : `/0/${action.from}?filter`}
                 type={actionType}>
                 {`${socialData?.type}/${socialData?.username}`.slice(0, 10)}
               </ActionLink>
