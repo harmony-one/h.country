@@ -24,10 +24,10 @@ export const LocationFilter = (props:
     const { address, latestLocation, onClick } = props;
 
     let fullAddress = [
-        latestLocation.country,
-        latestLocation.city,
-        latestLocation.road,
-        latestLocation.postcode,
+        latestLocation?.country || '',
+        latestLocation?.city || '',
+        latestLocation?.road || '',
+        latestLocation?.postcode || '',
     ].join('+');
 
     fullAddress = fullAddress.replace(/ /g, '+');
@@ -57,7 +57,7 @@ export const LocationFilter = (props:
 }
 
 export const useUrls = () => {
-    const { actions, setFilters, filters, setFilterMode } = useActionsContext();
+    const { actions, setFilters, filters } = useActionsContext();
     const { pageOwnerAddress, wallet } = useUserContext();
     const [urls, setUrls] = useState<LinkItem[]>([]);
 
@@ -70,7 +70,6 @@ export const useUrls = () => {
                     value: location,
                 },
             ]);
-            setFilterMode("location");
         }
     };
 
