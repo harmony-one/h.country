@@ -60,14 +60,7 @@ export const UserPage = (props: { id: string }) => {
   useEffect(() => {
     if (topicsQueryParam === 'clear') {
       setFilterMode("all")
-      // setFilters([])
     } else if (topicsQueryParam === 'filter') {
-      setFilters([
-        {
-          type: "address",
-          value: key,
-        },
-      ]);
       setFilterMode("address");
     }
   }, [key, topicsQueryParam])

@@ -38,10 +38,14 @@ const handleActionTypeColor = (type: ActionType, theme: any) => {
 
 export const handleActionType = (action: Action, walletAddress: string) => {
   // const myAddress = walletAddress ? walletAddress.slice(2) : '';
-  if (action.to === action.from) {
-    return ActionType.self;
+  if (action.type === 'link') {
+    return action.from === walletAddress ? ActionType.self : ActionType.other
   } else {
-    return ActionType.other;
+    if (action.to === action.from) {
+      return ActionType.self;
+    } else {
+      return ActionType.other;
+    }
   }
 };
 
@@ -329,17 +333,18 @@ const UserAction = (props: UserActionProps) => {
               >
                 0/{action.fromShort}
               </ActionLink>{' '}
-              <ActionLink
+              {/* <ActionLink
                 className="link"
                 to={`/0/${action.from}?filter`}
                 type={actionType}
               >
                 {socialData?.username}
-              </ActionLink>{' '}
+              </ActionLink>{' '} */}
               <ActionLink
+                target="_blank"
                 className="link"
-                to={`/0/${action.from}?filter`}
-                type={ActionType.none}>
+                to={typeof action.payload === 'string' && action.payload ? action.payload : `/0/${action.from}?filter`}
+                type={actionType}>
                 {`${socialData?.type}/${socialData?.username}`.slice(0, 10)}
               </ActionLink>
             </Text>
