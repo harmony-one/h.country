@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from "react";
-import { Box, Spinner } from "grommet"; // Spinner,
+import { Box, Spinner, Text } from "grommet"; // Spinner,
+import { Button } from "antd";
 import styled from "styled-components";
 import InfiniteScroll from "react-infinite-scroll-component";
 
@@ -18,7 +19,7 @@ import {
 } from "./hooks";
 import { ReactionsProvider } from "../../context";
 import UserAction from "../../components/action";
-import { useLocation } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 
 const UserPageBox = styled(Box)`
   .filter-panel {
@@ -37,6 +38,7 @@ export const UserPage = (props: { id: string }) => {
   const locationItems = useTopLocations();
   const urls = useUrls();
   const isUserPage = useIsUserPage();
+  const navigate = useNavigate()
   const {
     actions,
     filters,
@@ -76,7 +78,10 @@ export const UserPage = (props: { id: string }) => {
   );
 
   if (!key || !isValidAddress(key)) {
-    return <Box>Not a valid user ID</Box>;
+    return <Box justify={'center'} align={'center'} margin={{ top: '32px' }} gap={'8px'}>
+      <Text>User not found</Text>
+      <Button onClick={() => navigate('/')}>Return to Main Page</Button>
+    </Box>;
   }
 
   const onTagClicked = (hashtag: string) => {
@@ -112,8 +117,8 @@ export const UserPage = (props: { id: string }) => {
     wallet,
   };
   return (
-    <UserPageBox margin={{ top: "28px" }}>
-      <Box gap={"16px"} pad={"2px 16px"}>
+    <UserPageBox margin={{ top: "30px" }}>
+      <Box gap={"32px"} pad={"0 16px"}>
         <HeaderList {...headerListProps} type={"url"} items={indexedUrls} />
         <HeaderList
           {...headerListProps}
@@ -216,7 +221,7 @@ export const UserPage = (props: { id: string }) => {
           </PlainButton> */}
         {/* </Box> */}
       </Box>
-      <Box pad={"0 16px"}>
+      <Box>
         {!actions.length && isLoading && (
           <Box align={"center"}>
             <Spinner color={"spinner"} />

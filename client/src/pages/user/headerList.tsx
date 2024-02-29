@@ -35,12 +35,13 @@ export const SmallHeaderText = styled(Text)`
 const HeaderIcon = styled.span<{ isUserPage?: Boolean }>`
   font-family: "M PLUS Rounded 1c", sans-serif;
   color: transparent;
-  font-size: 80px;
+  font-size: 96px;
   -webkit-text-stroke: 1.5px
-    ${(props) =>
-      props.isUserPage
-        ? props.theme.global.colors.blue1
-        : props.theme.global.colors.yellow1};
+  ${(props) =>
+    props.isUserPage
+      ? props.theme.global.colors.blue1
+      : props.theme.global.colors.yellow1
+  };
   font-weight: 700;
 `;
 
@@ -63,6 +64,13 @@ interface HeaderListProps {
 interface TitleClickEvent {
   providerName: string;
 }
+
+const ListContainer = styled.div`
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+    grid-auto-columns: 1fr;
+    row-gap: 6px;
+`
 
 export const HeaderList = (props: HeaderListProps) => {
   const { userId: key, type, items, wallet, isUserPage } = props;
@@ -142,16 +150,10 @@ export const HeaderList = (props: HeaderListProps) => {
     <Box direction={"row"} align={"center"} height={"80px"}>
       {type === "hashtag" ? (
         <Box style={{ flex: "5" }}>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateRows: "repeat(3, 1fr)",
-              gridAutoColumns: "1fr",
-            }}
-          >
+          <ListContainer>
             {items.map((item, index) => (
               <div
-                key={index}
+                key={item.id}
                 style={{
                   gridRowStart: (index % 3) + 1,
                   gridColumnStart: Math.floor(index / 3) + 1,
@@ -164,20 +166,14 @@ export const HeaderList = (props: HeaderListProps) => {
                 </Box>
               </div>
             ))}
-          </div>
+          </ListContainer>
         </Box>
       ) : (
         <Box style={{ flex: "5" }}>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateRows: "repeat(3, 1fr)",
-              gridAutoColumns: "1fr",
-            }}
-          >
+          <ListContainer>
             {items.map((item) => (
               <div
-                key={item.index}
+                key={item.id}
                 style={{
                   gridRowStart: (item.index % 3) + 1,
                   gridColumnStart: Math.floor(item.index / 3) + 1,
@@ -199,7 +195,7 @@ export const HeaderList = (props: HeaderListProps) => {
                 </Box>
               </div>
             ))}
-          </div>
+          </ListContainer>
         </Box>
       )}
       <Button
