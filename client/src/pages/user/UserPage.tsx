@@ -19,7 +19,7 @@ import {
 } from "./hooks";
 import { ReactionsProvider } from "../../context";
 import UserAction from "../../components/action";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const UserPageBox = styled(Box)`
   .filter-panel {
@@ -43,9 +43,9 @@ export const UserPage = (props: { id: string }) => {
     actions,
     filters,
     setFilters,
-    // filterMode,
+    filterMode,
     setFilterMode,
-    DefaultFilterMode,
+    // DefaultFilterMode,
     isLoading,
     lastVisible,
     loadActions,
@@ -62,6 +62,7 @@ export const UserPage = (props: { id: string }) => {
   useEffect(() => {
     if (topicsQueryParam === 'clear') {
       setFilterMode("all")
+      setFilters([])
     } else if (topicsQueryParam === 'filter') {
       setFilterMode("address");
     }
@@ -93,7 +94,6 @@ export const UserPage = (props: { id: string }) => {
           value: hashtag,
         },
       ]);
-      setFilterMode("hashtag");
     }
   };
 
@@ -106,7 +106,6 @@ export const UserPage = (props: { id: string }) => {
           value: location,
         },
       ]);
-      setFilterMode("location");
     }
   };
 
@@ -132,12 +131,21 @@ export const UserPage = (props: { id: string }) => {
         pad={"0 16px"}
       >
         <Box direction={"row"} gap="12px">
-          <PlainText style={{ cursor: 'pointer' }} onClick={() => setFilterMode("all")}>all</PlainText>
-          <PlainText style={{ cursor: 'pointer' }} onClick={() => setFilterMode("address")}>
+          <PlainText
+            style={{ cursor: 'pointer' }}
+            color={filterMode === 'all' ? "blue1" : ""}
+            onClick={() => setFilterMode("all")}>
+            all
+          </PlainText>
+          <PlainText
+            color={filterMode === 'address' ? "blue1" : ""}
+            style={{ cursor: 'pointer' }}
+            onClick={() => setFilterMode("address")}
+          >
             0/{key?.substring(0, 4)}
           </PlainText>
           {filters
-            .filter((f) => f.value !== "one" && f.value !== "ai")
+            // .filter((f) => f.value !== "one" && f.value !== "ai")
             .map((filter) => {
               const { value, type } = filter;
               const onClick = () => {
@@ -146,7 +154,6 @@ export const UserPage = (props: { id: string }) => {
                 );
 
                 setFilters(newFilters);
-                setFilterMode(newFilters[0]?.type || DefaultFilterMode);
               };
               return type === "location" ? (
                 <Box key={value}>
@@ -240,7 +247,7 @@ export const UserPage = (props: { id: string }) => {
             }}
             hasMore={true}
             loader={""}
-            // scrollThreshold="200px"
+          // scrollThreshold="200px"
           >
             {actions.map((action, index) => {
               // const id = getUniqueId(action) // now using doc id.

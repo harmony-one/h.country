@@ -9,7 +9,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { ActionFilter, ActionFilterType, AddressComponents } from "../types";
+import { ActionFilter, ActionFilterMode, AddressComponents } from "../types";
 import { getMessages, genFilter, IFilter } from "../api";
 import { useUserContext } from "./UserContext";
 import { QueryDocumentSnapshot, Unsubscribe } from 'firebase/firestore';
@@ -32,9 +32,9 @@ interface ActionsContextType {
   isLoading: boolean;
   filters: ActionFilter[];
   setFilters: Dispatch<SetStateAction<ActionFilter[]>>
-  filterMode: ActionFilterType;
-  setFilterMode: Dispatch<SetStateAction<ActionFilterType>>
-  DefaultFilterMode: ActionFilterType;
+  filterMode: ActionFilterMode
+  setFilterMode: Dispatch<SetStateAction<ActionFilterMode>>
+  DefaultFilterMode: ActionFilterMode;
   lastVisible?: QueryDocumentSnapshot;
 }
 
@@ -44,7 +44,7 @@ interface ActionsProviderProps {
   children: ReactNode;
 }
 
-const DefaultFilterMode: ActionFilterType = 'all'
+const DefaultFilterMode: ActionFilterMode = 'all'
 
 export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) => {
   const { firstTimeVisit, pageOwnerAddress } = useUserContext();
@@ -52,66 +52,50 @@ export const ActionsProvider: React.FC<ActionsProviderProps> = ({ children }) =>
   const [actions, setActions] = useState<Action[]>([]);
   const [lastVisible, setLastVisible] = useState<QueryDocumentSnapshot | undefined>();
 
-  const [filterMode, setFilterMode] = useState<ActionFilterType>(
+  const [filterMode, setFilterMode] = useState<ActionFilterMode>(
     firstTimeVisit ? 'all' : DefaultFilterMode
   );
   const [isLoading, setLoading] = useState(false);
   const [filters, setFilters] = useState<ActionFilter[]>([])
   const [unsubscribeUpdates, setUnsubscribeUpdates] = useState<Unsubscribe[]>([])
 
-  useEffect(() => {
-    // Drop sub-filters if user select All of <Address> filter
-    if (!['hashtag', 'location'].includes(filterMode)) {
-      setFilters([])
-    }
-  }, [filterMode]);
-
   const loadActions = useCallback(async (lastVisible?: QueryDocumentSnapshot) => {
     setLoading(true)
 
     // Unsubscribe from previous updates
     // console.log(`Unsubscribe from ${unsubscribeUpdates.length} updates`)
-    unsubscribeUpdates.forEach(unsubscribe => {
-      unsubscribe()
-    })
+
+    if (!lastVisible) {
+      unsubscribeUpdates.forEach(unsubscribe => {
+        unsubscribe()
+      })
+    }
 
     try {
-      let actionFilters: IFilter[][] = [[]];
+      let allFilters: IFilter[][] = [[]];
 
-      if (filters.length > 1 && ['location', 'hashtag'].includes(filterMode)) {
-        actionFilters = [
-          filters.map(f => {
-            if (f.type === 'hashtag') {
-              return genFilter('payload', '==', f.value)
-            } else {
-              return genFilter('address.short', '==', f.value)
-            }
-          })
+      const actionFilters =
+        filters.map(f => {
+          if (f.type === 'hashtag') {
+            return genFilter('payload', '==', f.value)
+          } else {
+            return genFilter('address.short', '==', f.value)
+          }
+        })
+
+      if (filterMode === "address" && pageOwnerAddress) {
+        allFilters = [
+          [...actionFilters, genFilter('from', '==', pageOwnerAddress)],
+          [...actionFilters, genFilter('to', '==', pageOwnerAddress)]
         ]
       } else {
-        if (filterMode === "address" && pageOwnerAddress) {
-          actionFilters = [
-            [genFilter('from', '==', pageOwnerAddress)],
-            [genFilter('to', '==', pageOwnerAddress)]
-          ]
-        } else if (filterMode === 'location' && filters.length > 0) {
-          const [{ value }] = filters
-          actionFilters = [
-            [genFilter('payload', '==', value)],
-            [genFilter('address.short', '==', value)]
-          ]
-        } else if (filterMode === 'hashtag' && filters.length > 0) {
-          const [{ value }] = filters
-          actionFilters = [
-            [genFilter('payload', '==', value)]
-          ]
-        }
+        allFilters = [actionFilters]
       }
 
-      console.log('Fetching actions...', actionFilters, filterMode)
+      console.log('Fetching actions...', allFilters, filterMode)
       const data = await getMessages({
         lastVisible,
-        filters: actionFilters,
+        filters: allFilters,
         size: 200,
         updateCallback: (actionsUpdate: Action[]) => {
           setActions(oldActions => {

@@ -38,7 +38,8 @@ export interface LocationData {
   addressComponents?: AddressComponents;
 }
 
-export type ActionFilterType = 'all' | 'address' | 'hashtag' | 'location'
+export type ActionFilterMode = 'all' | 'address'
+export type ActionFilterType = 'hashtag' | 'location'
 
 export interface ActionFilter {
   type: ActionFilterType
