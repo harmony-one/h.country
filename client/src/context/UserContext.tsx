@@ -120,11 +120,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         "[user context] Generated new blockchain address: ",
         newWallet.address
       );
-
-      // if (forceGenerateNewWallet) {
-      //   window.location.replace('/hash')
-      // }
-      forceGenerateNewWallet = false
+      if (forceGenerateNewWallet) {
+        forceGenerateNewWallet = false
+        window.location.replace('/hash')
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
