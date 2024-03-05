@@ -18,7 +18,7 @@ import {
   useUrls,
 } from "./hooks";
 import { ReactionsProvider } from "../../context";
-import UserAction from "../../components/action";
+import UserAction, { truncateTag } from "../../components/action";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const UserPageBox = styled(Box)`
@@ -170,7 +170,7 @@ export const UserPage = (props: { id: string }) => {
                   color={isUserPage ? "blue1" : "yellow1"}
                   onClick={onClick}
                 >
-                  #{value}
+                   #{value && truncateTag(value.toLocaleLowerCase())}
                 </PlainText>
               );
             })}

@@ -78,8 +78,8 @@ export interface UserActionProps {
 
 const MAX_TAG_LENGTH = 15;
 
-const truncateTag = (tag: string) => {
-  return tag.length > MAX_TAG_LENGTH ? tag.slice(0, MAX_TAG_LENGTH) : tag;
+export const truncateTag = (tag: string, size=MAX_TAG_LENGTH) => {
+  return tag.length > size ? tag.slice(0, size) : tag;
 };
 
 export const getUniqueId = (action: Action) => {
